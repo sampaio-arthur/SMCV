@@ -1,0 +1,27 @@
+services:
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: postgres-aula
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres123
+      POSTGRES_DB: produtosdb
+      # O banco "produtosdb" é criado automaticamente na primeira execução
+    ports:
+      - "5432:5432"
+      # Expõe a porta 5432 do container para o Windows.
+      # A API .NET conecta via localhost:5432.
+    volumes:
+      - dados-postgres:/var/lib/postgresql/data
+      # Persiste os dados mesmo ao parar/reiniciar o container.
+    networks:
+      - rede-db
+
+volumes:
+  dados-postgres:
+
+networks:
+  rede-db:
+    driver: bridge
