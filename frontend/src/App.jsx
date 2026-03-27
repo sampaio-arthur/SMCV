@@ -1,20 +1,7 @@
-// src/App.jsx
-import { Navigate, Route, Routes } from 'react-router-dom';
-import Layout from './components/layout/Layout';
-import ProdutosPage from './components/produtos/ProdutosPage';
+import { AppRoutes } from './routes';
 
 function App() {
-  return (
-    <Routes>
-      <Route element={<Layout />}>
-        <Route path="/" element={<Navigate to="/produtos" replace />} />
-        <Route path="/produtos" element={<ProdutosPage />} />
-        {/* Leva 3: rotas para Categorias e Detalhes */}
-        {/* <Route path="/categorias" element={<CategoriasPage />} /> */}
-        {/* <Route path="/detalhes" element={<DetalheProdutoPage />} /> */}
-      </Route>
-    </Routes>
-  );
+  return <AppRoutes />;
 }
 
 export default App;
