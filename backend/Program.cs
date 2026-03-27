@@ -5,6 +5,12 @@ using DesenvWebApi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+string RequiredSetting(string key)
+{
+    return Environment.GetEnvironmentVariable(key)
+        ?? throw new InvalidOperationException($"Environment variable '{key}' was not configured.");
+}
+
 // ─── Controllers ──────────────────────────────────────────────────────────────
 builder.Services.AddControllers();
 
@@ -25,11 +31,13 @@ builder.Services.AddCors(options =>
 });
 
 // ─── Database ─────────────────────────────────────────────────────────────────
-// DB_HOST is injected by Docker Compose; falls back to "localhost" for local dev.
-var dbHost = Environment.GetEnvironmentVariable("DB_HOST") ?? "localhost";
-var connectionString = builder.Configuration
-    .GetConnectionString("DefaultConnection")!
-    .Replace("{DB_HOST}", dbHost);
+var connectionString = string.Join(";", [
+    $"Host={RequiredSetting("DB_HOST")}",
+    $"Port={RequiredSetting("DB_PORT")}",
+    $"Database={RequiredSetting("DB_NAME")}",
+    $"Username={RequiredSetting("DB_USER")}",
+    $"Password={RequiredSetting("DB_PASSWORD")}"
+]);
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(connectionString));
@@ -40,6 +48,12 @@ builder.Services.AddScoped<IExampleService, ExampleService>();
 
 // ─── Build & Pipeline ─────────────────────────────────────────────────────────
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    dbContext.Database.Migrate();
+}
 
 if (app.Environment.IsDevelopment())
 {
