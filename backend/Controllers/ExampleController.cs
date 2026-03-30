@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
-using DesenvWebApi.DTOs;
-using DesenvWebApi.Services;
+using SMCV.DTOs;
+using SMCV.Services;
 
-namespace DesenvWebApi.Controllers;
+namespace SMCV.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]

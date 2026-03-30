@@ -1,118 +1,93 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+## Stack
 
-## Project Overview
+- **Backend:** ASP.NET Core 8 + EF Core + PostgreSQL — namespace `SMCV`
+- **Frontend:** React 19 + Vite + Tailwind CSS
+- **Infra:** Docker Compose (db, backend, frontend)
 
-Domain-agnostic full-stack template. Provides the complete scaffolding (backend layers, frontend structure, Docker environment) with generic `Example` resources that are replaced when building a real application.
+## Commands
 
-**Stack:** ASP.NET Core 8 + EF Core + PostgreSQL (backend) / React 19 + Vite + Tailwind CSS (frontend)
-
-See `ARCHITECTURE_BACKEND.md` and `ARCHITECTURE_FRONT.md` for detailed architecture documentation.
-
----
-
-## Development Commands
-
-### Full stack via Docker (recommended)
 ```bash
-docker-compose up -d          # Build and start all services (db, backend, frontend)
-docker-compose down           # Stop all services
-docker-compose up -d --build  # Rebuild images after code changes
-```
+# Docker (full stack)
+docker-compose up -d            # start all
+docker-compose up -d --build    # rebuild + start
+docker-compose down             # stop
 
-URLs when running via Docker:
-- Frontend: http://localhost:3000
-- Backend API: http://localhost:8080
-- Swagger: http://localhost:8080/swagger
-
-### Database only
-```bash
-docker-compose up -d db       # Start only PostgreSQL on port 5432
-```
-
-### Backend (from `backend/`)
-```bash
-dotnet run                    # Start API on http://localhost:8080
-dotnet build                  # Build only
-dotnet ef migrations add Name # Add EF migration (requires db running)
-dotnet ef database update     # Apply migrations
-```
-
-### Frontend (from `frontend/`)
-```bash
-npm run dev                   # Start Vite dev server (http://localhost:5173)
-npm run build                 # Production build
-npm run lint                  # ESLint check
-npm run preview               # Preview production build
-```
-
----
-
-## Backend Structure (`backend/`)
-
-```
-backend/
-├── Controllers/        # ExampleController — HTTP routes
-├── Services/           # IExampleService + ExampleService — business logic
-├── Repositories/       # IExampleRepository + ExampleRepository — data access
-├── Entities/           # Example — EF Core entity (maps to DB table)
-├── DTOs/               # ExampleRequestDto + ExampleResponseDto
-├── Data/               # AppDbContext — EF Core DbContext
-├── Utils/              # ApiResponse<T> — generic response wrapper
-├── Program.cs          # DI registration, middleware pipeline
-├── appsettings.json    # Config — connection string uses {DB_HOST} placeholder
-└── Dockerfile
-```
-
-**API endpoint:** `GET|POST /api/example` and `GET|PUT|DELETE /api/example/{id}`
-
-**Connection string** uses the `DB_HOST` env var (set to `db` in Docker, `localhost` locally).
-
-**First-time setup:** After starting the database, run migrations:
-```bash
-cd backend
-dotnet ef migrations add InitialCreate
+# Backend (from backend/)
+dotnet run                      # API on :8080
+dotnet build
+dotnet ef migrations add Name
 dotnet ef database update
+
+# Frontend (from frontend/)
+npm run dev                     # Vite on :5173
+npm run build
+npm run lint
 ```
 
----
+## URLs
 
-## Frontend Structure (`frontend/src/`)
+| Service | Docker | Local |
+|---------|--------|-------|
+| Frontend | :3000 | :5173 |
+| Backend API | :8080 | :8080 |
+| Swagger | :8080/swagger | :8080/swagger |
 
-```
-src/
-├── components/
-│   ├── example/        # ExampleComponent (table + inline form)
-│   └── ui/             # Modal, Toast, ToastContainer, ConfirmDialog
-├── pages/              # ExamplePage — owns state, calls services
-├── layouts/            # MainLayout — sidebar + <Outlet>
-├── routes/             # AppRoutes — central route config (index.jsx)
-├── services/           # exampleService.js — Axios wrapper for /api/example
-├── hooks/              # useToast — convenience hook over ToastContext
-├── contexts/           # ToastContext — global toast notifications
-├── store/              # Global state placeholder (Zustand/Redux/Jotai)
-├── utils/              # Pure helpers: formatDate, truncate, sleep, get
-└── main.jsx            # Entry point — BrowserRouter + ToastProvider + App
-```
+## Backend Architecture
 
-**API base URL** defaults to `http://localhost:8080`. Override with `VITE_API_URL` env var.
+Arquitetura em 3 camadas: Controller -> Service -> Repository -> PostgreSQL.
 
----
+**Documentacao por camada em `backend/AGENTS.md`** — ponto de entrada com mapa de navegacao para cada pasta. Cada subpasta tem seu proprio `AGENTS.md` com regras, proibicoes, padroes de codigo e snippets especificos daquela camada:
+
+| Tarefa | Arquivo |
+|--------|---------|
+| Endpoint HTTP | `backend/Controllers/AGENTS.md` |
+| Regra de negocio | `backend/Services/AGENTS.md` |
+| Acesso a dados | `backend/Repositories/AGENTS.md` |
+| Entidade de banco | `backend/Entities/AGENTS.md` |
+| DTO (request/response) | `backend/DTOs/AGENTS.md` |
+| DbContext / migrations | `backend/Data/AGENTS.md` |
+| Utilitarios | `backend/Utils/AGENTS.md` |
+| Program.cs / DI / pipeline | `backend/PROGRAM_AGENTS.md` |
 
 ## Adding a New Resource
 
 ### Backend
-1. `Entities/YourEntity.cs` → add `DbSet<YourEntity>` to `AppDbContext` → run migration
-2. `DTOs/YourEntityRequestDto.cs` + `YourEntityResponseDto.cs`
-3. `Repositories/IYourEntityRepository.cs` + `YourEntityRepository.cs`
-4. `Services/IYourEntityService.cs` + `YourEntityService.cs`
-5. `Controllers/YourEntityController.cs`
-6. Register in `Program.cs`
+1. `Entities/XxxEntity.cs` + `DbSet` em `AppDbContext` + migration
+2. `DTOs/XxxRequestDto.cs` + `XxxResponseDto.cs`
+3. `Repositories/IXxxRepository.cs` + `XxxRepository.cs`
+4. `Services/IXxxService.cs` + `XxxService.cs`
+5. `Controllers/XxxController.cs`
+6. Registrar no DI em `Program.cs` (`AddScoped`)
 
 ### Frontend
-1. `services/yourEntityService.js`
-2. `pages/YourEntityPage.jsx`
-3. `components/yourEntity/YourEntityComponent.jsx`
-4. Add route in `routes/index.jsx`
-5. Add nav entry in `layouts/MainLayout.jsx` → `navItems`
+1. `services/xxxService.js`
+2. `pages/XxxPage.jsx`
+3. `components/xxx/XxxComponent.jsx`
+4. Rota em `routes/index.jsx`
+5. Nav em `layouts/MainLayout.jsx` → `navItems`
+
+## Frontend Structure
+
+```
+src/
+├── components/ui/      # Modal, Toast, ConfirmDialog
+├── components/example/  # ExampleComponent (table + form)
+├── pages/              # XxxPage — state + service calls
+├── layouts/            # MainLayout — sidebar + Outlet
+├── routes/             # AppRoutes (index.jsx)
+├── services/           # Axios wrappers para /api/xxx
+├── hooks/              # useToast
+├── contexts/           # ToastContext
+├── store/              # Global state (Zustand/Redux/Jotai)
+├── utils/              # formatDate, truncate, sleep, get
+└── main.jsx            # BrowserRouter + ToastProvider + App
+```
+
+API base URL: `VITE_API_URL` (default `http://localhost:8080`).
+
+## Environment
+
+Connection string via env vars: `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`.
+Auto-migrate habilitado no startup (`Program.cs`).

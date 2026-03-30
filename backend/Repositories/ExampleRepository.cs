@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
-using DesenvWebApi.Data;
-using DesenvWebApi.Entities;
+using SMCV.Data;
+using SMCV.Entities;
 
-namespace DesenvWebApi.Repositories;
+namespace SMCV.Repositories;
 
 public class ExampleRepository : IExampleRepository
 {

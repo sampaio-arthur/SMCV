@@ -1,4 +1,4 @@
-namespace DesenvWebApi.Entities;
+namespace SMCV.Entities;
 
 /// <summary>
 /// Generic example entity. Replace with your domain entity.

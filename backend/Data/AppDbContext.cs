@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using DesenvWebApi.Entities;
+using SMCV.Entities;
 
-namespace DesenvWebApi.Data;
+namespace SMCV.Data;
 
 public class AppDbContext : DbContext
 {

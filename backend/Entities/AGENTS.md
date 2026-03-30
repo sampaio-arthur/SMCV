@@ -10,7 +10,7 @@ Cada Entity = uma tabela. Propriedades = colunas.
 ## REGRAS OBRIGATORIAS
 
 - Nomenclatura: **PascalCase**, **singular**, **ingles** (ex: `Product`, nao `Produtos`)
-- Namespace: `DesenvWebApi.Entities`
+- Namespace: `SMCV.Entities`
 - Campos obrigatorios em toda Entity:
   - `public int Id { get; set; }` — chave primaria
   - `public DateTime CreatedAt { get; set; } = DateTime.UtcNow;`
@@ -48,7 +48,7 @@ public Profile Profile { get; set; } = null!;
 ## REFERENCIA RAPIDA
 
 ```csharp
-namespace DesenvWebApi.Entities;
+namespace SMCV.Entities;
 
 public class Xxx
 {

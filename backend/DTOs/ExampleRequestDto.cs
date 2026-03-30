@@ -1,4 +1,4 @@
-namespace DesenvWebApi.DTOs;
+namespace SMCV.DTOs;
 
 /// <summary>
 /// DTO for creating or updating an Example resource.

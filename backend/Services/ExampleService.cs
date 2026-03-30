@@ -1,8 +1,8 @@
-using DesenvWebApi.DTOs;
-using DesenvWebApi.Entities;
-using DesenvWebApi.Repositories;
+using SMCV.DTOs;
+using SMCV.Entities;
+using SMCV.Repositories;
 
-namespace DesenvWebApi.Services;
+namespace SMCV.Services;
 
 public class ExampleService : IExampleService
 {

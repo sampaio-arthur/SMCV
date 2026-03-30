@@ -1,4 +1,4 @@
-namespace DesenvWebApi.Utils;
+namespace SMCV.Utils;
 
 /// <summary>
 /// Generic wrapper for consistent API responses.

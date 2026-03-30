@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using DesenvWebApi.Data;
-using DesenvWebApi.Repositories;
-using DesenvWebApi.Services;
+using SMCV.Data;
+using SMCV.Repositories;
+using SMCV.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 

@@ -1,6 +1,6 @@
-using DesenvWebApi.Entities;
+using SMCV.Entities;
 
-namespace DesenvWebApi.Repositories;
+namespace SMCV.Repositories;
 
 public interface IExampleRepository
 {

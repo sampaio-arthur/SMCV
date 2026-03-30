@@ -1,6 +1,6 @@
-using DesenvWebApi.DTOs;
+using SMCV.DTOs;
 
-namespace DesenvWebApi.Services;
+namespace SMCV.Services;
 
 public interface IExampleService
 {

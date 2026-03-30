@@ -2,11 +2,11 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-COPY ["DesenvWebApi.csproj", "./"]
+COPY ["SMCV.csproj", "./"]
 RUN dotnet restore
 
 COPY . .
-RUN dotnet publish DesenvWebApi.csproj -c Release -o /app/publish /p:UseAppHost=false
+RUN dotnet publish SMCV.csproj -c Release -o /app/publish /p:UseAppHost=false
 
 # Runtime stage
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
@@ -17,4 +17,4 @@ ENV ASPNETCORE_URLS=http://+:8080
 ENV ASPNETCORE_ENVIRONMENT=Production
 
 COPY --from=build /app/publish .
-ENTRYPOINT ["dotnet", "DesenvWebApi.dll"]
+ENTRYPOINT ["dotnet", "SMCV.dll"]

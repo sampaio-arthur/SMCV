@@ -6,7 +6,7 @@
 ## VISAO GERAL
 
 Arquitetura em 3 camadas: **Controller -> Service -> Repository -> PostgreSQL**.
-Framework: ASP.NET Core 8 com EF Core. Namespace raiz: `DesenvWebApi`.
+Framework: ASP.NET Core 8 com EF Core. Namespace raiz: `SMCV`.
 Controllers recebem/retornam DTOs. Services orquestram logica. Repositories acessam o banco.
 Entidades nunca sao expostas na API. Injecao de dependencia via interfaces com `AddScoped`.
 
@@ -28,7 +28,7 @@ Entidades nunca sao expostas na API. Injecao de dependencia via interfaces com `
 1. **Sempre usar DTOs** — nunca expor `Entity` em controllers ou retornos de service
 2. **Interfaces obrigatorias** — todo Service e Repository tem sua interface (`IXxx`)
 3. **Async em tudo** — todas as operacoes de I/O usam `async/await` com sufixo `Async`
-4. **Namespace** — seguir `DesenvWebApi.{Camada}` (ex: `DesenvWebApi.Services`)
+4. **Namespace** — seguir `SMCV.{Camada}` (ex: `SMCV.Services`)
 5. **Injecao via construtor** — nunca usar `[FromServices]` ou service locator
 6. **Uma classe por arquivo** — nome do arquivo = nome da classe
 7. **PascalCase** para classes, metodos e propriedades

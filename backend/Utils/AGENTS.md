@@ -10,7 +10,7 @@ Codigo que nao pertence a nenhuma camada especifica.
 ## REGRAS OBRIGATORIAS
 
 - Classes devem ser **estaticas** ou **sem estado** (stateless)
-- Namespace: `DesenvWebApi.Utils`
+- Namespace: `SMCV.Utils`
 - Funcionalidade deve ser generica — util para qualquer parte da aplicacao
 
 ## PROIBICOES

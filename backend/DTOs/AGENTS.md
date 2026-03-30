@@ -10,7 +10,7 @@ Desacoplar a Entity da interface HTTP.
 ## REGRAS OBRIGATORIAS
 
 - Nomenclatura: `XxxRequestDto` (entrada) e `XxxResponseDto` (saida)
-- Namespace: `DesenvWebApi.DTOs`
+- Namespace: `SMCV.DTOs`
 - Um arquivo por DTO
 
 ### RequestDto (o que o cliente envia)
@@ -28,7 +28,7 @@ Desacoplar a Entity da interface HTTP.
 ## PROIBICOES
 
 - **SEM** logica (metodos, calculos)
-- **SEM** referencia a Entity (`using DesenvWebApi.Entities` nao deve aparecer)
+- **SEM** referencia a Entity (`using SMCV.Entities` nao deve aparecer)
 - **SEM** heranca entre DTOs (nao criar `BaseDto`)
 - **SEM** anotacoes de EF Core
 

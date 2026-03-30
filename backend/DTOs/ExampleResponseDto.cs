@@ -1,4 +1,4 @@
-namespace DesenvWebApi.DTOs;
+namespace SMCV.DTOs;
 
 /// <summary>
 /// DTO returned by the API for Example resources.
