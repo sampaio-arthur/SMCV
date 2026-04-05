@@ -1,16 +1,21 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 import MainLayout from '../layouts/MainLayout';
 import ExamplePage from '../pages/ExamplePage';
+import CampaignPage from '../pages/CampaignPage';
+import ContactPage from '../pages/ContactPage';
+import UserPage from '../pages/UserPage';
+import UserProfilePage from '../pages/UserProfilePage';
 
-// Central route configuration.
-// Add new routes here as you expand the application.
 export function AppRoutes() {
   return (
     <Routes>
       <Route element={<MainLayout />}>
-        <Route path="/" element={<Navigate to="/example" replace />} />
+        <Route path="/" element={<Navigate to="/campaign" replace />} />
         <Route path="/example" element={<ExamplePage />} />
-        {/* <Route path="/your-resource" element={<YourPage />} /> */}
+        <Route path="/campaign" element={<CampaignPage />} />
+        <Route path="/contact" element={<ContactPage />} />
+        <Route path="/user" element={<UserPage />} />
+        <Route path="/user-profile" element={<UserProfilePage />} />
       </Route>
     </Routes>
   );
