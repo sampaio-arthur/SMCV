@@ -1,4 +1,4 @@
-namespace SMCV.Utils;
+namespace SMCV.Common.ResultPattern;
 
 /// <summary>
 /// Generic wrapper for consistent API responses.

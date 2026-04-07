@@ -1,8 +1,8 @@
-using SMCV.DTOs;
-using SMCV.Entities;
-using SMCV.Repositories;
+using SMCV.Application.DTOs;
+using SMCV.Application.Interfaces;
+using SMCV.Domain.Entities;
 
-namespace SMCV.Services;
+namespace SMCV.Infrastructure.Services;
 
 public class ExampleService : IExampleService
 {

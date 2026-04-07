@@ -1,6 +1,6 @@
-using SMCV.DTOs;
+using SMCV.Application.DTOs;
 
-namespace SMCV.Services;
+namespace SMCV.Application.Interfaces;
 
 public interface IExampleService
 {

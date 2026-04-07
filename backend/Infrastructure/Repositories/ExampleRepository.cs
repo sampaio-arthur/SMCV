@@ -1,8 +1,9 @@
 using Microsoft.EntityFrameworkCore;
-using SMCV.Data;
-using SMCV.Entities;
+using SMCV.Application.Interfaces;
+using SMCV.Domain.Entities;
+using SMCV.Infrastructure.Data;
 
-namespace SMCV.Repositories;
+namespace SMCV.Infrastructure.Repositories;
 
 public class ExampleRepository : IExampleRepository
 {

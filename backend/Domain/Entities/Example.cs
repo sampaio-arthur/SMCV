@@ -1,4 +1,4 @@
-namespace SMCV.Entities;
+namespace SMCV.Domain.Entities;
 
 /// <summary>
 /// Generic example entity. Replace with your domain entity.

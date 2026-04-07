@@ -1,4 +1,4 @@
-namespace SMCV.DTOs;
+namespace SMCV.Application.DTOs;
 
 /// <summary>
 /// DTO returned by the API for Example resources.

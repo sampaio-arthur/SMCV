@@ -4,16 +4,19 @@
 
 ## RESPONSABILIDADE
 
-Receber requisicoes HTTP, delegar ao Service e retornar respostas com status code correto.
+Receber requisicoes HTTP e delegar para MediatR. Retornar respostas com status code correto.
 Controllers NAO contem logica de negocio.
+Na arquitetura CQRS, controllers chamam `_mediator.Send()` em vez de chamar Services diretamente.
+
+> **NOTA:** O `ExampleController` atual ainda usa `IExampleService` (padrao legado).
+> Novos controllers devem usar `IMediator` quando MediatR for adicionado ao projeto.
 
 ## REGRAS OBRIGATORIAS
 
 - Decorar com `[ApiController]` e `[Route("api/[controller]")]`
 - Herdar de `ControllerBase`
-- Injetar o `IXxxService` via construtor (`private readonly`)
 - Todos os metodos sao `async Task<ActionResult<T>>` (exceto DELETE que retorna `Task<IActionResult>`)
-- Verificar retorno nulo do Service e retornar `NotFound()` quando aplicavel
+- Verificar retorno nulo e retornar `NotFound()` quando aplicavel
 
 ## PROIBICOES
 
@@ -31,35 +34,3 @@ Controllers NAO contem logica de negocio.
 | Criar | `[HttpPost]` | `CreatedAtAction()` 201 | 400 (automatico) |
 | Atualizar | `[HttpPut("{id}")]` | `Ok(result)` 200 | `NotFound()` 404 |
 | Deletar | `[HttpDelete("{id}")]` | `NoContent()` 204 | `NotFound()` 404 |
-
-## REFERENCIA RAPIDA
-
-```csharp
-[ApiController]
-[Route("api/[controller]")]
-public class XxxController : ControllerBase
-{
-    private readonly IXxxService _service;
-
-    public XxxController(IXxxService service)
-    {
-        _service = service;
-    }
-
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<XxxResponseDto>>> GetAll()
-    {
-        var result = await _service.GetAllAsync();
-        return Ok(result);
-    }
-
-    [HttpPost]
-    public async Task<ActionResult<XxxResponseDto>> Create([FromBody] XxxRequestDto dto)
-    {
-        var result = await _service.CreateAsync(dto);
-        return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
-    }
-}
-```
-
-> **ATENCAO:** `ApiResponse<T>` existe em `Utils/` mas NAO esta sendo usado nos controllers atuais. Os controllers retornam DTOs diretamente.
