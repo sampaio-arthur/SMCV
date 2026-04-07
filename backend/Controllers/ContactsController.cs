@@ -1,5 +1,6 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using SMCV.Application.DTOs;
 using SMCV.Application.DTOs.Contacts;
 using SMCV.Features.Contacts.Commands.CreateContact;
 using SMCV.Features.Contacts.Commands.DeleteContact;
@@ -21,6 +22,8 @@ public class ContactsController : ControllerBase
     }
 
     [HttpGet("{id:guid}")]
+    [ProducesResponseType(typeof(ContactResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetById(Guid id)
     {
         var result = await _mediator.Send(new GetContactByIdQuery(id));
@@ -28,6 +31,7 @@ public class ContactsController : ControllerBase
     }
 
     [HttpGet("campaign/{campaignId:guid}")]
+    [ProducesResponseType(typeof(IEnumerable<ContactResponse>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetByCampaign(Guid campaignId)
     {
         var result = await _mediator.Send(new GetContactsByCampaignQuery(campaignId));
@@ -35,6 +39,8 @@ public class ContactsController : ControllerBase
     }
 
     [HttpPost]
+    [ProducesResponseType(typeof(ContactResponse), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Create([FromBody] CreateContactRequest request)
     {
         var command = new CreateContactCommand(
@@ -50,6 +56,8 @@ public class ContactsController : ControllerBase
     }
 
     [HttpDelete("{id:guid}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete(Guid id)
     {
         await _mediator.Send(new DeleteContactCommand(id));
@@ -57,6 +65,8 @@ public class ContactsController : ControllerBase
     }
 
     [HttpPost("search")]
+    [ProducesResponseType(typeof(SearchContactsResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Search([FromBody] SearchContactsRequest request)
     {
         var command = new SearchContactsCommand(

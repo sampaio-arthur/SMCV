@@ -1,5 +1,6 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using SMCV.Application.DTOs;
 using SMCV.Application.DTOs.Campaigns;
 using SMCV.Features.Campaigns.Commands.CreateCampaign;
 using SMCV.Features.Campaigns.Commands.DeleteCampaign;
@@ -25,6 +26,7 @@ public class CampaignsController : ControllerBase
     }
 
     [HttpGet]
+    [ProducesResponseType(typeof(IEnumerable<CampaignResponse>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAll()
     {
         var result = await _mediator.Send(new GetAllCampaignsQuery());
@@ -32,6 +34,8 @@ public class CampaignsController : ControllerBase
     }
 
     [HttpGet("{id:guid}")]
+    [ProducesResponseType(typeof(CampaignDetailResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetById(Guid id)
     {
         var result = await _mediator.Send(new GetCampaignByIdQuery(id));
@@ -40,6 +44,8 @@ public class CampaignsController : ControllerBase
 
     [HttpPost]
     [Consumes("multipart/form-data")]
+    [ProducesResponseType(typeof(CampaignResponse), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Create([FromForm] CreateCampaignRequest request, IFormFile resumeFile)
     {
         if (resumeFile == null || resumeFile.Length == 0)
@@ -73,6 +79,9 @@ public class CampaignsController : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
+    [ProducesResponseType(typeof(CampaignResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Update(Guid id, [FromBody] UpdateCampaignRequest request)
     {
         var command = new UpdateCampaignCommand(id, request.EmailSubject, request.EmailBody);
@@ -81,6 +90,8 @@ public class CampaignsController : ControllerBase
     }
 
     [HttpDelete("{id:guid}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete(Guid id)
     {
         await _mediator.Send(new DeleteCampaignCommand(id));
@@ -88,6 +99,8 @@ public class CampaignsController : ControllerBase
     }
 
     [HttpPost("{id:guid}/send")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> SendEmails(Guid id)
     {
         var count = await _mediator.Send(new SendCampaignEmailsCommand(id));
@@ -95,6 +108,8 @@ public class CampaignsController : ControllerBase
     }
 
     [HttpGet("{id:guid}/export-csv")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ExportCsv(Guid id)
     {
         var csvBytes = await _mediator.Send(new ExportContactsCsvCommand(id));

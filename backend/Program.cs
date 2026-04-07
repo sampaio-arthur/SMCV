@@ -1,8 +1,11 @@
 using System.Reflection;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 using SMCV.Application.Interfaces;
+using SMCV.Common.Middleware;
 using SMCV.Infrastructure.Data;
+using SMCV.Infrastructure.ExternalServices;
 using SMCV.Infrastructure.Repositories;
 using SMCV.Infrastructure.Services;
 
@@ -19,17 +22,24 @@ builder.Services.AddControllers();
 
 // ─── Swagger / OpenAPI ────────────────────────────────────────────────────────
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "Job Prospector API",
+        Version = "v1",
+        Description = "API para prospecção de empregos via e-mail automatizado"
+    });
+});
 
 // ─── CORS ─────────────────────────────────────────────────────────────────────
-// Permissive policy for development. Restrict in production.
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll", policy =>
+    options.AddPolicy("AllowReactApp", policy =>
     {
-        policy.AllowAnyOrigin()
-              .AllowAnyMethod()
-              .AllowAnyHeader();
+        policy.WithOrigins("http://localhost:3000", "http://localhost:5173")
+              .AllowAnyHeader()
+              .AllowAnyMethod();
     });
 });
 
@@ -50,9 +60,24 @@ builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.Get
 builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
-// ─── Dependency Injection ─────────────────────────────────────────────────────
+// ─── Repositórios ─────────────────────────────────────────────────────────────
 builder.Services.AddScoped<IExampleRepository, ExampleRepository>();
 builder.Services.AddScoped<IExampleService, ExampleService>();
+builder.Services.AddScoped<ICampaignRepository, CampaignRepository>();
+builder.Services.AddScoped<IContactRepository, ContactRepository>();
+builder.Services.AddScoped<IEmailLogRepository, EmailLogRepository>();
+
+// ─── Serviços Externos ───────────────────────────────────────────────────────
+builder.Services.AddScoped<IHunterService, HunterService>();
+builder.Services.AddScoped<IEmailSenderService, EmailSenderService>();
+builder.Services.AddScoped<ICsvExportService, CsvExportService>();
+
+// ─── HttpClient para Hunter.io ───────────────────────────────────────────────
+builder.Services.AddHttpClient<HunterService>();
+
+// ─── EmailSettings via IOptions ──────────────────────────────────────────────
+builder.Services.Configure<EmailSettings>(
+    builder.Configuration.GetSection("EmailSettings"));
 
 // ─── Build & Pipeline ─────────────────────────────────────────────────────────
 var app = builder.Build();
@@ -63,12 +88,10 @@ using (var scope = app.Services.CreateScope())
     dbContext.Database.Migrate();
 }
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
-
-app.UseCors("AllowAll");
+app.UseSwagger();
+app.UseSwaggerUI();
+app.UseStaticFiles();
+app.UseCors("AllowReactApp");
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.MapControllers();
 app.Run();
