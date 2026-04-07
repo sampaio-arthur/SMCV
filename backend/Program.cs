@@ -1,3 +1,5 @@
+using System.Reflection;
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using SMCV.Application.Interfaces;
 using SMCV.Infrastructure.Data;
@@ -42,6 +44,11 @@ var connectionString = string.Join(";", [
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(connectionString));
+
+// ─── MediatR + FluentValidation + AutoMapper ─────────────────────────────────
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
+builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
+builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
 // ─── Dependency Injection ─────────────────────────────────────────────────────
 builder.Services.AddScoped<IExampleRepository, ExampleRepository>();
