@@ -1,6 +1,6 @@
-using SMCV.Entities;
+using SMCV.Domain.Entities;
 
-namespace SMCV.Repositories;
+namespace SMCV.Application.Interfaces;
 
 public interface IExampleRepository
 {

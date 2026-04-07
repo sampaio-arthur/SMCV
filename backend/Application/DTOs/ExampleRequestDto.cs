@@ -1,4 +1,4 @@
-namespace SMCV.DTOs;
+namespace SMCV.Application.DTOs;
 
 /// <summary>
 /// DTO for creating or updating an Example resource.

@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using SMCV.Entities;
+using SMCV.Domain.Entities;
 
-namespace SMCV.Data;
+namespace SMCV.Infrastructure.Data;
 
 public class AppDbContext : DbContext
 {

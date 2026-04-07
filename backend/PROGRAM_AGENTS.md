@@ -15,8 +15,10 @@ Manter esta ordem no `Program.cs`:
 2. AddEndpointsApiExplorer() + AddSwaggerGen()
 3. AddCors()
 4. AddDbContext<AppDbContext>()
-5. AddScoped — Repositories (IXxxRepository, XxxRepository)
-6. AddScoped — Services (IXxxService, XxxService)
+5. AddMediatR() (quando adicionado)
+6. AddAutoMapper() (quando adicionado)
+7. AddScoped — Repositories
+8. AddScoped — Services / External Services
 ```
 
 ## COMO REGISTRAR NOVO RECURSO
@@ -24,11 +26,9 @@ Manter esta ordem no `Program.cs`:
 ```csharp
 // Em "Dependency Injection", apos os registros existentes:
 builder.Services.AddScoped<INovoRepository, NovoRepository>();
-builder.Services.AddScoped<INovoService, NovoService>();
 ```
 
 - Sempre usar `AddScoped` (um por request HTTP)
-- Sempre registrar Repository ANTES do Service correspondente
 - Adicionar os `using` necessarios no topo do arquivo
 
 ## CORS
@@ -38,7 +38,6 @@ Configuracao atual: politica `"AllowAll"` (permissiva para desenvolvimento).
 policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
 ```
 Para producao: restringir origins, methods e headers.
-Localizacao: bloco `AddCors(options => ...)` antes do `AddDbContext`.
 
 ## AUTO-MIGRATE
 
@@ -72,7 +71,6 @@ app.Run();
 ```
 
 Para adicionar middleware: inserir ENTRE `UseCors` e `MapControllers`.
-Exemplo: `app.UseAuthentication()` e `app.UseAuthorization()`.
 
 ## CONNECTION STRING
 

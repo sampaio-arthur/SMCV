@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using SMCV.DTOs;
-using SMCV.Services;
+using SMCV.Application.DTOs;
+using SMCV.Application.Interfaces;
 
 namespace SMCV.Controllers;
 

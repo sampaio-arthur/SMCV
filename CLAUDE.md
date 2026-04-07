@@ -36,30 +36,30 @@ npm run lint
 
 ## Backend Architecture
 
-Arquitetura em 3 camadas: Controller -> Service -> Repository -> PostgreSQL.
+Arquitetura CQRS: Controller -> MediatR Handler -> Repository -> PostgreSQL.
 
 **Documentacao por camada em `backend/AGENTS.md`** — ponto de entrada com mapa de navegacao para cada pasta. Cada subpasta tem seu proprio `AGENTS.md` com regras, proibicoes, padroes de codigo e snippets especificos daquela camada:
 
 | Tarefa | Arquivo |
 |--------|---------|
 | Endpoint HTTP | `backend/Controllers/AGENTS.md` |
-| Regra de negocio | `backend/Services/AGENTS.md` |
-| Acesso a dados | `backend/Repositories/AGENTS.md` |
-| Entidade de banco | `backend/Entities/AGENTS.md` |
-| DTO (request/response) | `backend/DTOs/AGENTS.md` |
-| DbContext / migrations | `backend/Data/AGENTS.md` |
-| Utilitarios | `backend/Utils/AGENTS.md` |
+| Handler CQRS (logica de negocio) | `backend/Features/AGENTS.md` |
+| Entidade de banco / Enums | `backend/Domain/AGENTS.md` |
+| DTO / Interfaces / Mappings | `backend/Application/AGENTS.md` |
+| DbContext / Repositories / APIs externas | `backend/Infrastructure/AGENTS.md` |
+| Result / Excecoes | `backend/Common/AGENTS.md` |
 | Program.cs / DI / pipeline | `backend/PROGRAM_AGENTS.md` |
 
 ## Adding a New Resource
 
 ### Backend
-1. `Entities/XxxEntity.cs` + `DbSet` em `AppDbContext` + migration
-2. `DTOs/XxxRequestDto.cs` + `XxxResponseDto.cs`
-3. `Repositories/IXxxRepository.cs` + `XxxRepository.cs`
-4. `Services/IXxxService.cs` + `XxxService.cs`
-5. `Controllers/XxxController.cs`
-6. Registrar no DI em `Program.cs` (`AddScoped`)
+1. `Domain/Entities/Xxx.cs` + `DbSet` em `AppDbContext` + migration
+2. `Application/DTOs/XxxRequestDto.cs` + `XxxResponseDto.cs`
+3. `Application/Interfaces/IXxxRepository.cs`
+4. `Infrastructure/Repositories/XxxRepository.cs`
+5. `Features/Xxx/Commands/` + `Features/Xxx/Queries/` (handlers CQRS)
+6. `Controllers/XxxController.cs`
+7. Registrar no DI em `Program.cs` (`AddScoped`)
 
 ### Frontend
 1. `services/xxxService.js`
