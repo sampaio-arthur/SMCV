@@ -31,6 +31,31 @@ builder.Services.AddSwaggerGen(c =>
         Version = "v1",
         Description = "API para prospecção de empregos via e-mail automatizado"
     });
+
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Digite: Bearer {seu token}"
+    });
+
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] {}
+        }
+    });
 });
 
 // ─── CORS ─────────────────────────────────────────────────────────────────────
@@ -100,11 +125,11 @@ builder.Services.AddHttpClient<HunterService>();
 // ─── EmailSettings via IOptions ──────────────────────────────────────────────
 builder.Services.Configure<EmailSettings>(opts =>
 {
-    opts.SmtpHost       = RequiredSetting("SMTP_HOST");
-    opts.SmtpPort       = int.Parse(RequiredSetting("SMTP_PORT"));
-    opts.SenderEmail    = RequiredSetting("SMTP_SENDER_EMAIL");
+    opts.SmtpHost = RequiredSetting("SMTP_HOST");
+    opts.SmtpPort = int.Parse(RequiredSetting("SMTP_PORT"));
+    opts.SenderEmail = RequiredSetting("SMTP_SENDER_EMAIL");
     opts.SenderPassword = RequiredSetting("SMTP_SENDER_PASSWORD");
-    opts.SenderName     = RequiredSetting("SMTP_SENDER_NAME");
+    opts.SenderName = RequiredSetting("SMTP_SENDER_NAME");
 });
 
 // ─── Build & Pipeline ─────────────────────────────────────────────────────────
