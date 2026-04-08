@@ -9,11 +9,11 @@ public class HunterService : IHunterService
     private readonly HttpClient _httpClient;
     private readonly string _apiKey;
 
-    public HunterService(HttpClient httpClient, IConfiguration configuration)
+    public HunterService(HttpClient httpClient)
     {
         _httpClient = httpClient;
-        _apiKey = configuration["HunterApi:ApiKey"]
-            ?? throw new InvalidOperationException("HunterApi:ApiKey not configured in appsettings.json");
+        _apiKey = Environment.GetEnvironmentVariable("HUNTER_API_KEY")
+            ?? throw new InvalidOperationException("Variável de ambiente 'HUNTER_API_KEY' não configurada.");
     }
 
     public async Task<IEnumerable<HunterContactResult>> SearchContactsAsync(

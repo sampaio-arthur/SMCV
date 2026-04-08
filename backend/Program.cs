@@ -73,8 +73,14 @@ builder.Services.AddScoped<ICsvExportService, CsvExportService>();
 builder.Services.AddHttpClient<HunterService>();
 
 // ─── EmailSettings via IOptions ──────────────────────────────────────────────
-builder.Services.Configure<EmailSettings>(
-    builder.Configuration.GetSection("EmailSettings"));
+builder.Services.Configure<EmailSettings>(opts =>
+{
+    opts.SmtpHost       = RequiredSetting("SMTP_HOST");
+    opts.SmtpPort       = int.Parse(RequiredSetting("SMTP_PORT"));
+    opts.SenderEmail    = RequiredSetting("SMTP_SENDER_EMAIL");
+    opts.SenderPassword = RequiredSetting("SMTP_SENDER_PASSWORD");
+    opts.SenderName     = RequiredSetting("SMTP_SENDER_NAME");
+});
 
 // ─── Build & Pipeline ─────────────────────────────────────────────────────────
 var app = builder.Build();

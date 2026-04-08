@@ -23,9 +23,15 @@ Criar o banco PostgreSQL:
 CREATE DATABASE jobprospector;
 ```
 
-## Variáveis de Ambiente
+## Configuração
 
-Configurar no `.env` ou variáveis de ambiente do sistema:
+Copie o arquivo de exemplo e preencha com suas credenciais:
+
+```bash
+cp .env.example .env
+```
+
+Edite o `.env` com seus valores reais. **Nunca commite o `.env`.**
 
 | Variável | Descrição | Exemplo |
 |----------|-----------|---------|
@@ -33,24 +39,16 @@ Configurar no `.env` ou variáveis de ambiente do sistema:
 | `DB_PORT` | Porta do PostgreSQL | `5432` |
 | `DB_NAME` | Nome do banco | `jobprospector` |
 | `DB_USER` | Usuário do banco | `postgres` |
-| `DB_PASSWORD` | Senha do banco | `postgres` |
-
-### appsettings.json (backend)
-
-```json
-{
-  "HunterApi": {
-    "ApiKey": "SUA_CHAVE_HUNTER_IO"
-  },
-  "EmailSettings": {
-    "SmtpHost": "smtp.gmail.com",
-    "SmtpPort": 587,
-    "SenderEmail": "seu@email.com",
-    "SenderPassword": "sua_senha_app",
-    "SenderName": "Seu Nome"
-  }
-}
-```
+| `DB_PASSWORD` | Senha do banco | `change-me` |
+| `POSTGRES_DB` | Nome do banco (Docker) | `jobprospector` |
+| `POSTGRES_USER` | Usuário (Docker) | `postgres` |
+| `POSTGRES_PASSWORD` | Senha (Docker) | `change-me` |
+| `HUNTER_API_KEY` | Chave da API Hunter.io | `your_key_here` |
+| `SMTP_HOST` | Servidor SMTP | `smtp.gmail.com` |
+| `SMTP_PORT` | Porta SMTP | `587` |
+| `SMTP_SENDER_EMAIL` | E-mail remetente | `your@email.com` |
+| `SMTP_SENDER_PASSWORD` | Senha ou App Password | `your_app_password` |
+| `SMTP_SENDER_NAME` | Nome do remetente | `Job Prospector` |
 
 ## Execução com Docker
 

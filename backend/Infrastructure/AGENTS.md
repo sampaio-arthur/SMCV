@@ -73,11 +73,23 @@ Infrastructure/
 - Usar metodos async do EF Core (`ToListAsync`, `FindAsync`, etc.)
 - `SaveChangesAsync()` apos cada operacao de escrita
 
+## PADRAO DE CONFIGURACAO — Servicos Externos
+
+Credenciais e configuracoes sensiveis NUNCA sao lidas via IConfiguration ou appsettings.json.
+
+Padroes corretos:
+- API keys e strings simples → `Environment.GetEnvironmentVariable("NOME_VAR")`
+- Grupos de configuracao com tipagem → `IOptions<T>` alimentado via `Program.cs`
+  usando `RequiredSetting()`, nunca via `.GetSection()` apontando para appsettings.json
+
+Variaveis disponiveis estao documentadas em `.env.example` na raiz do projeto.
+O `docker-compose.yml` e responsavel por injetar essas variaveis no container do backend.
+
 ## REGRAS OBRIGATORIAS — ExternalServices
 
 - Namespace: `SMCV.Infrastructure.ExternalServices`
 - Implementar interface de `Application/Interfaces/`
-- Configuracoes via `IOptions<T>` ou `IConfiguration` (nunca hardcoded)
+- Configuracoes via `IOptions<T>` ou `Environment.GetEnvironmentVariable` (nunca hardcoded, nunca via appsettings.json)
 - Registrar no DI em `Program.cs` com `AddScoped`
 
 ## REGRAS OBRIGATORIAS — DbContext
