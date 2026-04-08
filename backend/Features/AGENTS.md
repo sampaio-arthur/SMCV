@@ -25,7 +25,6 @@ Features/
 ## ESTADO ATUAL
 
 Pastas criadas mas ainda sem handlers implementados.
-A logica de negocio do Example ainda esta em `Infrastructure/Services/ExampleService.cs` (padrao legado).
 Novos dominios (Contacts, Campaigns, EmailLogs) serao implementados diretamente como handlers CQRS.
 
 ## REGRAS OBRIGATORIAS (para implementacoes futuras)

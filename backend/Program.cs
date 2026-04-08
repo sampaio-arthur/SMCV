@@ -7,7 +7,6 @@ using SMCV.Common.Middleware;
 using SMCV.Infrastructure.Data;
 using SMCV.Infrastructure.ExternalServices;
 using SMCV.Infrastructure.Repositories;
-using SMCV.Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -61,8 +60,6 @@ builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
 // ─── Repositórios ─────────────────────────────────────────────────────────────
-builder.Services.AddScoped<IExampleRepository, ExampleRepository>();
-builder.Services.AddScoped<IExampleService, ExampleService>();
 builder.Services.AddScoped<ICampaignRepository, CampaignRepository>();
 builder.Services.AddScoped<IContactRepository, ContactRepository>();
 builder.Services.AddScoped<IEmailLogRepository, EmailLogRepository>();

@@ -15,7 +15,6 @@ Infrastructure/
 │   ├── AppDbContext.cs       ← DbContext do EF Core
 │   └── Migrations/           ← migrations geradas pelo EF Core
 ├── Repositories/             ← implementacao de repositorios
-├── Services/                 ← implementacao de servicos (legado)
 └── ExternalServices/         ← integracoes com APIs externas
 ```
 
@@ -24,9 +23,7 @@ Infrastructure/
 | Tipo | Arquivo | Descricao |
 |------|---------|-----------|
 | DbContext | `Data/AppDbContext.cs` | Contexto do banco com DbSets |
-| Repository | `Repositories/ExampleRepository.cs` | CRUD de Example no banco |
-| Service | `Services/ExampleService.cs` | Logica de negocio do Example (legado) |
-| Migration | `Data/Migrations/InitialCreate` | Criacao da tabela Examples |
+| Migration | `Data/Migrations/InitialCreate` | Criacao das tabelas iniciais |
 
 ## REGRAS OBRIGATORIAS — Repositories
 

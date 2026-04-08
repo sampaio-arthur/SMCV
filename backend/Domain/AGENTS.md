@@ -15,12 +15,6 @@ Domain/
 └── Enums/       ← enumeracoes do dominio
 ```
 
-## ENTIDADES EXISTENTES
-
-| Entidade | Arquivo | Descricao |
-|----------|---------|-----------|
-| Example | `Entities/Example.cs` | Entidade de exemplo (scaffolding) |
-
 ## REGRAS OBRIGATORIAS
 
 - Namespace: `SMCV.Domain.Entities` ou `SMCV.Domain.Enums`

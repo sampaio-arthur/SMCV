@@ -16,15 +16,6 @@ Application/
 └── Mappings/     ← AutoMapper profiles (quando adicionado)
 ```
 
-## ARQUIVOS EXISTENTES
-
-| Tipo | Arquivo | Descricao |
-|------|---------|-----------|
-| DTO | `DTOs/ExampleRequestDto.cs` | Entrada para criar/atualizar Example |
-| DTO | `DTOs/ExampleResponseDto.cs` | Saida da API para Example |
-| Interface | `Interfaces/IExampleRepository.cs` | Contrato do repositorio de Example |
-| Interface | `Interfaces/IExampleService.cs` | Contrato do servico de Example (legado) |
-
 ## REGRAS OBRIGATORIAS — DTOs
 
 - Namespace: `SMCV.Application.DTOs`
@@ -36,7 +27,7 @@ Application/
 ## REGRAS OBRIGATORIAS — Interfaces
 
 - Namespace: `SMCV.Application.Interfaces`
-- Prefixo `I` no nome (ex: `IExampleRepository`)
+- Prefixo `I` no nome (ex: `ICampaignRepository`)
 - Metodos async com sufixo `Async`
 - Repository trabalha com Entity; Service trabalha com DTOs
 

@@ -134,35 +134,6 @@ namespace SMCV.Infrastructure.Data.Migrations
                     b.ToTable("EmailLogs");
                 });
 
-            modelBuilder.Entity("SMCV.Domain.Entities.Example", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("text");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Examples");
-                });
-
             modelBuilder.Entity("SMCV.Domain.Entities.Contact", b =>
                 {
                     b.HasOne("SMCV.Domain.Entities.Campaign", "Campaign")

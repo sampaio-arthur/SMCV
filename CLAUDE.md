@@ -73,7 +73,6 @@ Arquitetura CQRS: Controller -> MediatR Handler -> Repository -> PostgreSQL.
 ```
 src/
 ├── components/ui/      # Modal, Toast, ConfirmDialog
-├── components/example/  # ExampleComponent (table + form)
 ├── pages/              # XxxPage — state + service calls
 ├── layouts/            # MainLayout — sidebar + Outlet
 ├── routes/             # AppRoutes (index.jsx)

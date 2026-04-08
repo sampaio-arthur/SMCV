@@ -8,9 +8,6 @@ Receber requisicoes HTTP e delegar para MediatR. Retornar respostas com status c
 Controllers NAO contem logica de negocio.
 Na arquitetura CQRS, controllers chamam `_mediator.Send()` em vez de chamar Services diretamente.
 
-> **NOTA:** O `ExampleController` atual ainda usa `IExampleService` (padrao legado).
-> Novos controllers devem usar `IMediator` quando MediatR for adicionado ao projeto.
-
 ## REGRAS OBRIGATORIAS
 
 - Decorar com `[ApiController]` e `[Route("api/[controller]")]`

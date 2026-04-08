@@ -10,7 +10,6 @@ public class AppDbContext : DbContext
     {
     }
 
-    public DbSet<Example> Examples { get; set; }
     public DbSet<Campaign> Campaigns { get; set; }
     public DbSet<Contact> Contacts { get; set; }
     public DbSet<EmailLog> EmailLogs { get; set; }
