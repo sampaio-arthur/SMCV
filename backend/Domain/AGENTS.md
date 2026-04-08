@@ -11,9 +11,31 @@ Esta camada NAO depende de nenhuma outra — e a base da aplicacao.
 
 ```
 Domain/
-├── Entities/    ← classes mapeadas para tabelas do banco
-└── Enums/       ← enumeracoes do dominio
+├── Entities/
+│   ├── Campaign.cs
+│   ├── Contact.cs
+│   └── EmailLog.cs
+└── Enums/
+    ├── CampaignStatus.cs
+    └── EmailStatus.cs
 ```
+
+## ARQUIVOS EXISTENTES
+
+### Entities (`SMCV.Domain.Entities`)
+
+| Arquivo | Descricao |
+|---------|-----------|
+| `Campaign.cs` | Agregado raiz de campanha: niche, region, resume, email content, status, colecao de contacts. |
+| `Contact.cs` | Contato prospectado: company, email, domain, position, referencia a Campaign, EmailLog opcional. |
+| `EmailLog.cs` | Log de envio de email: status, timestamp de envio, mensagem de erro, referencia a Contact. |
+
+### Enums (`SMCV.Domain.Enums`)
+
+| Arquivo | Valores |
+|---------|---------|
+| `CampaignStatus.cs` | `Draft`, `Running`, `Completed`, `Cancelled` |
+| `EmailStatus.cs` | `Pending`, `Sent`, `Failed` |
 
 ## REGRAS OBRIGATORIAS
 

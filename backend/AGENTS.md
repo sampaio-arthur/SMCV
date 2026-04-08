@@ -26,14 +26,15 @@ Entidades nunca sao expostas na API. Injecao de dependencia via interfaces com `
 ## REGRAS GLOBAIS
 
 1. **Sempre usar DTOs** — nunca expor `Entity` em controllers ou retornos de handler
-2. **Interfaces obrigatorias** — todo Repository tem sua interface em `Application/Interfaces/`
+2. **Interfaces obrigatorias** — todo Repository e Service externo tem sua interface em `Application/Interfaces/`
 3. **Async em tudo** — todas as operacoes de I/O usam `async/await` com sufixo `Async`
 4. **Namespace** — seguir `SMCV.{Camada}.{Subcamada}` (ex: `SMCV.Domain.Entities`)
 5. **Injecao via construtor** — nunca usar `[FromServices]` ou service locator
 6. **Uma classe por arquivo** — nome do arquivo = nome da classe
 7. **PascalCase** para classes, metodos e propriedades
 8. **Timestamps UTC** — sempre `DateTime.UtcNow` para `CreatedAt`/`UpdatedAt`
-9. **Registrar no DI** — todo novo Repository deve ser registrado em `Program.cs`
+9. **Registrar no DI** — todo novo Repository/Service deve ser registrado em `Program.cs`
+10. **Validacao via FluentValidation** — validators em `Features/{Dominio}/Commands/`
 
 ## ESTRUTURA DE PASTAS
 
@@ -41,21 +42,24 @@ Entidades nunca sao expostas na API. Injecao de dependencia via interfaces com `
 backend/
 ├── Controllers/          ← roteamento HTTP, delega para MediatR
 ├── Features/             ← nucleo CQRS por dominio (Commands + Queries)
+│   ├── Campaigns/
+│   ├── Contacts/
+│   └── EmailLogs/
 ├── Domain/
-│   ├── Entities/         ← entidades EF Core
-│   └── Enums/            ← enums do dominio
+│   ├── Entities/         ← entidades EF Core (Campaign, Contact, EmailLog)
+│   └── Enums/            ← enums do dominio (CampaignStatus, EmailStatus)
 ├── Infrastructure/
-│   ├── Data/             ← DbContext, Migrations
-│   ├── Repositories/     ← implementacao de acesso a dados
-│   ├── Services/         ← implementacoes de servicos (legado)
-│   └── ExternalServices/ ← integracao com APIs externas
+│   ├── Data/             ← DbContext, DbContextFactory, Migrations
+│   ├── Repositories/     ← implementacao de acesso a dados (Base, Campaign, Contact, EmailLog)
+│   └── ExternalServices/ ← integracao com APIs externas (Hunter.io, SMTP, CSV)
 ├── Application/
-│   ├── DTOs/             ← objetos de transferencia
+│   ├── DTOs/             ← objetos de transferencia (Campaigns/, Contacts/, EmailLogs/)
 │   ├── Interfaces/       ← contratos de repositorios e servicos
 │   └── Mappings/         ← AutoMapper profiles
 ├── Common/
-│   ├── Exceptions/       ← excecoes customizadas
-│   └── ResultPattern/    ← Result<T> para respostas padronizadas
+│   ├── Exceptions/       ← excecoes customizadas (Business, NotFound)
+│   ├── Middleware/        ← ExceptionHandlingMiddleware
+│   └── ResultPattern/    ← ApiResponse<T> para respostas padronizadas
 └── Program.cs
 ```
 

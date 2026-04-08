@@ -8,12 +8,21 @@ Receber requisicoes HTTP e delegar para MediatR. Retornar respostas com status c
 Controllers NAO contem logica de negocio.
 Na arquitetura CQRS, controllers chamam `_mediator.Send()` em vez de chamar Services diretamente.
 
+## ARQUIVOS EXISTENTES
+
+| Arquivo | Namespace | Descricao |
+|---------|-----------|-----------|
+| `CampaignsController.cs` | `SMCV.Controllers` | CRUD de campanhas, envio de emails, exportacao CSV. Aceita upload de arquivo (resume). |
+| `ContactsController.cs` | `SMCV.Controllers` | CRUD de contatos, busca via Hunter.io, filtro por campanha. |
+| `EmailLogsController.cs` | `SMCV.Controllers` | Consulta de logs de email por contato ou por campanha. |
+
 ## REGRAS OBRIGATORIAS
 
 - Decorar com `[ApiController]` e `[Route("api/[controller]")]`
 - Herdar de `ControllerBase`
 - Todos os metodos sao `async Task<ActionResult<T>>` (exceto DELETE que retorna `Task<IActionResult>`)
 - Verificar retorno nulo e retornar `NotFound()` quando aplicavel
+- Injetar `IMediator` via construtor
 
 ## PROIBICOES
 

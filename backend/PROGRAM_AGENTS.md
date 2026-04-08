@@ -15,17 +15,43 @@ Manter esta ordem no `Program.cs`:
 2. AddEndpointsApiExplorer() + AddSwaggerGen()
 3. AddCors()
 4. AddDbContext<AppDbContext>()
-5. AddMediatR() (quando adicionado)
-6. AddAutoMapper() (quando adicionado)
-7. AddScoped — Repositories
-8. AddScoped — Services / External Services
+5. AddMediatR() + AddValidatorsFromAssembly() + AddAutoMapper()
+6. AddScoped — Repositories
+7. AddScoped — External Services
+8. AddHttpClient — clientes HTTP tipados
+9. Configure<T> — configuracoes via IOptions
+```
+
+## REGISTROS ATUAIS NO DI
+
+### Repositories
+```csharp
+builder.Services.AddScoped<ICampaignRepository, CampaignRepository>();
+builder.Services.AddScoped<IContactRepository, ContactRepository>();
+builder.Services.AddScoped<IEmailLogRepository, EmailLogRepository>();
+```
+
+### External Services
+```csharp
+builder.Services.AddScoped<IHunterService, HunterService>();
+builder.Services.AddScoped<IEmailSenderService, EmailSenderService>();
+builder.Services.AddScoped<ICsvExportService, CsvExportService>();
+```
+
+### HttpClient e Options
+```csharp
+builder.Services.AddHttpClient<HunterService>();
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 ```
 
 ## COMO REGISTRAR NOVO RECURSO
 
 ```csharp
-// Em "Dependency Injection", apos os registros existentes:
+// Em "Repositórios", apos os registros existentes:
 builder.Services.AddScoped<INovoRepository, NovoRepository>();
+
+// Em "Serviços Externos":
+builder.Services.AddScoped<INovoService, NovoService>();
 ```
 
 - Sempre usar `AddScoped` (um por request HTTP)
@@ -33,11 +59,13 @@ builder.Services.AddScoped<INovoRepository, NovoRepository>();
 
 ## CORS
 
-Configuracao atual: politica `"AllowAll"` (permissiva para desenvolvimento).
+Configuracao atual: politica `"AllowReactApp"` com origins especificos.
 ```csharp
-policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+policy.WithOrigins("http://localhost:3000", "http://localhost:5173")
+      .AllowAnyHeader()
+      .AllowAnyMethod();
 ```
-Para producao: restringir origins, methods e headers.
+Para producao: restringir origins conforme necessario.
 
 ## AUTO-MIGRATE
 
@@ -53,19 +81,20 @@ Executa ANTES de `app.Run()`. Aplica migrations pendentes automaticamente.
 
 ## SWAGGER
 
-Habilitado apenas em Development:
+Habilitado para todos os ambientes (sem condicional):
 ```csharp
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwagger();
+app.UseSwaggerUI();
 ```
 
 ## PIPELINE HTTP (ordem importa)
 
 ```
-app.UseCors("AllowAll");
+app.UseSwagger();
+app.UseSwaggerUI();
+app.UseStaticFiles();
+app.UseCors("AllowReactApp");
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.MapControllers();
 app.Run();
 ```

@@ -90,3 +90,31 @@ API base URL: `VITE_API_URL` (default `http://localhost:8080`).
 
 Connection string via env vars: `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`.
 Auto-migrate habilitado no startup (`Program.cs`).
+
+## Manutenção dos AGENTS.md
+
+> **REGRA OBRIGATÓRIA:** Os arquivos AGENTS.md são documentação viva do projeto.
+> Eles devem estar 100% sincronizados com o código a qualquer momento.
+
+### Quando atualizar
+
+Sempre que qualquer uma das seguintes ações for realizada, o(s) AGENTS.md correspondente(s) DEVEM ser atualizados na mesma sessão, antes de encerrar a tarefa:
+
+| Ação | AGENTS.md a atualizar |
+|------|-----------------------|
+| Criar nova entidade | `backend/Domain/AGENTS.md` |
+| Criar novo DTO ou Interface | `backend/Application/AGENTS.md` |
+| Criar novo Repository ou ExternalService | `backend/Infrastructure/AGENTS.md` |
+| Criar novo Handler CQRS | `backend/Features/AGENTS.md` |
+| Criar novo Controller | `backend/Controllers/AGENTS.md` |
+| Alterar Program.cs (DI, middleware) | `backend/PROGRAM_AGENTS.md` |
+| Alterar Result ou Exceção | `backend/Common/AGENTS.md` |
+| Qualquer alteração estrutural | `backend/AGENTS.md` (navigation map) |
+
+### Como atualizar
+
+1. Leia o AGENTS.md atual da pasta afetada
+2. Atualize a seção `ARQUIVOS EXISTENTES` (adicione ou remova conforme o real)
+3. Atualize a seção `ESTRUTURA` se a árvore de pastas mudou
+4. Não altere as REGRAS OBRIGATÓRIAS a menos que o padrão arquitetural tenha mudado
+5. Faça o commit do AGENTS.md junto com o código que o motivou
