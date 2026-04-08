@@ -1,16 +1,11 @@
-using SMCV.Application.DTOs.EmailLogs;
-
 namespace SMCV.Application.DTOs.Contacts;
 
 public record ContactResponse(
     Guid Id,
+    Guid CampaignId,
     string CompanyName,
     string Email,
-    string Domain,
-    string? ContactName,
-    string? Position,
-    string Source,
-    Guid CampaignId,
-    DateTime CreatedAt,
-    EmailLogResponse? EmailLog
+    string EmailStatus,
+    DateTime? EmailSentAt,
+    DateTime CreatedAt
 );

@@ -13,6 +13,7 @@ Automatiza o processo manual de buscar contatos de empresas, organizar campanhas
 - Node.js 18+
 - Conta Hunter.io (free tier: [criar conta](https://hunter.io/users/sign_up))
 - Conta SMTP (Gmail, Outlook, etc.)
+- Keycloak (Identity Provider)
 - Docker e Docker Compose (opcional)
 
 ## Configuração do Banco
@@ -49,6 +50,8 @@ Edite o `.env` com seus valores reais. **Nunca commite o `.env`.**
 | `SMTP_SENDER_EMAIL` | E-mail remetente | `your@email.com` |
 | `SMTP_SENDER_PASSWORD` | Senha ou App Password | `your_app_password` |
 | `SMTP_SENDER_NAME` | Nome do remetente | `Job Prospector` |
+| `KEYCLOAK_AUTHORITY` | URL do realm Keycloak | `http://localhost:8180/realms/smcv` |
+| `KEYCLOAK_AUDIENCE` | Audience do token JWT | `smcv-backend` |
 
 ## Execução com Docker
 
@@ -82,11 +85,25 @@ npm run dev                 # Vite em :5173
 
 Documentação interativa disponível em `/swagger`.
 
+Todos os endpoints (exceto `POST /api/users`) requerem autenticação via JWT Bearer (Keycloak).
+
 | Método | Rota | Descrição |
 |--------|------|-----------|
+| GET | `/api/users` | Listar usuários |
+| GET | `/api/users/{id}` | Detalhes do usuário |
+| POST | `/api/users` | Criar usuário (AllowAnonymous) |
+| PUT | `/api/users/{id}` | Atualizar usuário |
+| DELETE | `/api/users/{id}` | Excluir usuário |
+| GET | `/api/userprofiles` | Listar perfis |
+| GET | `/api/userprofiles/{id}` | Detalhes do perfil |
+| GET | `/api/userprofiles/user/{userId}` | Perfil por usuário |
+| POST | `/api/userprofiles` | Criar perfil |
+| POST | `/api/userprofiles/{id}/upload-resume` | Upload de currículo (PDF) |
+| PUT | `/api/userprofiles/{id}` | Atualizar perfil |
+| DELETE | `/api/userprofiles/{id}` | Excluir perfil |
 | GET | `/api/campaigns` | Listar campanhas |
 | GET | `/api/campaigns/{id}` | Detalhes da campanha com contatos |
-| POST | `/api/campaigns` | Criar campanha (multipart/form-data) |
+| POST | `/api/campaigns` | Criar campanha (JSON) |
 | PUT | `/api/campaigns/{id}` | Atualizar campanha |
 | DELETE | `/api/campaigns/{id}` | Excluir campanha |
 | POST | `/api/campaigns/{id}/send` | Disparar e-mails da campanha |
@@ -102,17 +119,30 @@ Documentação interativa disponível em `/swagger`.
 ## Diagrama de Entidades
 
 ```
-Campaign (1) ──── (N) Contact (1) ──── (1) EmailLog
-   │                      │                    │
-   ├─ Id                  ├─ Id                ├─ Id
-   ├─ Niche               ├─ CompanyName       ├─ ContactId (UNIQUE)
-   ├─ Region              ├─ Email             ├─ Status
-   ├─ ResumeFileName      ├─ Domain            ├─ SentAt
-   ├─ ResumeFilePath      ├─ ContactName       ├─ ErrorMessage
-   ├─ EmailSubject        ├─ Position          └─ CreatedAt
-   ├─ EmailBody           ├─ Source
-   ├─ Status              ├─ CampaignId (FK)
-   └─ CreatedAt           └─ CreatedAt
+User (1) ──────────────── (1) UserProfile
+  │                              UserId (FK, UNIQUE)
+  └── (1) ──────────── (N) Campaign
+                               UserId (FK)
+                                  └── (1) ── (N) Contact
+                                                  CampaignId (FK)
+                                                     └── (1) ── (0..1) EmailLog
+                                                                        ContactId (FK, UNIQUE)
+
+User                UserProfile          Campaign
+├─ Id               ├─ Id                ├─ Id
+├─ Name             ├─ UserId (FK)       ├─ UserId (FK)
+├─ Email (UNIQUE)   ├─ ResumeFilePath    ├─ Name
+├─ PasswordHash     └─ CreatedAt         ├─ Niche
+└─ CreatedAt                             ├─ Region
+                                         ├─ EmailSubject
+Contact              EmailLog            ├─ EmailBody
+├─ Id                ├─ Id               ├─ Status
+├─ CampaignId (FK)   ├─ ContactId (FK)   └─ CreatedAt
+├─ CompanyName       ├─ ErrorMessage
+├─ Email             └─ CreatedAt
+├─ EmailStatus
+├─ EmailSentAt
+└─ CreatedAt
 ```
 
 ## Stack
@@ -120,11 +150,11 @@ Campaign (1) ──── (N) Contact (1) ──── (1) EmailLog
 - **Backend:** ASP.NET Core 8, EF Core, MediatR (CQRS), AutoMapper, FluentValidation, MailKit
 - **Frontend:** React 19, Vite, Tailwind CSS
 - **Banco:** PostgreSQL 15+
+- **Auth:** Keycloak (OpenID Connect / JWT Bearer)
 - **Infra:** Docker Compose
 
 ## Limitações Conhecidas
 
 - Envio de e-mails é síncrono (sem fila/background job)
 - Hunter.io free tier: 25 buscas/mês
-- Sem autenticação/autorização implementada
 - Sem rate limiting no envio de e-mails

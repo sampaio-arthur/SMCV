@@ -1,22 +1,23 @@
 namespace SMCV.Domain.Entities;
 
+using SMCV.Domain.Enums;
+
 public class Contact
 {
     public Guid Id { get; set; }
-    public string CompanyName { get; set; } = string.Empty;
-    public string Email { get; set; } = string.Empty;
-    public string Domain { get; set; } = string.Empty;
-    public string? ContactName { get; set; }
-    public string? Position { get; set; }
-    public string Source { get; set; } = string.Empty;
     public Guid CampaignId { get; set; }
     public Campaign Campaign { get; set; } = null!;
-    public EmailLog? EmailLog { get; set; }
+    public string CompanyName { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+    public EmailStatus EmailStatus { get; set; }
+    public DateTime? EmailSentAt { get; set; }
     public DateTime CreatedAt { get; set; }
+    public EmailLog? EmailLog { get; set; }
 
     public Contact()
     {
         Id = Guid.NewGuid();
+        EmailStatus = EmailStatus.Pending;
         CreatedAt = DateTime.UtcNow;
     }
 

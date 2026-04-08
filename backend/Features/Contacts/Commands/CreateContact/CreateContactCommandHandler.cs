@@ -36,10 +36,6 @@ public class CreateContactCommandHandler : IRequestHandler<CreateContactCommand,
         {
             CompanyName = request.CompanyName,
             Email = request.Email,
-            Domain = request.Domain,
-            ContactName = request.ContactName,
-            Position = request.Position,
-            Source = "manual",
             CampaignId = request.CampaignId
         };
 

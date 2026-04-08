@@ -44,16 +44,18 @@ backend/
 ├── Features/             ← nucleo CQRS por dominio (Commands + Queries)
 │   ├── Campaigns/
 │   ├── Contacts/
-│   └── EmailLogs/
+│   ├── EmailLogs/
+│   ├── Users/
+│   └── UserProfiles/
 ├── Domain/
-│   ├── Entities/         ← entidades EF Core (Campaign, Contact, EmailLog)
+│   ├── Entities/         ← entidades EF Core (Campaign, Contact, EmailLog, User, UserProfile)
 │   └── Enums/            ← enums do dominio (CampaignStatus, EmailStatus)
 ├── Infrastructure/
 │   ├── Data/             ← DbContext, DbContextFactory, Migrations
-│   ├── Repositories/     ← implementacao de acesso a dados (Base, Campaign, Contact, EmailLog)
+│   ├── Repositories/     ← implementacao de acesso a dados (Base, Campaign, Contact, EmailLog, User, UserProfile)
 │   └── ExternalServices/ ← integracao com APIs externas (Hunter.io, SMTP, CSV)
 ├── Application/
-│   ├── DTOs/             ← objetos de transferencia (Campaigns/, Contacts/, EmailLogs/)
+│   ├── DTOs/             ← objetos de transferencia (Campaigns/, Contacts/, EmailLogs/, Users/, UserProfiles/)
 │   ├── Interfaces/       ← contratos de repositorios e servicos
 │   └── Mappings/         ← AutoMapper profiles
 ├── Common/

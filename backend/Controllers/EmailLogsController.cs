@@ -1,4 +1,5 @@
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SMCV.Application.DTOs;
 using SMCV.Application.DTOs.EmailLogs;
@@ -9,6 +10,7 @@ namespace SMCV.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class EmailLogsController : ControllerBase
 {
     private readonly IMediator _mediator;

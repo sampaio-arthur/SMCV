@@ -9,23 +9,41 @@ namespace SMCV.Features.Campaigns.Commands.SendCampaignEmails;
 public class SendCampaignEmailsCommandHandler : IRequestHandler<SendCampaignEmailsCommand, int>
 {
     private readonly ICampaignRepository _campaignRepository;
+    private readonly IContactRepository _contactRepository;
     private readonly IEmailLogRepository _emailLogRepository;
     private readonly IEmailSenderService _emailSenderService;
+    private readonly IUserRepository _userRepository;
+    private readonly IUserProfileRepository _userProfileRepository;
 
     public SendCampaignEmailsCommandHandler(
         ICampaignRepository campaignRepository,
+        IContactRepository contactRepository,
         IEmailLogRepository emailLogRepository,
-        IEmailSenderService emailSenderService)
+        IEmailSenderService emailSenderService,
+        IUserRepository userRepository,
+        IUserProfileRepository userProfileRepository)
     {
         _campaignRepository = campaignRepository;
+        _contactRepository = contactRepository;
         _emailLogRepository = emailLogRepository;
         _emailSenderService = emailSenderService;
+        _userRepository = userRepository;
+        _userProfileRepository = userProfileRepository;
     }
 
     public async Task<int> Handle(SendCampaignEmailsCommand request, CancellationToken cancellationToken)
     {
         var campaign = await _campaignRepository.GetByIdWithContactsAsync(request.CampaignId)
             ?? throw new NotFoundException("Campaign", request.CampaignId);
+
+        var userProfile = await _userProfileRepository.GetByUserIdAsync(campaign.UserId)
+            ?? throw new BusinessException("Perfil do usuário não encontrado. Configure seu perfil antes de disparar emails.");
+
+        if (string.IsNullOrEmpty(userProfile.ResumeFilePath))
+            throw new BusinessException("Nenhum currículo encontrado no perfil. Faça upload do currículo antes de disparar emails.");
+
+        var user = await _userRepository.GetByIdAsync(campaign.UserId)
+            ?? throw new NotFoundException("User", campaign.UserId);
 
         campaign.Status = CampaignStatus.Running;
         await _campaignRepository.UpdateAsync(campaign);
@@ -34,36 +52,48 @@ public class SendCampaignEmailsCommandHandler : IRequestHandler<SendCampaignEmai
 
         foreach (var contact in campaign.Contacts)
         {
-            var existingLog = await _emailLogRepository.GetByContactIdAsync(contact.Id);
-            if (existingLog is not null && existingLog.Status == EmailStatus.Sent)
+            if (contact.EmailStatus == EmailStatus.Sent)
                 continue;
-
-            var emailLog = new EmailLog
-            {
-                ContactId = contact.Id
-            };
 
             try
             {
                 await _emailSenderService.SendEmailWithAttachmentAsync(
-                    contact.Email,
-                    contact.ContactName ?? contact.CompanyName,
-                    campaign.EmailSubject,
-                    campaign.EmailBody,
-                    campaign.ResumeFilePath,
-                    campaign.ResumeFileName);
+                    toEmail: contact.Email,
+                    toName: contact.CompanyName,
+                    subject: campaign.EmailSubject,
+                    body: campaign.EmailBody,
+                    attachmentPath: userProfile.ResumeFilePath,
+                    attachmentFileName: Path.GetFileName(userProfile.ResumeFilePath),
+                    fromEmail: user.Email,
+                    fromName: user.Name);
 
-                emailLog.Status = EmailStatus.Sent;
-                emailLog.SentAt = DateTime.UtcNow;
+                contact.EmailStatus = EmailStatus.Sent;
+                contact.EmailSentAt = DateTime.UtcNow;
+                await _contactRepository.UpdateAsync(contact);
+
                 successCount++;
             }
             catch (Exception ex)
             {
-                emailLog.Status = EmailStatus.Failed;
-                emailLog.ErrorMessage = ex.Message;
-            }
+                contact.EmailStatus = EmailStatus.Failed;
+                await _contactRepository.UpdateAsync(contact);
 
-            await _emailLogRepository.AddAsync(emailLog);
+                var existingLog = await _emailLogRepository.GetByContactIdAsync(contact.Id);
+                if (existingLog is null)
+                {
+                    var emailLog = new EmailLog
+                    {
+                        ContactId = contact.Id,
+                        ErrorMessage = ex.Message
+                    };
+                    await _emailLogRepository.AddAsync(emailLog);
+                }
+                else
+                {
+                    existingLog.ErrorMessage = ex.Message;
+                    await _emailLogRepository.UpdateAsync(existingLog);
+                }
+            }
         }
 
         campaign.Status = CampaignStatus.Completed;

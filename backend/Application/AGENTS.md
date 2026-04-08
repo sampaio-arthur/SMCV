@@ -26,6 +26,14 @@ Application/
 │   │   └── SearchContactsResponse.cs
 │   ├── EmailLogs/
 │   │   └── EmailLogResponse.cs
+│   ├── Users/
+│   │   ├── UserResponse.cs
+│   │   ├── CreateUserRequest.cs
+│   │   └── UpdateUserRequest.cs
+│   ├── UserProfiles/
+│   │   ├── UserProfileResponse.cs
+│   │   ├── CreateUserProfileRequest.cs
+│   │   └── UpdateUserProfileRequest.cs
 │   └── ErrorResponse.cs
 ├── Interfaces/
 │   ├── HunterContactResult.cs
@@ -35,7 +43,9 @@ Application/
 │   ├── IEmailLogRepository.cs
 │   ├── IEmailSenderService.cs
 │   ├── IHunterService.cs
-│   └── IRepository.cs
+│   ├── IRepository.cs
+│   ├── IUserRepository.cs
+│   └── IUserProfileRepository.cs
 └── Mappings/
     └── MappingProfile.cs
 ```
@@ -46,19 +56,19 @@ Application/
 
 | Arquivo | Tipo | Descricao |
 |---------|------|-----------|
-| `CampaignDetailResponse.cs` | Response | Detalhes completos da campanha com contatos e logs de email aninhados. |
-| `CampaignResponse.cs` | Response | Resumo da campanha com contagem de contatos (sem lista detalhada). |
-| `CreateCampaignRequest.cs` | Request | Criacao de campanha: niche, region, email subject/body. Resume tratado separadamente. |
+| `CampaignDetailResponse.cs` | Response | Detalhes completos da campanha com UserId, Name e contatos aninhados. |
+| `CampaignResponse.cs` | Response | Resumo da campanha com UserId, Name e contagem de contatos (sem lista detalhada). |
+| `CreateCampaignRequest.cs` | Request | Criacao de campanha: UserId, Name, Niche, Region, EmailSubject, EmailBody. |
 | `ExportContactsCsvRequest.cs` | Request | Exportacao CSV de contatos por campaign ID. |
 | `SendCampaignEmailsRequest.cs` | Request | Disparo de emails da campanha por campaign ID. |
-| `UpdateCampaignRequest.cs` | Request | Atualizacao de email subject e body da campanha. |
+| `UpdateCampaignRequest.cs` | Request | Atualizacao de Name, EmailSubject e EmailBody da campanha. |
 
 ### DTOs — Contacts (`SMCV.Application.DTOs.Contacts`)
 
 | Arquivo | Tipo | Descricao |
 |---------|------|-----------|
-| `ContactResponse.cs` | Response | Contato com company/email, referencia a campanha e log de email opcional. |
-| `CreateContactRequest.cs` | Request | Criacao de contato: company, email, domain, position, campaign ID. |
+| `ContactResponse.cs` | Response | Contato com CompanyName, Email, EmailStatus, EmailSentAt e referencia a campanha. |
+| `CreateContactRequest.cs` | Request | Criacao de contato: CampaignId, CompanyName, Email. |
 | `SearchContactsRequest.cs` | Request | Busca de contatos via Hunter.io: niche, region, limit. |
 | `SearchContactsResponse.cs` | Response | Resultado da busca: total encontrado e lista de contatos adicionados. |
 
@@ -66,7 +76,23 @@ Application/
 
 | Arquivo | Tipo | Descricao |
 |---------|------|-----------|
-| `EmailLogResponse.cs` | Response | Status de envio, timestamp e detalhes de erro. |
+| `EmailLogResponse.cs` | Response | Log de email: Id, ContactId, ErrorMessage, CreatedAt. |
+
+### DTOs — Users (`SMCV.Application.DTOs.Users`)
+
+| Arquivo | Tipo | Descricao |
+|---------|------|-----------|
+| `UserResponse.cs` | Response | Dados do usuario: Id, Name, Email, CreatedAt. |
+| `CreateUserRequest.cs` | Request | Criacao de usuario: Name, Email, Password. |
+| `UpdateUserRequest.cs` | Request | Atualizacao de usuario: Name, Email. |
+
+### DTOs — UserProfiles (`SMCV.Application.DTOs.UserProfiles`)
+
+| Arquivo | Tipo | Descricao |
+|---------|------|-----------|
+| `UserProfileResponse.cs` | Response | Perfil do usuario: Id, UserId, ResumeFilePath, CreatedAt. |
+| `CreateUserProfileRequest.cs` | Request | Criacao de perfil: UserId, ResumeFilePath. |
+| `UpdateUserProfileRequest.cs` | Request | Atualizacao de perfil: ResumeFilePath. |
 
 ### DTOs — Root (`SMCV.Application.DTOs`)
 
@@ -82,16 +108,18 @@ Application/
 | `ICampaignRepository.cs` | Extensao de IRepository para Campaign com eager loading de contacts. | `CampaignRepository.cs` |
 | `IContactRepository.cs` | Extensao de IRepository para Contact com busca por campanha e email. | `ContactRepository.cs` |
 | `IEmailLogRepository.cs` | Extensao de IRepository para EmailLog com busca por contact/campaign. | `EmailLogRepository.cs` |
+| `IUserRepository.cs` | Extensao de IRepository para User com GetByEmailAsync. | `UserRepository.cs` |
+| `IUserProfileRepository.cs` | Extensao de IRepository para UserProfile com GetByUserIdAsync. | `UserProfileRepository.cs` |
 | `IHunterService.cs` | Busca de contatos por niche/region via Hunter.io. | `HunterService.cs` |
-| `IEmailSenderService.cs` | Envio de email com anexos via SMTP. | `EmailSenderService.cs` |
+| `IEmailSenderService.cs` | Envio de email com anexos via SMTP. Aceita fromEmail e fromName. | `EmailSenderService.cs` |
 | `ICsvExportService.cs` | Geracao de CSV a partir de lista de contatos. | `CsvExportService.cs` |
-| `HunterContactResult.cs` | Record representando resultado individual da API Hunter.io (nao e interface). | — |
+| `HunterContactResult.cs` | Record com CompanyName e Email — resultado individual da API Hunter.io (nao e interface). | — |
 
 ### Mappings (`SMCV.Application.Mappings`)
 
 | Arquivo | Descricao |
 |---------|-----------|
-| `MappingProfile.cs` | Perfil AutoMapper: Campaign, Contact, EmailLog -> DTOs com conversao de enum para string. |
+| `MappingProfile.cs` | Perfil AutoMapper: Campaign, Contact, EmailLog, User, UserProfile -> DTOs com conversao de enum para string. |
 
 ## REGRAS OBRIGATORIAS — DTOs
 

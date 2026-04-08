@@ -1,4 +1,5 @@
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SMCV.Application.DTOs;
 using SMCV.Application.DTOs.Contacts;
@@ -12,6 +13,7 @@ namespace SMCV.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class ContactsController : ControllerBase
 {
     private readonly IMediator _mediator;
@@ -44,12 +46,9 @@ public class ContactsController : ControllerBase
     public async Task<IActionResult> Create([FromBody] CreateContactRequest request)
     {
         var command = new CreateContactCommand(
+            request.CampaignId,
             request.CompanyName,
-            request.Email,
-            request.Domain,
-            request.ContactName,
-            request.Position,
-            request.CampaignId);
+            request.Email);
 
         var result = await _mediator.Send(command);
         return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);

@@ -6,20 +6,8 @@ public class CreateContactCommandValidator : AbstractValidator<CreateContactComm
 {
     public CreateContactCommandValidator()
     {
-        RuleFor(x => x.CompanyName)
-            .NotEmpty().WithMessage("CompanyName é obrigatório.")
-            .MaximumLength(500);
-
-        RuleFor(x => x.Email)
-            .NotEmpty().WithMessage("Email é obrigatório.")
-            .EmailAddress().WithMessage("Formato de e-mail inválido.")
-            .MaximumLength(255);
-
-        RuleFor(x => x.Domain)
-            .NotEmpty().WithMessage("Domain é obrigatório.")
-            .MaximumLength(255);
-
-        RuleFor(x => x.CampaignId)
-            .NotEqual(Guid.Empty).WithMessage("CampaignId é obrigatório.");
+        RuleFor(x => x.CampaignId).NotEmpty();
+        RuleFor(x => x.CompanyName).NotEmpty().MaximumLength(500);
+        RuleFor(x => x.Email).NotEmpty().EmailAddress().MaximumLength(255);
     }
 }

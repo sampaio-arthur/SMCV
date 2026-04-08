@@ -1,4 +1,5 @@
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SMCV.Application.DTOs;
 using SMCV.Application.DTOs.Campaigns;
@@ -14,11 +15,10 @@ namespace SMCV.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class CampaignsController : ControllerBase
 {
     private readonly IMediator _mediator;
-
-    private static readonly string[] AllowedExtensions = [".pdf", ".doc", ".docx"];
 
     public CampaignsController(IMediator mediator)
     {
@@ -43,34 +43,15 @@ public class CampaignsController : ControllerBase
     }
 
     [HttpPost]
-    [Consumes("multipart/form-data")]
     [ProducesResponseType(typeof(CampaignResponse), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Create([FromForm] CreateCampaignRequest request, IFormFile resumeFile)
+    public async Task<IActionResult> Create([FromBody] CreateCampaignRequest request)
     {
-        if (resumeFile == null || resumeFile.Length == 0)
-            return BadRequest(new { message = "Arquivo de currículo é obrigatório." });
-
-        var extension = Path.GetExtension(resumeFile.FileName).ToLowerInvariant();
-        if (!AllowedExtensions.Contains(extension))
-            return BadRequest(new { message = "Apenas arquivos .pdf, .doc e .docx são permitidos." });
-
-        var uploadsDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "resumes");
-        Directory.CreateDirectory(uploadsDir);
-
-        var fileName = $"{Guid.NewGuid()}_{resumeFile.FileName}";
-        var filePath = Path.Combine(uploadsDir, fileName);
-
-        using (var stream = new FileStream(filePath, FileMode.Create))
-        {
-            await resumeFile.CopyToAsync(stream);
-        }
-
         var command = new CreateCampaignCommand(
+            request.UserId,
+            request.Name,
             request.Niche,
             request.Region,
-            resumeFile.FileName,
-            filePath,
             request.EmailSubject,
             request.EmailBody);
 
@@ -84,7 +65,7 @@ public class CampaignsController : ControllerBase
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Update(Guid id, [FromBody] UpdateCampaignRequest request)
     {
-        var command = new UpdateCampaignCommand(id, request.EmailSubject, request.EmailBody);
+        var command = new UpdateCampaignCommand(id, request.Name, request.EmailSubject, request.EmailBody);
         var result = await _mediator.Send(command);
         return Ok(result);
     }

@@ -14,7 +14,9 @@ Domain/
 ├── Entities/
 │   ├── Campaign.cs
 │   ├── Contact.cs
-│   └── EmailLog.cs
+│   ├── EmailLog.cs
+│   ├── User.cs
+│   └── UserProfile.cs
 └── Enums/
     ├── CampaignStatus.cs
     └── EmailStatus.cs
@@ -26,9 +28,11 @@ Domain/
 
 | Arquivo | Descricao |
 |---------|-----------|
-| `Campaign.cs` | Agregado raiz de campanha: niche, region, resume, email content, status, colecao de contacts. |
-| `Contact.cs` | Contato prospectado: company, email, domain, position, referencia a Campaign, EmailLog opcional. |
-| `EmailLog.cs` | Log de envio de email: status, timestamp de envio, mensagem de erro, referencia a Contact. |
+| `Campaign.cs` | Agregado raiz de campanha: UserId (FK), Name, Niche, Region, EmailSubject, EmailBody, Status, User nav, colecao de Contacts. |
+| `Contact.cs` | Contato prospectado: CompanyName, Email, EmailStatus (enum), EmailSentAt (DateTime?), referencia a Campaign. |
+| `EmailLog.cs` | Log de envio de email: Id, ContactId, Contact nav, ErrorMessage, CreatedAt. |
+| `User.cs` | Usuario da plataforma: Id, Name, Email, PasswordHash, CreatedAt, UserProfile nav, Campaigns collection. |
+| `UserProfile.cs` | Perfil do usuario: Id, UserId (FK), User nav, ResumeFilePath, CreatedAt. |
 
 ### Enums (`SMCV.Domain.Enums`)
 

@@ -14,12 +14,13 @@ Manter esta ordem no `Program.cs`:
 1. AddControllers()
 2. AddEndpointsApiExplorer() + AddSwaggerGen()
 3. AddCors()
-4. AddDbContext<AppDbContext>()
-5. AddMediatR() + AddValidatorsFromAssembly() + AddAutoMapper()
-6. AddScoped — Repositories
-7. AddScoped — External Services
-8. AddHttpClient — clientes HTTP tipados
-9. Configure<T> — configuracoes via IOptions
+4. AddAuthentication (JWT Bearer — Keycloak)
+5. AddDbContext<AppDbContext>()
+6. AddMediatR() + AddValidatorsFromAssembly() + AddAutoMapper()
+7. AddScoped — Repositories
+8. AddScoped — External Services
+9. AddHttpClient — clientes HTTP tipados
+10. Configure<T> — configuracoes via IOptions
 ```
 
 ## REGISTROS ATUAIS NO DI
@@ -29,6 +30,8 @@ Manter esta ordem no `Program.cs`:
 builder.Services.AddScoped<ICampaignRepository, CampaignRepository>();
 builder.Services.AddScoped<IContactRepository, ContactRepository>();
 builder.Services.AddScoped<IEmailLogRepository, EmailLogRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IUserProfileRepository, UserProfileRepository>();
 ```
 
 ### External Services
@@ -95,11 +98,14 @@ app.UseSwaggerUI();
 app.UseStaticFiles();
 app.UseCors("AllowReactApp");
 app.UseMiddleware<ExceptionHandlingMiddleware>();
+app.UseAuthentication();
+app.UseAuthorization();
 app.MapControllers();
 app.Run();
 ```
 
-Para adicionar middleware: inserir ENTRE `UseCors` e `MapControllers`.
+Para adicionar middleware: inserir ENTRE `UseCors` e `UseAuthentication`.
+`UseAuthentication()` e `UseAuthorization()` devem estar ANTES de `MapControllers()`.
 
 ## CONNECTION STRING
 

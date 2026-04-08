@@ -12,9 +12,11 @@ Na arquitetura CQRS, controllers chamam `_mediator.Send()` em vez de chamar Serv
 
 | Arquivo | Namespace | Descricao |
 |---------|-----------|-----------|
-| `CampaignsController.cs` | `SMCV.Controllers` | CRUD de campanhas, envio de emails, exportacao CSV. Aceita upload de arquivo (resume). |
-| `ContactsController.cs` | `SMCV.Controllers` | CRUD de contatos, busca via Hunter.io, filtro por campanha. |
-| `EmailLogsController.cs` | `SMCV.Controllers` | Consulta de logs de email por contato ou por campanha. |
+| `CampaignsController.cs` | `SMCV.Controllers` | CRUD de campanhas, envio de emails, exportacao CSV. Recebe [FromBody] (sem multipart/IFormFile). Requer [Authorize]. |
+| `ContactsController.cs` | `SMCV.Controllers` | CRUD de contatos, busca via Hunter.io, filtro por campanha. Requer [Authorize]. |
+| `EmailLogsController.cs` | `SMCV.Controllers` | Consulta de logs de email por contato ou por campanha. Requer [Authorize]. |
+| `UsersController.cs` | `SMCV.Controllers` | CRUD de usuarios. POST e [AllowAnonymous], demais endpoints requerem [Authorize]. |
+| `UserProfilesController.cs` | `SMCV.Controllers` | CRUD de perfis de usuario e endpoint upload-resume. Requer [Authorize]. |
 
 ## REGRAS OBRIGATORIAS
 

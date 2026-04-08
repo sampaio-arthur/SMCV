@@ -1,6 +1,8 @@
 using System.Reflection;
 using FluentValidation;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using SMCV.Application.Interfaces;
 using SMCV.Common.Middleware;
@@ -42,6 +44,27 @@ builder.Services.AddCors(options =>
     });
 });
 
+// ─── Autenticação Keycloak (JWT Bearer) ───────────────────────────────────────
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.Authority = RequiredSetting("KEYCLOAK_AUTHORITY");
+    options.Audience = RequiredSetting("KEYCLOAK_AUDIENCE");
+    options.RequireHttpsMetadata = false;
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+    };
+});
+
+builder.Services.AddAuthorization();
+
 // ─── Database ─────────────────────────────────────────────────────────────────
 var connectionString = string.Join(";", [
     $"Host={RequiredSetting("DB_HOST")}",
@@ -63,6 +86,8 @@ builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 builder.Services.AddScoped<ICampaignRepository, CampaignRepository>();
 builder.Services.AddScoped<IContactRepository, ContactRepository>();
 builder.Services.AddScoped<IEmailLogRepository, EmailLogRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IUserProfileRepository, UserProfileRepository>();
 
 // ─── Serviços Externos ───────────────────────────────────────────────────────
 builder.Services.AddScoped<IHunterService, HunterService>();
@@ -95,6 +120,8 @@ app.UseSwagger();
 app.UseSwaggerUI();
 app.UseStaticFiles();
 app.UseCors("AllowReactApp");
+app.UseAuthentication();
+app.UseAuthorization();
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.MapControllers();
 app.Run();

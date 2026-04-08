@@ -22,17 +22,16 @@ public class CreateCampaignCommandHandler : IRequestHandler<CreateCampaignComman
     {
         var campaign = new Campaign
         {
+            UserId = request.UserId,
+            Name = request.Name,
             Niche = request.Niche,
             Region = request.Region,
-            ResumeFileName = request.ResumeFileName,
-            ResumeFilePath = request.ResumeFilePath,
             EmailSubject = request.EmailSubject,
             EmailBody = request.EmailBody,
             Status = CampaignStatus.Draft
         };
 
         await _campaignRepository.AddAsync(campaign);
-
         return _mapper.Map<CampaignResponse>(campaign);
     }
 }

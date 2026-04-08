@@ -36,7 +36,6 @@ public class HunterService : IHunterService
         if (json.TryGetProperty("data", out var data) &&
             data.TryGetProperty("emails", out var emails))
         {
-            var domain = data.TryGetProperty("domain", out var d) ? d.GetString() ?? "" : "";
             var organization = data.TryGetProperty("organization", out var org) ? org.GetString() ?? niche : niche;
 
             foreach (var email in emails.EnumerateArray())
@@ -44,23 +43,9 @@ public class HunterService : IHunterService
                 var emailValue = email.TryGetProperty("value", out var v) ? v.GetString() : null;
                 if (string.IsNullOrEmpty(emailValue)) continue;
 
-                var firstName = email.TryGetProperty("first_name", out var fn) ? fn.GetString() : null;
-                var lastName = email.TryGetProperty("last_name", out var ln) ? ln.GetString() : null;
-                var contactName = (firstName, lastName) switch
-                {
-                    (not null, not null) => $"{firstName} {lastName}",
-                    (not null, null) => firstName,
-                    (null, not null) => lastName,
-                    _ => null
-                };
-                var position = email.TryGetProperty("position", out var pos) ? pos.GetString() : null;
-
                 results.Add(new HunterContactResult(
                     CompanyName: organization,
-                    Domain: domain,
-                    Email: emailValue,
-                    ContactName: contactName,
-                    Position: position));
+                    Email: emailValue));
             }
         }
 

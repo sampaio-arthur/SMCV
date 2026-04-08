@@ -22,7 +22,9 @@ Infrastructure/
 │   ├── BaseRepository.cs
 │   ├── CampaignRepository.cs
 │   ├── ContactRepository.cs
-│   └── EmailLogRepository.cs
+│   ├── EmailLogRepository.cs
+│   ├── UserRepository.cs
+│   └── UserProfileRepository.cs
 └── ExternalServices/
     ├── CsvExportService.cs
     ├── EmailSenderService.cs
@@ -36,7 +38,7 @@ Infrastructure/
 
 | Arquivo | Descricao |
 |---------|-----------|
-| `AppDbContext.cs` | DbContext do EF Core com DbSets para Campaign, Contact, EmailLog. Configura relacionamentos e constraints via Fluent API. |
+| `AppDbContext.cs` | DbContext do EF Core com DbSets para Campaign, Contact, EmailLog, User, UserProfile. Configura relacionamentos e constraints de todas as 5 entidades via Fluent API. |
 | `AppDbContextFactory.cs` | Factory design-time para EF Core migrations. Le connection string de appsettings. |
 
 ### Data/Migrations (`SMCV.Infrastructure.Data.Migrations`)
@@ -55,14 +57,16 @@ Infrastructure/
 | `CampaignRepository.cs` | `ICampaignRepository` | Extensao do BaseRepository com eager loading de contacts e email logs. |
 | `ContactRepository.cs` | `IContactRepository` | Extensao do BaseRepository com busca por campanha, email e include de email logs. |
 | `EmailLogRepository.cs` | `IEmailLogRepository` | Extensao do BaseRepository com busca por contact ID e campaign ID. |
+| `UserRepository.cs` | `IUserRepository` | Extensao do BaseRepository com GetByEmailAsync para busca por email. |
+| `UserProfileRepository.cs` | `IUserProfileRepository` | Extensao do BaseRepository com GetByUserIdAsync para busca por UserId. |
 
 ### ExternalServices (`SMCV.Infrastructure.ExternalServices`)
 
 | Arquivo | Interface | Descricao |
 |---------|-----------|-----------|
-| `HunterService.cs` | `IHunterService` | Integracao com API Hunter.io para busca de contatos por dominio. Usa HttpClient. |
-| `EmailSenderService.cs` | `IEmailSenderService` | Envio de email SMTP via MailKit com suporte a anexos. Configurado via `EmailSettings`. |
-| `CsvExportService.cs` | `ICsvExportService` | Geracao de CSV a partir de contatos com escaping e UTF-8 BOM. |
+| `HunterService.cs` | `IHunterService` | Integracao simplificada com API Hunter.io: retorna apenas CompanyName e Email. Usa HttpClient. |
+| `EmailSenderService.cs` | `IEmailSenderService` | Envio de email SMTP via MailKit com suporte a anexos. Aceita fromEmail e fromName como parametros. Configurado via `EmailSettings`. |
+| `CsvExportService.cs` | `ICsvExportService` | Geracao de CSV com colunas CompanyName, Email, EmailStatus, CampaignId. Escaping e UTF-8 BOM. |
 | `EmailSettings.cs` | — | Classe de configuracao SMTP: host, port, sender email/password/name. Bind via `IOptions<EmailSettings>`. |
 
 ## REGRAS OBRIGATORIAS — Repositories

@@ -15,25 +15,18 @@ public class EmailSenderService : IEmailSenderService
     }
 
     public async Task SendEmailWithAttachmentAsync(
-        string toEmail,
-        string toName,
-        string subject,
-        string body,
-        string attachmentPath,
-        string attachmentFileName)
+        string toEmail, string toName,
+        string subject, string body,
+        string attachmentPath, string attachmentFileName,
+        string fromEmail, string fromName)
     {
         var message = new MimeMessage();
-        message.From.Add(new MailboxAddress(_settings.SenderName, _settings.SenderEmail));
+        message.From.Add(new MailboxAddress(fromName, fromEmail));
         message.To.Add(new MailboxAddress(toName, toEmail));
         message.Subject = subject;
 
-        var builder = new BodyBuilder
-        {
-            HtmlBody = body
-        };
-
+        var builder = new BodyBuilder { HtmlBody = body };
         builder.Attachments.Add(attachmentFileName, await File.ReadAllBytesAsync(attachmentPath));
-
         message.Body = builder.ToMessageBody();
 
         using var client = new SmtpClient();

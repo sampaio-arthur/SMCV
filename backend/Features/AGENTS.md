@@ -57,14 +57,57 @@ Features/
 │       └── GetContactsByCampaign/
 │           ├── GetContactsByCampaignQuery.cs
 │           └── GetContactsByCampaignQueryHandler.cs
-└── EmailLogs/
+├── EmailLogs/
+│   └── Queries/
+│       ├── GetEmailLogByContact/
+│       │   ├── GetEmailLogByContactQuery.cs
+│       │   └── GetEmailLogByContactQueryHandler.cs
+│       └── GetEmailLogsByCampaign/
+│           ├── GetEmailLogsByCampaignQuery.cs
+│           └── GetEmailLogsByCampaignQueryHandler.cs
+├── Users/
+│   ├── Commands/
+│   │   ├── CreateUser/
+│   │   │   ├── CreateUserCommand.cs
+│   │   │   ├── CreateUserCommandHandler.cs
+│   │   │   └── CreateUserCommandValidator.cs
+│   │   ├── UpdateUser/
+│   │   │   ├── UpdateUserCommand.cs
+│   │   │   ├── UpdateUserCommandHandler.cs
+│   │   │   └── UpdateUserCommandValidator.cs
+│   │   └── DeleteUser/
+│   │       ├── DeleteUserCommand.cs
+│   │       └── DeleteUserCommandHandler.cs
+│   └── Queries/
+│       ├── GetAllUsers/
+│       │   ├── GetAllUsersQuery.cs
+│       │   └── GetAllUsersQueryHandler.cs
+│       └── GetUserById/
+│           ├── GetUserByIdQuery.cs
+│           └── GetUserByIdQueryHandler.cs
+└── UserProfiles/
+    ├── Commands/
+    │   ├── CreateUserProfile/
+    │   │   ├── CreateUserProfileCommand.cs
+    │   │   ├── CreateUserProfileCommandHandler.cs
+    │   │   └── CreateUserProfileCommandValidator.cs
+    │   ├── UpdateUserProfile/
+    │   │   ├── UpdateUserProfileCommand.cs
+    │   │   ├── UpdateUserProfileCommandHandler.cs
+    │   │   └── UpdateUserProfileCommandValidator.cs
+    │   └── DeleteUserProfile/
+    │       ├── DeleteUserProfileCommand.cs
+    │       └── DeleteUserProfileCommandHandler.cs
     └── Queries/
-        ├── GetEmailLogByContact/
-        │   ├── GetEmailLogByContactQuery.cs
-        │   └── GetEmailLogByContactQueryHandler.cs
-        └── GetEmailLogsByCampaign/
-            ├── GetEmailLogsByCampaignQuery.cs
-            └── GetEmailLogsByCampaignQueryHandler.cs
+        ├── GetAllUserProfiles/
+        │   ├── GetAllUserProfilesQuery.cs
+        │   └── GetAllUserProfilesQueryHandler.cs
+        ├── GetUserProfileById/
+        │   ├── GetUserProfileByIdQuery.cs
+        │   └── GetUserProfileByIdQueryHandler.cs
+        └── GetUserProfileByUserId/
+            ├── GetUserProfileByUserIdQuery.cs
+            └── GetUserProfileByUserIdQueryHandler.cs
 ```
 
 ## ESTADO ATUAL
@@ -75,11 +118,11 @@ Todos os handlers estao implementados e funcionais:
 
 | Handler | Tipo | Namespace | Descricao |
 |---------|------|-----------|-----------|
-| `CreateCampaignCommandHandler` | Command | `SMCV.Features.Campaigns.Commands.CreateCampaign` | Cria campanha em status Draft. Validator incluso. |
+| `CreateCampaignCommandHandler` | Command | `SMCV.Features.Campaigns.Commands.CreateCampaign` | Cria campanha em status Draft. Command: UserId, Name, Niche, Region, EmailSubject, EmailBody. Validator incluso. |
 | `DeleteCampaignCommandHandler` | Command | `SMCV.Features.Campaigns.Commands.DeleteCampaign` | Deleta campanha. Valida existencia e impede exclusao se status Running. |
 | `ExportContactsCsvCommandHandler` | Command | `SMCV.Features.Campaigns.Commands.ExportContactsCsv` | Busca contatos da campanha e gera CSV via ICsvExportService. |
-| `SendCampaignEmailsCommandHandler` | Command | `SMCV.Features.Campaigns.Commands.SendCampaignEmails` | Envia emails para contatos com anexo de resume. Cria/atualiza EmailLogs. |
-| `UpdateCampaignCommandHandler` | Command | `SMCV.Features.Campaigns.Commands.UpdateCampaign` | Atualiza subject/body. Valida status Draft antes de permitir alteracao. Validator incluso. |
+| `SendCampaignEmailsCommandHandler` | Command | `SMCV.Features.Campaigns.Commands.SendCampaignEmails` | Envia emails para contatos. Injeta IUserRepository e IUserProfileRepository para obter remetente e resume do UserProfile. |
+| `UpdateCampaignCommandHandler` | Command | `SMCV.Features.Campaigns.Commands.UpdateCampaign` | Atualiza Name, EmailSubject e EmailBody. Valida status Draft. Validator incluso. |
 | `GetAllCampaignsQueryHandler` | Query | `SMCV.Features.Campaigns.Queries.GetAllCampaigns` | Lista todas as campanhas com eager loading de contacts. |
 | `GetCampaignByIdQueryHandler` | Query | `SMCV.Features.Campaigns.Queries.GetCampaignById` | Busca campanha por ID com contacts. Lanca NotFoundException se nao encontrada. |
 
@@ -87,11 +130,11 @@ Todos os handlers estao implementados e funcionais:
 
 | Handler | Tipo | Namespace | Descricao |
 |---------|------|-----------|-----------|
-| `CreateContactCommandHandler` | Command | `SMCV.Features.Contacts.Commands.CreateContact` | Cria contato manual. Valida existencia da campanha e unicidade de email. Validator incluso. |
+| `CreateContactCommandHandler` | Command | `SMCV.Features.Contacts.Commands.CreateContact` | Cria contato manual com CampaignId, CompanyName, Email. Valida existencia da campanha e unicidade de email. Validator incluso. |
 | `DeleteContactCommandHandler` | Command | `SMCV.Features.Contacts.Commands.DeleteContact` | Deleta contato por ID. Valida existencia. |
-| `SearchContactsCommandHandler` | Command | `SMCV.Features.Contacts.Commands.SearchContacts` | Busca contatos via Hunter.io, filtra duplicatas, cria novos contatos no banco. |
-| `GetContactByIdQueryHandler` | Query | `SMCV.Features.Contacts.Queries.GetContactById` | Busca contato por ID com email log. Lanca NotFoundException se nao encontrado. |
-| `GetContactsByCampaignQueryHandler` | Query | `SMCV.Features.Contacts.Queries.GetContactsByCampaign` | Lista contatos de uma campanha com email logs. Valida existencia da campanha. |
+| `SearchContactsCommandHandler` | Command | `SMCV.Features.Contacts.Commands.SearchContacts` | Busca contatos via Hunter.io (CompanyName + Email), filtra duplicatas, cria novos contatos no banco. |
+| `GetContactByIdQueryHandler` | Query | `SMCV.Features.Contacts.Queries.GetContactById` | Busca contato por ID. Lanca NotFoundException se nao encontrado. |
+| `GetContactsByCampaignQueryHandler` | Query | `SMCV.Features.Contacts.Queries.GetContactsByCampaign` | Lista contatos de uma campanha. Valida existencia da campanha. |
 
 ### EmailLogs
 
@@ -101,6 +144,27 @@ Todos os handlers estao implementados e funcionais:
 | `GetEmailLogsByCampaignQueryHandler` | Query | `SMCV.Features.EmailLogs.Queries.GetEmailLogsByCampaign` | Lista todos os logs de email de uma campanha com detalhes do contato. |
 
 > **Nota:** EmailLogs nao possui Commands — os logs sao criados automaticamente pelo `SendCampaignEmailsCommandHandler`.
+
+### Users
+
+| Handler | Tipo | Namespace | Descricao |
+|---------|------|-----------|-----------|
+| `CreateUserCommandHandler` | Command | `SMCV.Features.Users.Commands.CreateUser` | Cria usuario. Validator incluso. |
+| `UpdateUserCommandHandler` | Command | `SMCV.Features.Users.Commands.UpdateUser` | Atualiza dados do usuario. Validator incluso. |
+| `DeleteUserCommandHandler` | Command | `SMCV.Features.Users.Commands.DeleteUser` | Deleta usuario por ID. Valida existencia. |
+| `GetAllUsersQueryHandler` | Query | `SMCV.Features.Users.Queries.GetAllUsers` | Lista todos os usuarios. |
+| `GetUserByIdQueryHandler` | Query | `SMCV.Features.Users.Queries.GetUserById` | Busca usuario por ID. Lanca NotFoundException se nao encontrado. |
+
+### UserProfiles
+
+| Handler | Tipo | Namespace | Descricao |
+|---------|------|-----------|-----------|
+| `CreateUserProfileCommandHandler` | Command | `SMCV.Features.UserProfiles.Commands.CreateUserProfile` | Cria perfil de usuario. Validator incluso. |
+| `UpdateUserProfileCommandHandler` | Command | `SMCV.Features.UserProfiles.Commands.UpdateUserProfile` | Atualiza perfil (incluindo ResumeFilePath). Validator incluso. |
+| `DeleteUserProfileCommandHandler` | Command | `SMCV.Features.UserProfiles.Commands.DeleteUserProfile` | Deleta perfil por ID. Valida existencia. |
+| `GetAllUserProfilesQueryHandler` | Query | `SMCV.Features.UserProfiles.Queries.GetAllUserProfiles` | Lista todos os perfis de usuario. |
+| `GetUserProfileByIdQueryHandler` | Query | `SMCV.Features.UserProfiles.Queries.GetUserProfileById` | Busca perfil por ID. Lanca NotFoundException se nao encontrado. |
+| `GetUserProfileByUserIdQueryHandler` | Query | `SMCV.Features.UserProfiles.Queries.GetUserProfileByUserId` | Busca perfil pelo UserId. Lanca NotFoundException se nao encontrado. |
 
 ## REGRAS OBRIGATORIAS
 

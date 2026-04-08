@@ -12,7 +12,7 @@ using SMCV.Infrastructure.Data;
 namespace SMCV.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260407185014_InitialCreate")]
+    [Migration("20260408190858_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -41,6 +41,10 @@ namespace SMCV.Infrastructure.Data.Migrations
                         .IsRequired()
                         .HasColumnType("varchar(500)");
 
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
+
                     b.Property<string>("Niche")
                         .IsRequired()
                         .HasColumnType("varchar(255)");
@@ -49,20 +53,17 @@ namespace SMCV.Infrastructure.Data.Migrations
                         .IsRequired()
                         .HasColumnType("varchar(255)");
 
-                    b.Property<string>("ResumeFileName")
-                        .IsRequired()
-                        .HasColumnType("varchar(500)");
-
-                    b.Property<string>("ResumeFilePath")
-                        .IsRequired()
-                        .HasColumnType("varchar(1000)");
-
                     b.Property<int>("Status")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasDefaultValue(0);
 
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Campaigns");
                 });
@@ -79,26 +80,20 @@ namespace SMCV.Infrastructure.Data.Migrations
                         .IsRequired()
                         .HasColumnType("varchar(500)");
 
-                    b.Property<string>("ContactName")
-                        .HasColumnType("varchar(255)");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Domain")
-                        .IsRequired()
-                        .HasColumnType("varchar(255)");
 
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("varchar(255)");
 
-                    b.Property<string>("Position")
-                        .HasColumnType("varchar(255)");
+                    b.Property<DateTime?>("EmailSentAt")
+                        .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("Source")
-                        .IsRequired()
-                        .HasColumnType("varchar(255)");
+                    b.Property<int>("EmailStatus")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
 
                     b.HasKey("Id");
 
@@ -123,18 +118,73 @@ namespace SMCV.Infrastructure.Data.Migrations
                     b.Property<string>("ErrorMessage")
                         .HasColumnType("text");
 
-                    b.Property<DateTime?>("SentAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("ContactId")
                         .IsUnique();
 
                     b.ToTable("EmailLogs");
+                });
+
+            modelBuilder.Entity("SMCV.Domain.Entities.User", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasColumnType("varchar(500)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("SMCV.Domain.Entities.UserProfile", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ResumeFilePath")
+                        .HasColumnType("varchar(1000)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("UserProfiles");
+                });
+
+            modelBuilder.Entity("SMCV.Domain.Entities.Campaign", b =>
+                {
+                    b.HasOne("SMCV.Domain.Entities.User", "User")
+                        .WithMany("Campaigns")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("SMCV.Domain.Entities.Contact", b =>
@@ -159,6 +209,17 @@ namespace SMCV.Infrastructure.Data.Migrations
                     b.Navigation("Contact");
                 });
 
+            modelBuilder.Entity("SMCV.Domain.Entities.UserProfile", b =>
+                {
+                    b.HasOne("SMCV.Domain.Entities.User", "User")
+                        .WithOne("UserProfile")
+                        .HasForeignKey("SMCV.Domain.Entities.UserProfile", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("SMCV.Domain.Entities.Campaign", b =>
                 {
                     b.Navigation("Contacts");
@@ -167,6 +228,13 @@ namespace SMCV.Infrastructure.Data.Migrations
             modelBuilder.Entity("SMCV.Domain.Entities.Contact", b =>
                 {
                     b.Navigation("EmailLog");
+                });
+
+            modelBuilder.Entity("SMCV.Domain.Entities.User", b =>
+                {
+                    b.Navigation("Campaigns");
+
+                    b.Navigation("UserProfile");
                 });
 #pragma warning restore 612, 618
         }

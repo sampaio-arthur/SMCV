@@ -10,17 +10,14 @@ public class CsvExportService : ICsvExportService
     {
         var sb = new StringBuilder();
 
-        sb.AppendLine("CompanyName,Email,Domain,ContactName,Position,Source,CampaignId");
+        sb.AppendLine("CompanyName,Email,EmailStatus,CampaignId");
 
         foreach (var c in contacts)
         {
             sb.AppendLine(string.Join(",",
                 Escape(c.CompanyName),
                 Escape(c.Email),
-                Escape(c.Domain),
-                Escape(c.ContactName ?? ""),
-                Escape(c.Position ?? ""),
-                Escape(c.Source),
+                Escape(c.EmailStatus.ToString()),
                 c.CampaignId));
         }
 

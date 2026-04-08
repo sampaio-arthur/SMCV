@@ -26,6 +26,7 @@ public class UpdateCampaignCommandHandler : IRequestHandler<UpdateCampaignComman
         if (campaign.Status != CampaignStatus.Draft)
             throw new InvalidOperationException("Apenas campanhas em Draft podem ser editadas.");
 
+        campaign.Name = request.Name;
         campaign.EmailSubject = request.EmailSubject;
         campaign.EmailBody = request.EmailBody;
 

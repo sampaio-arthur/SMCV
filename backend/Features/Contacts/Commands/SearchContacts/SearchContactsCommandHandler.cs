@@ -45,10 +45,6 @@ public class SearchContactsCommandHandler : IRequestHandler<SearchContactsComman
             {
                 CompanyName = result.CompanyName,
                 Email = result.Email,
-                Domain = result.Domain,
-                ContactName = result.ContactName,
-                Position = result.Position,
-                Source = "hunter.io",
                 CampaignId = request.CampaignId
             };
 

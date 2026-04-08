@@ -6,27 +6,11 @@ public class CreateCampaignCommandValidator : AbstractValidator<CreateCampaignCo
 {
     public CreateCampaignCommandValidator()
     {
-        RuleFor(x => x.Niche)
-            .NotEmpty().WithMessage("Niche é obrigatório.")
-            .MaximumLength(255);
-
-        RuleFor(x => x.Region)
-            .NotEmpty().WithMessage("Region é obrigatório.")
-            .MaximumLength(255);
-
-        RuleFor(x => x.ResumeFileName)
-            .NotEmpty().WithMessage("ResumeFileName é obrigatório.")
-            .MaximumLength(500);
-
-        RuleFor(x => x.ResumeFilePath)
-            .NotEmpty().WithMessage("ResumeFilePath é obrigatório.")
-            .MaximumLength(1000);
-
-        RuleFor(x => x.EmailSubject)
-            .NotEmpty().WithMessage("EmailSubject é obrigatório.")
-            .MaximumLength(500);
-
-        RuleFor(x => x.EmailBody)
-            .NotEmpty().WithMessage("EmailBody é obrigatório.");
+        RuleFor(x => x.UserId).NotEmpty();
+        RuleFor(x => x.Name).NotEmpty().MaximumLength(255);
+        RuleFor(x => x.Niche).NotEmpty().MaximumLength(255);
+        RuleFor(x => x.Region).NotEmpty().MaximumLength(255);
+        RuleFor(x => x.EmailSubject).NotEmpty().MaximumLength(500);
+        RuleFor(x => x.EmailBody).NotEmpty();
     }
 }
