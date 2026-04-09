@@ -47,9 +47,12 @@ Features/
 │   │   ├── DeleteContact/
 │   │   │   ├── DeleteContactCommand.cs
 │   │   │   └── DeleteContactCommandHandler.cs
-│   │   └── SearchContacts/
-│   │       ├── SearchContactsCommand.cs
-│   │       └── SearchContactsCommandHandler.cs
+│   │   ├── SearchContacts/
+│   │   │   ├── SearchContactsCommand.cs
+│   │   │   └── SearchContactsCommandHandler.cs
+│   │   └── UpdateContact/
+│   │       ├── UpdateContactCommand.cs
+│   │       └── UpdateContactCommandHandler.cs
 │   └── Queries/
 │       ├── GetContactById/
 │       │   ├── GetContactByIdQuery.cs
@@ -136,6 +139,7 @@ Todos os handlers estao implementados e funcionais:
 | `CreateContactCommandHandler` | Command | `SMCV.Features.Contacts.Commands.CreateContact` | Cria contato manual com CampaignId, CompanyName, Email. Valida existencia da campanha e unicidade de email. Validator incluso. |
 | `DeleteContactCommandHandler` | Command | `SMCV.Features.Contacts.Commands.DeleteContact` | Deleta contato por ID. Valida existencia. |
 | `SearchContactsCommandHandler` | Command | `SMCV.Features.Contacts.Commands.SearchContacts` | Busca contatos via Hunter.io (CompanyName + Email), filtra duplicatas, cria novos contatos no banco. |
+| `UpdateContactCommandHandler` | Command | `SMCV.Features.Contacts.Commands.UpdateContact` | Atualiza CompanyName e Email do contato. Valida existencia. |
 | `GetContactByIdQueryHandler` | Query | `SMCV.Features.Contacts.Queries.GetContactById` | Busca contato por ID. Lanca NotFoundException se nao encontrado. |
 | `GetContactsByCampaignQueryHandler` | Query | `SMCV.Features.Contacts.Queries.GetContactsByCampaign` | Lista contatos de uma campanha. Valida existencia da campanha. |
 
@@ -143,7 +147,7 @@ Todos os handlers estao implementados e funcionais:
 
 | Handler | Tipo | Namespace | Descricao |
 |---------|------|-----------|-----------|
-| `GetEmailLogByContactQueryHandler` | Query | `SMCV.Features.EmailLogs.Queries.GetEmailLogByContact` | Busca log de email por contact ID. Lanca NotFoundException se nao encontrado. |
+| `GetEmailLogByContactQueryHandler` | Query | `SMCV.Features.EmailLogs.Queries.GetEmailLogByContact` | Lista logs de email por contact ID. Retorna lista vazia se nao houver logs. |
 | `GetEmailLogsByCampaignQueryHandler` | Query | `SMCV.Features.EmailLogs.Queries.GetEmailLogsByCampaign` | Lista todos os logs de email de uma campanha com detalhes do contato. |
 
 > **Nota:** EmailLogs nao possui Commands — os logs sao criados automaticamente pelo `SendCampaignEmailsCommandHandler`.

@@ -2,11 +2,10 @@ using AutoMapper;
 using MediatR;
 using SMCV.Application.DTOs.EmailLogs;
 using SMCV.Application.Interfaces;
-using SMCV.Common.Exceptions;
 
 namespace SMCV.Features.EmailLogs.Queries.GetEmailLogByContact;
 
-public class GetEmailLogByContactQueryHandler : IRequestHandler<GetEmailLogByContactQuery, EmailLogResponse>
+public class GetEmailLogByContactQueryHandler : IRequestHandler<GetEmailLogByContactQuery, IEnumerable<EmailLogResponse>>
 {
     private readonly IEmailLogRepository _emailLogRepository;
     private readonly IMapper _mapper;
@@ -17,11 +16,10 @@ public class GetEmailLogByContactQueryHandler : IRequestHandler<GetEmailLogByCon
         _mapper = mapper;
     }
 
-    public async Task<EmailLogResponse> Handle(GetEmailLogByContactQuery request, CancellationToken cancellationToken)
+    public async Task<IEnumerable<EmailLogResponse>> Handle(GetEmailLogByContactQuery request, CancellationToken cancellationToken)
     {
-        var emailLog = await _emailLogRepository.GetByContactIdAsync(request.ContactId)
-            ?? throw new NotFoundException("EmailLog", request.ContactId);
+        var emailLogs = await _emailLogRepository.GetByContactIdAsync(request.ContactId);
 
-        return _mapper.Map<EmailLogResponse>(emailLog);
+        return _mapper.Map<IEnumerable<EmailLogResponse>>(emailLogs);
     }
 }

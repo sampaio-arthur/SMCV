@@ -23,7 +23,8 @@ Application/
 │   │   ├── ContactResponse.cs
 │   │   ├── CreateContactRequest.cs
 │   │   ├── SearchContactsRequest.cs
-│   │   └── SearchContactsResponse.cs
+│   │   ├── SearchContactsResponse.cs
+│   │   └── UpdateContactRequest.cs
 │   ├── EmailLogs/
 │   │   └── EmailLogResponse.cs
 │   ├── Users/
@@ -71,6 +72,7 @@ Application/
 | `CreateContactRequest.cs` | Request | Criacao de contato: CampaignId, CompanyName, Email. |
 | `SearchContactsRequest.cs` | Request | Busca de contatos via Hunter.io: niche, region, limit. |
 | `SearchContactsResponse.cs` | Response | Resultado da busca: total encontrado e lista de contatos adicionados. |
+| `UpdateContactRequest.cs` | Request | Atualizacao de contato: CompanyName, Email. |
 
 ### DTOs — EmailLogs (`SMCV.Application.DTOs.EmailLogs`)
 

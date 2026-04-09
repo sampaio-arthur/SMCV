@@ -9,9 +9,10 @@ public class EmailLogRepository : BaseRepository<EmailLog>, IEmailLogRepository
 {
     public EmailLogRepository(AppDbContext context) : base(context) { }
 
-    public async Task<EmailLog?> GetByContactIdAsync(Guid contactId) =>
+    public async Task<IEnumerable<EmailLog>> GetByContactIdAsync(Guid contactId) =>
         await _context.EmailLogs
-            .FirstOrDefaultAsync(el => el.ContactId == contactId);
+            .Where(el => el.ContactId == contactId)
+            .ToListAsync();
 
     public async Task<IEnumerable<EmailLog>> GetByCampaignIdAsync(Guid campaignId) =>
         await _context.EmailLogs

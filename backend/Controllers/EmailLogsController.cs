@@ -21,8 +21,7 @@ public class EmailLogsController : ControllerBase
     }
 
     [HttpGet("contact/{contactId:guid}")]
-    [ProducesResponseType(typeof(EmailLogResponse), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(IEnumerable<EmailLogResponse>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetByContact(Guid contactId)
     {
         var result = await _mediator.Send(new GetEmailLogByContactQuery(contactId));

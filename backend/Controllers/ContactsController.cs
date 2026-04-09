@@ -6,6 +6,7 @@ using SMCV.Application.DTOs.Contacts;
 using SMCV.Features.Contacts.Commands.CreateContact;
 using SMCV.Features.Contacts.Commands.DeleteContact;
 using SMCV.Features.Contacts.Commands.SearchContacts;
+using SMCV.Features.Contacts.Commands.UpdateContact;
 using SMCV.Features.Contacts.Queries.GetContactById;
 using SMCV.Features.Contacts.Queries.GetContactsByCampaign;
 
@@ -52,6 +53,16 @@ public class ContactsController : ControllerBase
 
         var result = await _mediator.Send(command);
         return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
+    }
+
+    [HttpPut("{id:guid}")]
+    [ProducesResponseType(typeof(ContactResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> Update(Guid id, [FromBody] UpdateContactRequest request)
+    {
+        var command = new UpdateContactCommand(id, request.CompanyName, request.Email);
+        var result = await _mediator.Send(command);
+        return Ok(result);
     }
 
     [HttpDelete("{id:guid}")]
