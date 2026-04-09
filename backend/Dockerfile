@@ -12,6 +12,9 @@ RUN dotnet publish SMCV.csproj -c Release -o /app/publish /p:UseAppHost=false
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 WORKDIR /app
 
+RUN apt-get update && apt-get install -y tzdata
+ENV TZ=America/Sao_Paulo
+
 EXPOSE 8080
 ENV ASPNETCORE_URLS=http://+:8080
 ENV ASPNETCORE_ENVIRONMENT=Production

@@ -12,7 +12,7 @@ Na arquitetura CQRS, controllers chamam `_mediator.Send()` em vez de chamar Serv
 
 | Arquivo | Namespace | Descricao |
 |---------|-----------|-----------|
-| `AuthController.cs` | `SMCV.Controllers` | Registro, login e logout via sessao. POST /auth/register (BCrypt hash), POST /auth/login, POST /auth/logout, GET /auth/me. |
+| `AuthController.cs` | `SMCV.Controllers` | Registro, login e logout via sessao. Delega para MediatR: RegisterUserCommand, LoginUserCommand, GetCurrentUserQuery. Seta/limpa sessao (userId) no controller apos retorno do handler. |
 | `CampaignsController.cs` | `SMCV.Controllers` | CRUD de campanhas, envio de emails, exportacao CSV. UserId extraido da sessao no POST. |
 | `ContactsController.cs` | `SMCV.Controllers` | CRUD de contatos, busca via Hunter.io, filtro por campanha. |
 | `EmailLogsController.cs` | `SMCV.Controllers` | Consulta de logs de email por contato ou por campanha. |
@@ -31,8 +31,8 @@ Na arquitetura CQRS, controllers chamam `_mediator.Send()` em vez de chamar Serv
 ## PROIBICOES
 
 - **SEM** logica de negocio (if/else de regras, calculos, validacoes complexas)
-- **SEM** acesso direto ao `AppDbContext` ou Repository (exceto AuthController que usa IUserRepository diretamente)
-- **SEM** instanciacao de Entity — o controller trabalha apenas com DTOs (exceto AuthController)
+- **SEM** acesso direto ao `AppDbContext` ou Repository
+- **SEM** instanciacao de Entity — o controller trabalha apenas com DTOs
 - **SEM** try/catch generico (deixar o middleware tratar excecoes)
 
 ## PADROES DE CODIGO

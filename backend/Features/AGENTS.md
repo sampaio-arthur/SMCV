@@ -12,6 +12,18 @@ Validators (FluentValidation) ficam junto aos Commands que validam.
 
 ```
 Features/
+├── Auth/
+│   ├── Commands/
+│   │   ├── RegisterUser/
+│   │   │   ├── RegisterUserCommand.cs
+│   │   │   └── RegisterUserCommandHandler.cs
+│   │   └── LoginUser/
+│   │       ├── LoginUserCommand.cs
+│   │       └── LoginUserCommandHandler.cs
+│   └── Queries/
+│       └── GetCurrentUser/
+│           ├── GetCurrentUserQuery.cs
+│           └── GetCurrentUserQueryHandler.cs
 ├── Campaigns/
 │   ├── Commands/
 │   │   ├── CreateCampaign/
@@ -119,6 +131,14 @@ Features/
 ## ESTADO ATUAL
 
 Todos os handlers estao implementados e funcionais:
+
+### Auth
+
+| Handler | Tipo | Namespace | Descricao |
+|---------|------|-----------|-----------|
+| `RegisterUserCommandHandler` | Command | `SMCV.Features.Auth.Commands.RegisterUser` | Valida unicidade de email, faz BCrypt hash da senha e cria o usuario. Retorna `UserResponse`. |
+| `LoginUserCommandHandler` | Command | `SMCV.Features.Auth.Commands.LoginUser` | Valida credenciais (email + BCrypt.Verify). Lanca `BusinessException` se invalidas. Retorna `UserResponse`. Sessao setada no controller. |
+| `GetCurrentUserQueryHandler` | Query | `SMCV.Features.Auth.Queries.GetCurrentUser` | Busca usuario pelo `UserId` extraido da sessao no controller. Lanca `NotFoundException` se nao encontrado. |
 
 ### Campaigns
 

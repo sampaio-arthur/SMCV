@@ -1,7 +1,9 @@
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using SMCV.Features.Auth.Commands.LoginUser;
+using SMCV.Features.Auth.Commands.RegisterUser;
+using SMCV.Features.Auth.Queries.GetCurrentUser;
 using SMCV.Application.DTOs.Auth;
-using SMCV.Application.Interfaces;
-using SMCV.Domain.Entities;
 
 namespace SMCV.Controllers;
 
@@ -9,47 +11,27 @@ namespace SMCV.Controllers;
 [Route("api/[controller]")]
 public class AuthController : ControllerBase
 {
-    private readonly IUserRepository _userRepository;
+    private readonly IMediator _mediator;
 
-    public AuthController(IUserRepository userRepository)
+    public AuthController(IMediator mediator)
     {
-        _userRepository = userRepository;
+        _mediator = mediator;
     }
 
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request)
     {
-        var existing = await _userRepository.GetByEmailAsync(request.Email);
-        if (existing is not null)
-            return BadRequest(new { message = "Email já cadastrado." });
-
-        var user = new User
-        {
-            Name = request.Name,
-            Email = request.Email,
-            PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password)
-        };
-
-        await _userRepository.AddAsync(user);
-
-        HttpContext.Session.SetString("userId", user.Id.ToString());
-
-        return Created("", new { id = user.Id, name = user.Name, email = user.Email });
+        var result = await _mediator.Send(new RegisterUserCommand(request.Name, request.Email, request.Password));
+        HttpContext.Session.SetString("userId", result.Id.ToString());
+        return Created("", result);
     }
 
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
-        var user = await _userRepository.GetByEmailAsync(request.Email);
-        if (user is null)
-            return Unauthorized(new { message = "Email ou senha inválidos." });
-
-        if (!BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
-            return Unauthorized(new { message = "Email ou senha inválidos." });
-
-        HttpContext.Session.SetString("userId", user.Id.ToString());
-
-        return Ok(new { id = user.Id, name = user.Name, email = user.Email });
+        var result = await _mediator.Send(new LoginUserCommand(request.Email, request.Password));
+        HttpContext.Session.SetString("userId", result.Id.ToString());
+        return Ok(result);
     }
 
     [HttpPost("logout")]
@@ -65,9 +47,7 @@ public class AuthController : ControllerBase
         var userId = HttpContext.Session.GetString("userId");
         if (userId is null) return Unauthorized();
 
-        var user = await _userRepository.GetByIdAsync(Guid.Parse(userId));
-        if (user is null) return Unauthorized();
-
-        return Ok(new { id = user.Id, name = user.Name, email = user.Email });
+        var result = await _mediator.Send(new GetCurrentUserQuery(Guid.Parse(userId)));
+        return Ok(result);
     }
 }
