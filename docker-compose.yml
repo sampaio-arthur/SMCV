@@ -41,6 +41,8 @@ services:
       KC_DB_URL_DATABASE: ${KC_POSTGRES_DB}
       KC_DB_USERNAME: ${KC_POSTGRES_USER}
       KC_DB_PASSWORD: ${KC_POSTGRES_PASSWORD}
+      KC_HOSTNAME: localhost
+      KC_HOSTNAME_PORT: 8180
     command: start-dev
     depends_on:
       - keycloak-db
@@ -69,6 +71,7 @@ services:
       SMTP_SENDER_PASSWORD: ${SMTP_SENDER_PASSWORD}
       SMTP_SENDER_NAME: ${SMTP_SENDER_NAME}
       KEYCLOAK_AUTHORITY: ${KEYCLOAK_AUTHORITY}
+      KEYCLOAK_METADATA_URL: ${KEYCLOAK_METADATA_URL}
       KEYCLOAK_AUDIENCE: ${KEYCLOAK_AUDIENCE}
     networks:
       - app-network

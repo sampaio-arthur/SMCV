@@ -77,15 +77,35 @@ builder.Services.AddAuthentication(options =>
 })
 .AddJwtBearer(options =>
 {
-    options.Authority = RequiredSetting("KEYCLOAK_AUTHORITY");
-    options.Audience = RequiredSetting("KEYCLOAK_AUDIENCE");
+    var authority = RequiredSetting("KEYCLOAK_AUTHORITY");
+    var metadataUrl = Environment.GetEnvironmentVariable("KEYCLOAK_METADATA_URL");
+
     options.RequireHttpsMetadata = false;
-    options.TokenValidationParameters = new TokenValidationParameters
+    options.Audience = RequiredSetting("KEYCLOAK_AUDIENCE");
+
+    if (!string.IsNullOrEmpty(metadataUrl))
     {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateLifetime = true,
-    };
+        // Docker: fetch metadata via internal DNS, validate issuer via external URL
+        options.MetadataAddress = metadataUrl;
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidIssuer = authority,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+        };
+    }
+    else
+    {
+        // Local dev: authority serves both metadata and issuer
+        options.Authority = authority;
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+        };
+    }
 });
 
 builder.Services.AddAuthorization();
