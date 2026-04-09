@@ -22,6 +22,13 @@ public class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, UserR
         var user = await _userRepository.GetByIdAsync(request.Id)
             ?? throw new NotFoundException("User", request.Id);
 
+        if (user.Email != request.Email)
+        {
+            var existingUser = await _userRepository.GetByEmailAsync(request.Email);
+            if (existingUser is not null)
+                throw new BusinessException("Email já está em uso por outro usuário.");
+        }
+
         user.Name = request.Name;
         user.Email = request.Email;
 

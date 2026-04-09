@@ -104,6 +104,7 @@ app.MapControllers();
 app.Run();
 ```
 
+`ExceptionHandlingMiddleware` fica ANTES de `UseAuthentication`/`UseAuthorization` para capturar erros de auth tambem.
 Para adicionar middleware: inserir ENTRE `UseCors` e `UseAuthentication`.
 `UseAuthentication()` e `UseAuthorization()` devem estar ANTES de `MapControllers()`.
 

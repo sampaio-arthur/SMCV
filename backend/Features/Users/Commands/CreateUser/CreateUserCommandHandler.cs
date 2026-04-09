@@ -27,8 +27,7 @@ public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, UserR
         var user = new User
         {
             Name = request.Name,
-            Email = request.Email,
-            PasswordHash = string.Empty
+            Email = request.Email
         };
 
         await _userRepository.AddAsync(user);

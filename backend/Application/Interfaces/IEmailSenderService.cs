@@ -9,6 +9,6 @@ public interface IEmailSenderService
         string body,
         string attachmentPath,
         string attachmentFileName,
-        string fromEmail,
-        string fromName);
+        string replyToEmail,
+        string replyToName);
 }

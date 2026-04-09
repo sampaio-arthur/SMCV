@@ -3,4 +3,4 @@ using SMCV.Application.DTOs.Users;
 
 namespace SMCV.Features.Users.Queries.GetAllUsers;
 
-public record GetAllUsersQuery() : IRequest<IEnumerable<UserResponse>>;
+public record GetAllUsersQuery(int PageNumber = 1, int PageSize = 10) : IRequest<IEnumerable<UserResponse>>;

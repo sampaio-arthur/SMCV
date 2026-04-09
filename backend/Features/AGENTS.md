@@ -121,7 +121,7 @@ Todos os handlers estao implementados e funcionais:
 | `CreateCampaignCommandHandler` | Command | `SMCV.Features.Campaigns.Commands.CreateCampaign` | Cria campanha em status Draft. Command: UserId, Name, Niche, Region, EmailSubject, EmailBody. Validator incluso. |
 | `DeleteCampaignCommandHandler` | Command | `SMCV.Features.Campaigns.Commands.DeleteCampaign` | Deleta campanha. Valida existencia e impede exclusao se status Running. |
 | `ExportContactsCsvCommandHandler` | Command | `SMCV.Features.Campaigns.Commands.ExportContactsCsv` | Busca contatos da campanha e gera CSV via ICsvExportService. |
-| `SendCampaignEmailsCommandHandler` | Command | `SMCV.Features.Campaigns.Commands.SendCampaignEmails` | Envia emails para contatos. Injeta IUserRepository e IUserProfileRepository para obter remetente e resume do UserProfile. |
+| `SendCampaignEmailsCommandHandler` | Command | `SMCV.Features.Campaigns.Commands.SendCampaignEmails` | Envia emails para contatos. Injeta IUserRepository e IUserProfileRepository para obter remetente e resume do UserProfile. Query otimizada (sem N+1 para EmailLog). Status final: Completed, Failed ou PartialSuccess conforme resultado dos envios. |
 | `UpdateCampaignCommandHandler` | Command | `SMCV.Features.Campaigns.Commands.UpdateCampaign` | Atualiza Name, EmailSubject e EmailBody. Valida status Draft. Validator incluso. |
 | `GetAllCampaignsQueryHandler` | Query | `SMCV.Features.Campaigns.Queries.GetAllCampaigns` | Lista todas as campanhas com eager loading de contacts. |
 | `GetCampaignByIdQueryHandler` | Query | `SMCV.Features.Campaigns.Queries.GetCampaignById` | Busca campanha por ID com contacts. Lanca NotFoundException se nao encontrada. |
@@ -149,10 +149,10 @@ Todos os handlers estao implementados e funcionais:
 
 | Handler | Tipo | Namespace | Descricao |
 |---------|------|-----------|-----------|
-| `CreateUserCommandHandler` | Command | `SMCV.Features.Users.Commands.CreateUser` | Cria usuario. Validator incluso. |
-| `UpdateUserCommandHandler` | Command | `SMCV.Features.Users.Commands.UpdateUser` | Atualiza dados do usuario. Validator incluso. |
+| `CreateUserCommandHandler` | Command | `SMCV.Features.Users.Commands.CreateUser` | Cria usuario (sem PasswordHash — autenticacao via Keycloak). Validator incluso. |
+| `UpdateUserCommandHandler` | Command | `SMCV.Features.Users.Commands.UpdateUser` | Atualiza dados do usuario. Valida unicidade de email. Validator incluso (FluentValidation). |
 | `DeleteUserCommandHandler` | Command | `SMCV.Features.Users.Commands.DeleteUser` | Deleta usuario por ID. Valida existencia. |
-| `GetAllUsersQueryHandler` | Query | `SMCV.Features.Users.Queries.GetAllUsers` | Lista todos os usuarios. |
+| `GetAllUsersQueryHandler` | Query | `SMCV.Features.Users.Queries.GetAllUsers` | Lista usuarios com paginacao (PageNumber, PageSize). Usa GetAllPagedAsync. |
 | `GetUserByIdQueryHandler` | Query | `SMCV.Features.Users.Queries.GetUserById` | Busca usuario por ID. Lanca NotFoundException se nao encontrado. |
 
 ### UserProfiles
@@ -162,7 +162,7 @@ Todos os handlers estao implementados e funcionais:
 | `CreateUserProfileCommandHandler` | Command | `SMCV.Features.UserProfiles.Commands.CreateUserProfile` | Cria perfil de usuario. Validator incluso. |
 | `UpdateUserProfileCommandHandler` | Command | `SMCV.Features.UserProfiles.Commands.UpdateUserProfile` | Atualiza perfil (incluindo ResumeFilePath). Validator incluso. |
 | `DeleteUserProfileCommandHandler` | Command | `SMCV.Features.UserProfiles.Commands.DeleteUserProfile` | Deleta perfil por ID. Valida existencia. |
-| `GetAllUserProfilesQueryHandler` | Query | `SMCV.Features.UserProfiles.Queries.GetAllUserProfiles` | Lista todos os perfis de usuario. |
+| `GetAllUserProfilesQueryHandler` | Query | `SMCV.Features.UserProfiles.Queries.GetAllUserProfiles` | Lista perfis de usuario com paginacao (PageNumber, PageSize). Usa GetAllPagedAsync. |
 | `GetUserProfileByIdQueryHandler` | Query | `SMCV.Features.UserProfiles.Queries.GetUserProfileById` | Busca perfil por ID. Lanca NotFoundException se nao encontrado. |
 | `GetUserProfileByUserIdQueryHandler` | Query | `SMCV.Features.UserProfiles.Queries.GetUserProfileByUserId` | Busca perfil pelo UserId. Lanca NotFoundException se nao encontrado. |
 

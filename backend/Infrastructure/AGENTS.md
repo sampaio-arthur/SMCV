@@ -17,6 +17,8 @@ Infrastructure/
 │   └── Migrations/
 │       ├── 20260407185014_InitialCreate.cs
 │       ├── 20260407185014_InitialCreate.Designer.cs
+│       ├── 20260408224725_RemovePasswordHashAndSchemaSync.cs
+│       ├── 20260408224725_RemovePasswordHashAndSchemaSync.Designer.cs
 │       └── AppDbContextModelSnapshot.cs
 ├── Repositories/
 │   ├── BaseRepository.cs
@@ -47,6 +49,8 @@ Infrastructure/
 |---------|-----------|
 | `20260407185014_InitialCreate.cs` | Migration inicial: cria tabelas Campaign, Contact, EmailLog com relacionamentos e constraints. |
 | `20260407185014_InitialCreate.Designer.cs` | Snapshot designer da migration inicial (auto-gerado). |
+| `20260408224725_RemovePasswordHashAndSchemaSync.cs` | Remove coluna PasswordHash da tabela Users (autenticacao migrada para Keycloak) e sincroniza schema. |
+| `20260408224725_RemovePasswordHashAndSchemaSync.Designer.cs` | Snapshot designer da migration (auto-gerado). |
 | `AppDbContextModelSnapshot.cs` | Snapshot do modelo atual do banco (auto-gerado). |
 
 ### Repositories (`SMCV.Infrastructure.Repositories`)
@@ -57,15 +61,15 @@ Infrastructure/
 | `CampaignRepository.cs` | `ICampaignRepository` | Extensao do BaseRepository com eager loading de contacts e email logs. |
 | `ContactRepository.cs` | `IContactRepository` | Extensao do BaseRepository com busca por campanha, email e include de email logs. |
 | `EmailLogRepository.cs` | `IEmailLogRepository` | Extensao do BaseRepository com busca por contact ID e campaign ID. |
-| `UserRepository.cs` | `IUserRepository` | Extensao do BaseRepository com GetByEmailAsync para busca por email. |
-| `UserProfileRepository.cs` | `IUserProfileRepository` | Extensao do BaseRepository com GetByUserIdAsync para busca por UserId. |
+| `UserRepository.cs` | `IUserRepository` | Extensao do BaseRepository com GetByEmailAsync e GetAllPagedAsync(pageNumber, pageSize) para listagem paginada. |
+| `UserProfileRepository.cs` | `IUserProfileRepository` | Extensao do BaseRepository com GetByUserIdAsync e GetAllPagedAsync(pageNumber, pageSize) para listagem paginada. |
 
 ### ExternalServices (`SMCV.Infrastructure.ExternalServices`)
 
 | Arquivo | Interface | Descricao |
 |---------|-----------|-----------|
 | `HunterService.cs` | `IHunterService` | Integracao simplificada com API Hunter.io: retorna apenas CompanyName e Email. Usa HttpClient. |
-| `EmailSenderService.cs` | `IEmailSenderService` | Envio de email SMTP via MailKit com suporte a anexos. Aceita fromEmail e fromName como parametros. Configurado via `EmailSettings`. |
+| `EmailSenderService.cs` | `IEmailSenderService` | Envio de email SMTP via MailKit com suporte a anexos. From usa SMTP SenderEmail, Reply-To usa replyToEmail/replyToName do usuario. Configurado via `EmailSettings`. |
 | `CsvExportService.cs` | `ICsvExportService` | Geracao de CSV com colunas CompanyName, Email, EmailStatus, CampaignId. Escaping e UTF-8 BOM. |
 | `EmailSettings.cs` | — | Classe de configuracao SMTP: host, port, sender email/password/name. Bind via `IOptions<EmailSettings>`. |
 

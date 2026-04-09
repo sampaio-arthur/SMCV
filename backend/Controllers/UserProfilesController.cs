@@ -24,8 +24,8 @@ public class UserProfilesController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAll() =>
-        Ok(await _mediator.Send(new GetAllUserProfilesQuery()));
+    public async Task<IActionResult> GetAll([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10) =>
+        Ok(await _mediator.Send(new GetAllUserProfilesQuery(pageNumber, pageSize)));
 
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetById(Guid id) =>

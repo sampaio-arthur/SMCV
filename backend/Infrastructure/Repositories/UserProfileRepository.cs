@@ -11,4 +11,11 @@ public class UserProfileRepository : BaseRepository<UserProfile>, IUserProfileRe
 
     public async Task<UserProfile?> GetByUserIdAsync(Guid userId) =>
         await _context.UserProfiles.FirstOrDefaultAsync(up => up.UserId == userId);
+
+    public async Task<IEnumerable<UserProfile>> GetAllPagedAsync(int pageNumber, int pageSize) =>
+        await _context.UserProfiles
+            .OrderBy(up => up.CreatedAt)
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
 }

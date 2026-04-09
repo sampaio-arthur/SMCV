@@ -18,10 +18,11 @@ public class EmailSenderService : IEmailSenderService
         string toEmail, string toName,
         string subject, string body,
         string attachmentPath, string attachmentFileName,
-        string fromEmail, string fromName)
+        string replyToEmail, string replyToName)
     {
         var message = new MimeMessage();
-        message.From.Add(new MailboxAddress(fromName, fromEmail));
+        message.From.Add(new MailboxAddress(_settings.SenderName, _settings.SenderEmail));
+        message.ReplyTo.Add(new MailboxAddress(replyToName, replyToEmail));
         message.To.Add(new MailboxAddress(toName, toEmail));
         message.Subject = subject;
 

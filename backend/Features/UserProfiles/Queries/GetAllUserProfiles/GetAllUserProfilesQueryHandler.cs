@@ -18,7 +18,7 @@ public class GetAllUserProfilesQueryHandler : IRequestHandler<GetAllUserProfiles
 
     public async Task<IEnumerable<UserProfileResponse>> Handle(GetAllUserProfilesQuery request, CancellationToken cancellationToken)
     {
-        var profiles = await _userProfileRepository.GetAllAsync();
+        var profiles = await _userProfileRepository.GetAllPagedAsync(request.PageNumber, request.PageSize);
         return _mapper.Map<IEnumerable<UserProfileResponse>>(profiles);
     }
 }

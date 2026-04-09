@@ -23,8 +23,9 @@ public class UsersController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAll() =>
-        Ok(await _mediator.Send(new GetAllUsersQuery()));
+    [Authorize(Roles = "admin")]
+    public async Task<IActionResult> GetAll([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10) =>
+        Ok(await _mediator.Send(new GetAllUsersQuery(pageNumber, pageSize)));
 
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetById(Guid id) =>

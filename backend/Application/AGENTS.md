@@ -108,10 +108,10 @@ Application/
 | `ICampaignRepository.cs` | Extensao de IRepository para Campaign com eager loading de contacts. | `CampaignRepository.cs` |
 | `IContactRepository.cs` | Extensao de IRepository para Contact com busca por campanha e email. | `ContactRepository.cs` |
 | `IEmailLogRepository.cs` | Extensao de IRepository para EmailLog com busca por contact/campaign. | `EmailLogRepository.cs` |
-| `IUserRepository.cs` | Extensao de IRepository para User com GetByEmailAsync. | `UserRepository.cs` |
-| `IUserProfileRepository.cs` | Extensao de IRepository para UserProfile com GetByUserIdAsync. | `UserProfileRepository.cs` |
+| `IUserRepository.cs` | Extensao de IRepository para User com GetByEmailAsync e GetAllPagedAsync(pageNumber, pageSize). | `UserRepository.cs` |
+| `IUserProfileRepository.cs` | Extensao de IRepository para UserProfile com GetByUserIdAsync e GetAllPagedAsync(pageNumber, pageSize). | `UserProfileRepository.cs` |
 | `IHunterService.cs` | Busca de contatos por niche/region via Hunter.io. | `HunterService.cs` |
-| `IEmailSenderService.cs` | Envio de email com anexos via SMTP. Aceita fromEmail e fromName. | `EmailSenderService.cs` |
+| `IEmailSenderService.cs` | Envio de email com anexos via SMTP. Aceita replyToEmail e replyToName (From usa SMTP SenderEmail, Reply-To usa email do usuario). | `EmailSenderService.cs` |
 | `ICsvExportService.cs` | Geracao de CSV a partir de lista de contatos. | `CsvExportService.cs` |
 | `HunterContactResult.cs` | Record com CompanyName e Email — resultado individual da API Hunter.io (nao e interface). | — |
 
