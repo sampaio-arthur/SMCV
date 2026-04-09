@@ -25,6 +25,7 @@ public class AppDbContext : DbContext
             entity.Property(u => u.Id).ValueGeneratedNever();
             entity.Property(u => u.Name).HasColumnType("varchar(255)").IsRequired();
             entity.Property(u => u.Email).HasColumnType("varchar(255)").IsRequired();
+            entity.Property(u => u.PasswordHash).HasColumnType("varchar(500)").IsRequired();
             entity.Property(u => u.CreatedAt).HasColumnType("timestamp with time zone").IsRequired();
 
             entity.HasIndex(u => u.Email).IsUnique();

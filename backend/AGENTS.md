@@ -10,6 +10,7 @@ Framework: ASP.NET Core 8 com EF Core. Namespace raiz: `SMCV`.
 Controllers delegam para `MediatR.Send()`. Nenhuma logica de negocio vive no Controller.
 Handlers CQRS sao a unica camada com logica de negocio.
 Entidades nunca sao expostas na API. Injecao de dependencia via interfaces com `AddScoped`.
+Autenticacao simples via sessao (email + senha com BCrypt). Sem JWT, sem OAuth.
 
 ## NAVIGATION MAP
 
@@ -55,7 +56,7 @@ backend/
 │   ├── Repositories/     ← implementacao de acesso a dados (Base, Campaign, Contact, EmailLog, User, UserProfile)
 │   └── ExternalServices/ ← integracao com APIs externas (Hunter.io, SMTP, CSV)
 ├── Application/
-│   ├── DTOs/             ← objetos de transferencia (Campaigns/, Contacts/, EmailLogs/, Users/, UserProfiles/)
+│   ├── DTOs/             ← objetos de transferencia (Auth/, Campaigns/, Contacts/, EmailLogs/, Users/, UserProfiles/)
 │   ├── Interfaces/       ← contratos de repositorios e servicos
 │   └── Mappings/         ← AutoMapper profiles
 ├── Common/

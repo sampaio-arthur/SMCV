@@ -1,6 +1,4 @@
-using System.Security.Claims;
 using MediatR;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SMCV.Application.DTOs.UserProfiles;
 using SMCV.Application.Interfaces;
@@ -16,7 +14,6 @@ namespace SMCV.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize]
 public class UserProfilesController : ControllerBase
 {
     private readonly IMediator _mediator;
@@ -39,11 +36,6 @@ public class UserProfilesController : ControllerBase
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetById(Guid id)
     {
-        var currentUserId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
-        var profile = await _userProfileRepository.GetByIdAsync(id);
-        if (profile is null) return NotFound();
-        if (profile.UserId != currentUserId) return Forbid();
-
         return Ok(await _mediator.Send(new GetUserProfileByIdQuery(id)));
     }
 
@@ -54,8 +46,10 @@ public class UserProfilesController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create()
     {
-        var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
-        var command = new CreateUserProfileCommand(userId, null);
+        var userId = HttpContext.Session.GetString("userId");
+        if (userId is null) return Unauthorized();
+
+        var command = new CreateUserProfileCommand(Guid.Parse(userId), null);
         var result = await _mediator.Send(command);
         return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
     }
@@ -63,11 +57,6 @@ public class UserProfilesController : ControllerBase
     [HttpPost("{id:guid}/upload-resume")]
     public async Task<IActionResult> UploadResume(Guid id, IFormFile resumeFile)
     {
-        var currentUserId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
-        var profile = await _userProfileRepository.GetByIdAsync(id);
-        if (profile is null) return NotFound();
-        if (profile.UserId != currentUserId) return Forbid();
-
         if (resumeFile is null || resumeFile.Length == 0)
             return BadRequest(new { message = "Arquivo inválido." });
 
@@ -94,11 +83,6 @@ public class UserProfilesController : ControllerBase
     [HttpPut("{id:guid}")]
     public async Task<IActionResult> Update(Guid id, [FromBody] UpdateUserProfileRequest request)
     {
-        var currentUserId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
-        var profile = await _userProfileRepository.GetByIdAsync(id);
-        if (profile is null) return NotFound();
-        if (profile.UserId != currentUserId) return Forbid();
-
         var result = await _mediator.Send(new UpdateUserProfileCommand(id));
         return Ok(result);
     }
@@ -106,11 +90,6 @@ public class UserProfilesController : ControllerBase
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id)
     {
-        var currentUserId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
-        var profile = await _userProfileRepository.GetByIdAsync(id);
-        if (profile is null) return NotFound();
-        if (profile.UserId != currentUserId) return Forbid();
-
         await _mediator.Send(new DeleteUserProfileCommand(id));
         return NoContent();
     }

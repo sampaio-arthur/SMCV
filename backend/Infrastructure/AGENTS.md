@@ -15,10 +15,10 @@ Infrastructure/
 │   ├── AppDbContext.cs
 │   ├── AppDbContextFactory.cs
 │   └── Migrations/
-│       ├── 20260407185014_InitialCreate.cs
-│       ├── 20260407185014_InitialCreate.Designer.cs
+│       ├── 20260408190858_InitialCreate.cs
 │       ├── 20260408224725_RemovePasswordHashAndSchemaSync.cs
-│       ├── 20260408224725_RemovePasswordHashAndSchemaSync.Designer.cs
+│       ├── 20260409114950_ConvertStatusEnumsToString.cs
+│       ├── 20260409134101_AddPasswordHashToUser.cs
 │       └── AppDbContextModelSnapshot.cs
 ├── Repositories/
 │   ├── BaseRepository.cs
@@ -42,16 +42,6 @@ Infrastructure/
 |---------|-----------|
 | `AppDbContext.cs` | DbContext do EF Core com DbSets para Campaign, Contact, EmailLog, User, UserProfile. Configura relacionamentos e constraints de todas as 5 entidades via Fluent API. |
 | `AppDbContextFactory.cs` | Factory design-time para EF Core migrations. Le connection string de appsettings. |
-
-### Data/Migrations (`SMCV.Infrastructure.Data.Migrations`)
-
-| Arquivo | Descricao |
-|---------|-----------|
-| `20260407185014_InitialCreate.cs` | Migration inicial: cria tabelas Campaign, Contact, EmailLog com relacionamentos e constraints. |
-| `20260407185014_InitialCreate.Designer.cs` | Snapshot designer da migration inicial (auto-gerado). |
-| `20260408224725_RemovePasswordHashAndSchemaSync.cs` | Remove coluna PasswordHash da tabela Users (autenticacao migrada para Keycloak) e sincroniza schema. |
-| `20260408224725_RemovePasswordHashAndSchemaSync.Designer.cs` | Snapshot designer da migration (auto-gerado). |
-| `AppDbContextModelSnapshot.cs` | Snapshot do modelo atual do banco (auto-gerado). |
 
 ### Repositories (`SMCV.Infrastructure.Repositories`)
 

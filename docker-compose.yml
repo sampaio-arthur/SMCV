@@ -14,41 +14,6 @@ services:
     networks:
       - app-network
 
-  keycloak-db:
-    image: postgres:latest
-    container_name: keycloak-db
-    restart: always
-    environment:
-      POSTGRES_DB: ${KC_POSTGRES_DB}
-      POSTGRES_USER: ${KC_POSTGRES_USER}
-      POSTGRES_PASSWORD: ${KC_POSTGRES_PASSWORD}
-    volumes:
-      - keycloak-db-data:/var/lib/postgresql
-    networks:
-      - app-network
-
-  keycloak:
-    image: quay.io/keycloak/keycloak:24.0
-    container_name: keycloak
-    restart: always
-    ports:
-      - "8180:8080"
-    environment:
-      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
-      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
-      KC_DB: postgres
-      KC_DB_URL_HOST: keycloak-db
-      KC_DB_URL_DATABASE: ${KC_POSTGRES_DB}
-      KC_DB_USERNAME: ${KC_POSTGRES_USER}
-      KC_DB_PASSWORD: ${KC_POSTGRES_PASSWORD}
-      KC_HOSTNAME: localhost
-      KC_HOSTNAME_PORT: 8180
-    command: start-dev
-    depends_on:
-      - keycloak-db
-    networks:
-      - app-network
-
   backend:
     build: ./backend
     container_name: backend
@@ -57,7 +22,6 @@ services:
       - "8080:8080"
     depends_on:
       - db
-      - keycloak
     environment:
       DB_HOST: ${DB_HOST}
       DB_PORT: ${DB_PORT}
@@ -70,9 +34,6 @@ services:
       SMTP_SENDER_EMAIL: ${SMTP_SENDER_EMAIL}
       SMTP_SENDER_PASSWORD: ${SMTP_SENDER_PASSWORD}
       SMTP_SENDER_NAME: ${SMTP_SENDER_NAME}
-      KEYCLOAK_AUTHORITY: ${KEYCLOAK_AUTHORITY}
-      KEYCLOAK_METADATA_URL: ${KEYCLOAK_METADATA_URL}
-      KEYCLOAK_AUDIENCE: ${KEYCLOAK_AUDIENCE}
     networks:
       - app-network
 
@@ -89,7 +50,6 @@ services:
 
 volumes:
   db-data:
-  keycloak-db-data:
 
 networks:
   app-network:

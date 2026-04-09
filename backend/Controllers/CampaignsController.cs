@@ -1,6 +1,4 @@
-using System.Security.Claims;
 using MediatR;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SMCV.Application.DTOs;
 using SMCV.Application.DTOs.Campaigns;
@@ -16,7 +14,6 @@ namespace SMCV.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize]
 public class CampaignsController : ControllerBase
 {
     private readonly IMediator _mediator;
@@ -48,9 +45,11 @@ public class CampaignsController : ControllerBase
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Create([FromBody] CreateCampaignRequest request)
     {
-        var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+        var userId = HttpContext.Session.GetString("userId");
+        if (userId is null) return Unauthorized();
+
         var command = new CreateCampaignCommand(
-            userId,
+            Guid.Parse(userId),
             request.Name,
             request.Niche,
             request.Region,

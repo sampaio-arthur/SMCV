@@ -12,11 +12,12 @@ Na arquitetura CQRS, controllers chamam `_mediator.Send()` em vez de chamar Serv
 
 | Arquivo | Namespace | Descricao |
 |---------|-----------|-----------|
-| `CampaignsController.cs` | `SMCV.Controllers` | CRUD de campanhas, envio de emails, exportacao CSV. UserId extraido do JWT no POST (sem UserId no body). Requer [Authorize]. |
-| `ContactsController.cs` | `SMCV.Controllers` | CRUD de contatos, busca via Hunter.io, filtro por campanha. Requer [Authorize]. |
-| `EmailLogsController.cs` | `SMCV.Controllers` | Consulta de logs de email por contato ou por campanha. Requer [Authorize]. |
-| `UsersController.cs` | `SMCV.Controllers` | CRUD de usuarios. POST e [AllowAnonymous] (com JWT optional para setar User.Id = sub). GET/PUT/DELETE com ownership check (403 se userId != JWT sub). GetAll com paginacao (pageNumber, pageSize) e [Authorize(Roles = "admin")]. |
-| `UserProfilesController.cs` | `SMCV.Controllers` | CRUD de perfis de usuario e endpoint upload-resume. UserId extraido do JWT no POST. GET/PUT/DELETE/UploadResume com ownership check (403 se profile.UserId != JWT sub). Injeta IUserProfileRepository para ownership. GetAll com paginacao (pageNumber, pageSize). Requer [Authorize]. |
+| `AuthController.cs` | `SMCV.Controllers` | Registro, login e logout via sessao. POST /auth/register (BCrypt hash), POST /auth/login, POST /auth/logout, GET /auth/me. |
+| `CampaignsController.cs` | `SMCV.Controllers` | CRUD de campanhas, envio de emails, exportacao CSV. UserId extraido da sessao no POST. |
+| `ContactsController.cs` | `SMCV.Controllers` | CRUD de contatos, busca via Hunter.io, filtro por campanha. |
+| `EmailLogsController.cs` | `SMCV.Controllers` | Consulta de logs de email por contato ou por campanha. |
+| `UsersController.cs` | `SMCV.Controllers` | CRUD de usuarios com paginacao (pageNumber, pageSize). |
+| `UserProfilesController.cs` | `SMCV.Controllers` | CRUD de perfis de usuario e endpoint upload-resume. UserId extraido da sessao no POST. |
 
 ## REGRAS OBRIGATORIAS
 
@@ -25,12 +26,13 @@ Na arquitetura CQRS, controllers chamam `_mediator.Send()` em vez de chamar Serv
 - Todos os metodos sao `async Task<ActionResult<T>>` (exceto DELETE que retorna `Task<IActionResult>`)
 - Verificar retorno nulo e retornar `NotFound()` quando aplicavel
 - Injetar `IMediator` via construtor
+- Obtencao do usuario logado via `HttpContext.Session.GetString("userId")`
 
 ## PROIBICOES
 
 - **SEM** logica de negocio (if/else de regras, calculos, validacoes complexas)
-- **SEM** acesso direto ao `AppDbContext` ou Repository
-- **SEM** instanciacao de Entity — o controller trabalha apenas com DTOs
+- **SEM** acesso direto ao `AppDbContext` ou Repository (exceto AuthController que usa IUserRepository diretamente)
+- **SEM** instanciacao de Entity — o controller trabalha apenas com DTOs (exceto AuthController)
 - **SEM** try/catch generico (deixar o middleware tratar excecoes)
 
 ## PADROES DE CODIGO

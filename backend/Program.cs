@@ -1,8 +1,6 @@
 using System.Reflection;
 using FluentValidation;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using SMCV.Application.Interfaces;
 using SMCV.Common.Middleware;
@@ -34,31 +32,6 @@ builder.Services.AddSwaggerGen(c =>
         Version = "v1",
         Description = "API para prospecção de empregos via e-mail automatizado"
     });
-
-    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-    {
-        Name = "Authorization",
-        Type = SecuritySchemeType.Http,
-        Scheme = "bearer",
-        BearerFormat = "JWT",
-        In = ParameterLocation.Header,
-        Description = "Digite: Bearer {seu token}"
-    });
-
-    c.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
-            },
-            new string[] {}
-        }
-    });
 });
 
 // ─── CORS ─────────────────────────────────────────────────────────────────────
@@ -68,50 +41,19 @@ builder.Services.AddCors(options =>
     {
         policy.WithOrigins("http://localhost:3000", "http://localhost:5173")
               .AllowAnyHeader()
-              .AllowAnyMethod();
+              .AllowAnyMethod()
+              .AllowCredentials();
     });
 });
 
-// ─── Autenticação Keycloak (JWT Bearer) ───────────────────────────────────────
-builder.Services.AddAuthentication(options =>
+// ─── Sessão ──────────────────────────────────────────────────────────────────
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
 {
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
-.AddJwtBearer(options =>
-{
-    var authority = RequiredSetting("KEYCLOAK_AUTHORITY");
-    var metadataUrl = Environment.GetEnvironmentVariable("KEYCLOAK_METADATA_URL");
-
-    options.RequireHttpsMetadata = false;
-    options.Audience = RequiredSetting("KEYCLOAK_AUDIENCE");
-
-    if (!string.IsNullOrEmpty(metadataUrl))
-    {
-        // Docker: fetch metadata via internal DNS, validate issuer via external URL
-        options.MetadataAddress = metadataUrl;
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidIssuer = authority,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-        };
-    }
-    else
-    {
-        // Local dev: authority serves both metadata and issuer
-        options.Authority = authority;
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-        };
-    }
+    options.IdleTimeout = TimeSpan.FromHours(8);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
 });
-
-builder.Services.AddAuthorization();
 
 // ─── Database ─────────────────────────────────────────────────────────────────
 var connectionString = string.Join(";", [
@@ -169,7 +111,6 @@ app.UseSwaggerUI();
 app.UseStaticFiles();
 app.UseCors("AllowReactApp");
 app.UseMiddleware<ExceptionHandlingMiddleware>();
-app.UseAuthentication();
-app.UseAuthorization();
+app.UseSession();
 app.MapControllers();
 app.Run();

@@ -15,7 +15,7 @@ Manter esta ordem no `Program.cs`:
 1. AddControllers()
 2. AddEndpointsApiExplorer() + AddSwaggerGen()
 3. AddCors()
-4. AddAuthentication (JWT Bearer — Keycloak)
+4. AddDistributedMemoryCache() + AddSession()
 5. AddDbContext<AppDbContext>()
 6. AddMediatR() + AddValidatorsFromAssembly() + AddAutoMapper()
 7. AddScoped — Repositories
@@ -45,7 +45,7 @@ builder.Services.AddScoped<ICsvExportService, CsvExportService>();
 ### HttpClient e Options
 ```csharp
 builder.Services.AddHttpClient<HunterService>();
-builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+builder.Services.Configure<EmailSettings>(...);
 ```
 
 ## COMO REGISTRAR NOVO RECURSO
@@ -63,11 +63,12 @@ builder.Services.AddScoped<INovoService, NovoService>();
 
 ## CORS
 
-Configuracao atual: politica `"AllowReactApp"` com origins especificos.
+Configuracao atual: politica `"AllowReactApp"` com origins especificos e credentials habilitados para sessao.
 ```csharp
 policy.WithOrigins("http://localhost:3000", "http://localhost:5173")
       .AllowAnyHeader()
-      .AllowAnyMethod();
+      .AllowAnyMethod()
+      .AllowCredentials();
 ```
 Para producao: restringir origins conforme necessario.
 
@@ -99,15 +100,13 @@ app.UseSwaggerUI();
 app.UseStaticFiles();
 app.UseCors("AllowReactApp");
 app.UseMiddleware<ExceptionHandlingMiddleware>();
-app.UseAuthentication();
-app.UseAuthorization();
+app.UseSession();
 app.MapControllers();
 app.Run();
 ```
 
-`ExceptionHandlingMiddleware` fica ANTES de `UseAuthentication`/`UseAuthorization` para capturar erros de auth tambem.
-Para adicionar middleware: inserir ENTRE `UseCors` e `UseAuthentication`.
-`UseAuthentication()` e `UseAuthorization()` devem estar ANTES de `MapControllers()`.
+`ExceptionHandlingMiddleware` fica ANTES de `UseSession` para capturar erros.
+`UseSession()` deve estar ANTES de `MapControllers()`.
 
 ## CONNECTION STRING
 

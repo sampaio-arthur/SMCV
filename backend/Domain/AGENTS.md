@@ -31,7 +31,7 @@ Domain/
 | `Campaign.cs` | Agregado raiz de campanha: UserId (FK), Name, Niche, Region, EmailSubject, EmailBody, Status, User nav, colecao de Contacts. |
 | `Contact.cs` | Contato prospectado: CompanyName, Email, EmailStatus (enum), EmailSentAt (DateTime?), referencia a Campaign. |
 | `EmailLog.cs` | Log de envio de email: Id, ContactId, Contact nav, ErrorMessage, CreatedAt. |
-| `User.cs` | Usuario da plataforma: Id, Name, Email, CreatedAt, UserProfile nav, Campaigns collection. Autenticacao via Keycloak (sem PasswordHash). |
+| `User.cs` | Usuario da plataforma: Id, Name, Email, PasswordHash (BCrypt), CreatedAt, UserProfile nav, Campaigns collection. |
 | `UserProfile.cs` | Perfil do usuario: Id, UserId (FK), User nav, ResumeFilePath, CreatedAt. |
 
 ### Enums (`SMCV.Domain.Enums`)
@@ -44,12 +44,11 @@ Domain/
 ## REGRAS OBRIGATORIAS
 
 - Namespace: `SMCV.Domain.Entities` ou `SMCV.Domain.Enums`
-- Toda entidade tem `Id` (int, PK auto-increment)
+- Toda entidade tem `Id` (Guid, PK)
 - Campos obrigatorios usam `required`
 - Campos opcionais usam `?` (nullable)
-- Timestamps: `CreatedAt` (DateTime) e `UpdatedAt` (DateTime?)
+- Timestamps: `CreatedAt` (DateTime)
 - Default de `CreatedAt` = `DateTime.UtcNow`
-- Default de `IsActive` = `true` (quando aplicavel)
 
 ## PROIBICOES
 

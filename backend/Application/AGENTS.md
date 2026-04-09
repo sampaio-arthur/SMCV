@@ -12,6 +12,9 @@ Camada de abstracao entre Domain e Infrastructure.
 ```
 Application/
 ├── DTOs/
+│   ├── Auth/
+│   │   ├── LoginRequest.cs
+│   │   └── RegisterRequest.cs
 │   ├── Campaigns/
 │   │   ├── CampaignDetailResponse.cs
 │   │   ├── CampaignResponse.cs
@@ -53,13 +56,20 @@ Application/
 
 ## ARQUIVOS EXISTENTES
 
+### DTOs — Auth (`SMCV.Application.DTOs.Auth`)
+
+| Arquivo | Tipo | Descricao |
+|---------|------|-----------|
+| `RegisterRequest.cs` | Request | Registro de usuario: Name, Email, Password. |
+| `LoginRequest.cs` | Request | Login: Email, Password. |
+
 ### DTOs — Campaigns (`SMCV.Application.DTOs.Campaigns`)
 
 | Arquivo | Tipo | Descricao |
 |---------|------|-----------|
 | `CampaignDetailResponse.cs` | Response | Detalhes completos da campanha com UserId, Name e contatos aninhados. |
 | `CampaignResponse.cs` | Response | Resumo da campanha com UserId, Name e contagem de contatos (sem lista detalhada). |
-| `CreateCampaignRequest.cs` | Request | Criacao de campanha: Name, Niche, Region, EmailSubject, EmailBody (UserId extraido do JWT no controller). |
+| `CreateCampaignRequest.cs` | Request | Criacao de campanha: Name, Niche, Region, EmailSubject, EmailBody (UserId extraido da sessao no controller). |
 | `ExportContactsCsvRequest.cs` | Request | Exportacao CSV de contatos por campaign ID. |
 | `SendCampaignEmailsRequest.cs` | Request | Disparo de emails da campanha por campaign ID. |
 | `UpdateCampaignRequest.cs` | Request | Atualizacao de Name, EmailSubject e EmailBody da campanha. |
@@ -85,7 +95,7 @@ Application/
 | Arquivo | Tipo | Descricao |
 |---------|------|-----------|
 | `UserResponse.cs` | Response | Dados do usuario: Id, Name, Email, CreatedAt. |
-| `CreateUserRequest.cs` | Request | Criacao de usuario: Name, Email, Password. |
+| `CreateUserRequest.cs` | Request | Criacao de usuario: Name, Email. |
 | `UpdateUserRequest.cs` | Request | Atualizacao de usuario: Name, Email. |
 
 ### DTOs — UserProfiles (`SMCV.Application.DTOs.UserProfiles`)
@@ -93,7 +103,7 @@ Application/
 | Arquivo | Tipo | Descricao |
 |---------|------|-----------|
 | `UserProfileResponse.cs` | Response | Perfil do usuario: Id, UserId, ResumeFilePath, CreatedAt. |
-| `CreateUserProfileRequest.cs` | Request | Criacao de perfil (vazio — UserId extraido do JWT no controller). |
+| `CreateUserProfileRequest.cs` | Request | Criacao de perfil (vazio — UserId extraido da sessao no controller). |
 | `UpdateUserProfileRequest.cs` | Request | Atualizacao de perfil (vazio — ResumeFilePath so via endpoint de upload dedicado). |
 
 ### DTOs — Root (`SMCV.Application.DTOs`)

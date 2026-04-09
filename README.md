@@ -13,7 +13,6 @@ Automatiza o processo manual de buscar contatos de empresas, organizar campanhas
 - Node.js 18+
 - Conta Hunter.io (free tier: [criar conta](https://hunter.io/users/sign_up))
 - Conta SMTP (Gmail, Outlook, etc.)
-- Keycloak (Identity Provider)
 - Docker e Docker Compose (opcional)
 
 ## Configuração do Banco
@@ -50,8 +49,6 @@ Edite o `.env` com seus valores reais. **Nunca commite o `.env`.**
 | `SMTP_SENDER_EMAIL` | E-mail remetente | `your@email.com` |
 | `SMTP_SENDER_PASSWORD` | Senha ou App Password | `your_app_password` |
 | `SMTP_SENDER_NAME` | Nome do remetente | `Job Prospector` |
-| `KEYCLOAK_AUTHORITY` | URL do realm Keycloak | `http://localhost:8180/realms/smcv` |
-| `KEYCLOAK_AUDIENCE` | Audience do token JWT | `smcv-backend` |
 
 ## Execução com Docker
 
@@ -85,13 +82,17 @@ npm run dev                 # Vite em :5173
 
 Documentação interativa disponível em `/swagger`.
 
-Todos os endpoints (exceto `POST /api/users`) requerem autenticação via JWT Bearer (Keycloak).
+Autenticação via sessão (email + senha). Endpoints de auth:
 
 | Método | Rota | Descrição |
 |--------|------|-----------|
+| POST | `/api/auth/register` | Registrar novo usuário |
+| POST | `/api/auth/login` | Login (inicia sessão) |
+| POST | `/api/auth/logout` | Logout (limpa sessão) |
+| GET | `/api/auth/me` | Dados do usuário logado |
 | GET | `/api/users` | Listar usuários |
 | GET | `/api/users/{id}` | Detalhes do usuário |
-| POST | `/api/users` | Criar usuário (AllowAnonymous) |
+| POST | `/api/users` | Criar usuário |
 | PUT | `/api/users/{id}` | Atualizar usuário |
 | DELETE | `/api/users/{id}` | Excluir usuário |
 | GET | `/api/userprofiles` | Listar perfis |
@@ -111,6 +112,7 @@ Todos os endpoints (exceto `POST /api/users`) requerem autenticação via JWT Be
 | GET | `/api/contacts/{id}` | Detalhes do contato |
 | GET | `/api/contacts/campaign/{campaignId}` | Contatos de uma campanha |
 | POST | `/api/contacts` | Criar contato manualmente |
+| PUT | `/api/contacts/{id}` | Atualizar contato |
 | DELETE | `/api/contacts/{id}` | Excluir contato |
 | POST | `/api/contacts/search` | Buscar contatos via Hunter.io |
 | GET | `/api/emaillogs/contact/{contactId}` | Log de e-mail por contato |
@@ -147,10 +149,10 @@ Contact              EmailLog            ├─ EmailBody
 
 ## Stack
 
-- **Backend:** ASP.NET Core 8, EF Core, MediatR (CQRS), AutoMapper, FluentValidation, MailKit
+- **Backend:** ASP.NET Core 8, EF Core, MediatR (CQRS), AutoMapper, FluentValidation, MailKit, BCrypt
 - **Frontend:** React 19, Vite, Tailwind CSS
 - **Banco:** PostgreSQL 15+
-- **Auth:** Keycloak (OpenID Connect / JWT Bearer)
+- **Auth:** Sessão simples (email + senha com BCrypt)
 - **Infra:** Docker Compose
 
 ## Limitações Conhecidas

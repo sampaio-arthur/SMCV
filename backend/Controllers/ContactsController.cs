@@ -1,5 +1,4 @@
 using MediatR;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SMCV.Application.DTOs;
 using SMCV.Application.DTOs.Contacts;
@@ -14,7 +13,6 @@ namespace SMCV.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize]
 public class ContactsController : ControllerBase
 {
     private readonly IMediator _mediator;
