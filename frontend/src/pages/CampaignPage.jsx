@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import CampaignComponent from '../components/campaign/CampaignComponent';
-import { getAll, create, update, remove } from '../services/campaignService';
+import { getAll, create, update, remove, sendEmails, exportCsv } from '../services/campaignService';
 import { useToast } from '../hooks/useToast';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 
@@ -61,6 +61,33 @@ function CampaignPage() {
     navigate(`/contact?campaignId=${campaignId}`);
   };
 
+  const handleSendEmails = async (id) => {
+    try {
+      const result = await sendEmails(id);
+      toast.success(`E-mails disparados! ${result.emailsSent ?? 0} enviado(s).`);
+      await loadItems();
+    } catch {
+      toast.error('Erro ao disparar e-mails da campanha.');
+    }
+  };
+
+  const handleExportCsv = async (id, name) => {
+    try {
+      const response = await exportCsv(id);
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `${name || 'contatos'}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+      toast.success('CSV exportado com sucesso!');
+    } catch {
+      toast.error('Erro ao exportar CSV.');
+    }
+  };
+
   return (
     <div className="p-6">
       <div className="mb-6">
@@ -79,6 +106,8 @@ function CampaignPage() {
           onUpdate={handleUpdate}
           onDelete={handleDelete}
           onViewContacts={handleViewContacts}
+          onSendEmails={handleSendEmails}
+          onExportCsv={handleExportCsv}
         />
       )}
     </div>

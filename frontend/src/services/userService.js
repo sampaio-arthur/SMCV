@@ -1,33 +1,26 @@
-import axios from 'axios';
+import api from './api';
 
-const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8080';
-
-const api = axios.create({
-  baseURL: `${API_URL}/api/user`,
-  headers: { 'Content-Type': 'application/json' },
-});
-
-export const getAll = async () => {
-  const response = await api.get('/');
+export const getAll = async (pageNumber = 1, pageSize = 100) => {
+  const response = await api.get('/users', { params: { pageNumber, pageSize } });
   return response.data;
 };
 
 export const getById = async (id) => {
-  const response = await api.get(`/${id}`);
+  const response = await api.get(`/users/${id}`);
   return response.data;
 };
 
 export const create = async (data) => {
-  const response = await api.post('/', data);
+  const response = await api.post('/users', data);
   return response.data;
 };
 
 export const update = async (id, data) => {
-  const response = await api.put(`/${id}`, data);
+  const response = await api.put(`/users/${id}`, data);
   return response.data;
 };
 
 export const remove = async (id) => {
-  const response = await api.delete(`/${id}`);
+  const response = await api.delete(`/users/${id}`);
   return response.data;
 };

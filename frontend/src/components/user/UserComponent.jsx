@@ -5,7 +5,7 @@ import EmptyState from '../ui/EmptyState';
 import ConfirmDialog from '../ui/ConfirmDialog';
 import { useConfirm } from '../../hooks/useConfirm';
 
-const emptyForm = { name: '', email: '', password: '' };
+const emptyForm = { name: '', email: '' };
 
 function UserComponent({ items = [], onCreate, onUpdate, onDelete }) {
   const [showForm, setShowForm] = useState(false);
@@ -19,12 +19,10 @@ function UserComponent({ items = [], onCreate, onUpdate, onDelete }) {
     setSubmitting(true);
     try {
       if (editing) {
-        const payload = { name: formData.name, email: formData.email };
-        if (formData.password) payload.password = formData.password;
-        await onUpdate(editing.id, payload);
+        await onUpdate(editing.id, { name: formData.name, email: formData.email });
         setEditing(null);
       } else {
-        await onCreate(formData);
+        await onCreate({ name: formData.name, email: formData.email });
       }
       setFormData(emptyForm);
       setShowForm(false);
@@ -35,7 +33,7 @@ function UserComponent({ items = [], onCreate, onUpdate, onDelete }) {
 
   const handleEdit = (item) => {
     setEditing(item);
-    setFormData({ name: item.name, email: item.email, password: '' });
+    setFormData({ name: item.name, email: item.email });
     setShowForm(true);
   };
 
@@ -88,22 +86,7 @@ function UserComponent({ items = [], onCreate, onUpdate, onDelete }) {
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Senha {editing ? '' : '*'}
-            </label>
-            <input
-              type="password"
-              required={!editing}
-              value={formData.password}
-              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder={editing ? 'Deixe vazio para manter a atual' : 'Minimo 8 caracteres'}
-            />
-            {editing && (
-              <p className="text-xs text-gray-400 mt-1">Deixe em branco para nao alterar a senha.</p>
-            )}
-          </div>
+          <p className="text-xs text-gray-400">Para definir senha, use o registro via tela de login.</p>
 
           <div className="flex gap-2">
             <button

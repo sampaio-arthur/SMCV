@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import UserProfileComponent from '../components/userProfile/UserProfileComponent';
-import { getAll, create, update, remove } from '../services/userProfileService';
+import { getAll, create, remove, uploadResume } from '../services/userProfileService';
 import { getAll as getAllUsers } from '../services/userService';
 import { useToast } from '../hooks/useToast';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
@@ -28,23 +28,16 @@ function UserProfilePage() {
     }
   };
 
-  const handleCreate = async (item) => {
+  const handleCreate = async () => {
     try {
-      await create(item);
+      await create();
       toast.success('Perfil criado com sucesso!');
       await loadData();
-    } catch {
-      toast.error('Nao foi possivel criar o perfil. Verifique os campos e tente novamente.');
-    }
-  };
-
-  const handleUpdate = async (id, item) => {
-    try {
-      await update(id, item);
-      toast.success('Perfil atualizado com sucesso!');
-      await loadData();
-    } catch {
-      toast.error('Nao foi possivel atualizar o perfil. Verifique sua conexao.');
+    } catch (err) {
+      const msg = err.response?.status === 401
+        ? 'Voce precisa estar logado para criar um perfil.'
+        : 'Nao foi possivel criar o perfil.';
+      toast.error(msg);
     }
   };
 
@@ -58,12 +51,22 @@ function UserProfilePage() {
     }
   };
 
+  const handleUploadResume = async (id, file) => {
+    try {
+      await uploadResume(id, file);
+      toast.success('Curriculo enviado com sucesso!');
+      await loadData();
+    } catch {
+      toast.error('Erro ao enviar o curriculo. Verifique o arquivo e tente novamente.');
+    }
+  };
+
   return (
     <div className="p-6">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">Perfis de Usuario</h1>
+        <h1 className="text-2xl font-bold text-gray-800">Perfil de Usuario</h1>
         <p className="text-gray-500 text-sm mt-1">
-          Configure o curriculo e as credenciais SMTP de cada usuario.
+          Gerencie seu perfil e envie seu curriculo em PDF.
         </p>
       </div>
 
@@ -74,8 +77,8 @@ function UserProfilePage() {
           items={items}
           users={users}
           onCreate={handleCreate}
-          onUpdate={handleUpdate}
           onDelete={handleDelete}
+          onUploadResume={handleUploadResume}
         />
       )}
     </div>

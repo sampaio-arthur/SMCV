@@ -1,38 +1,31 @@
-import axios from 'axios';
-
-const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8080';
-
-const api = axios.create({
-  baseURL: `${API_URL}/api/contact`,
-  headers: { 'Content-Type': 'application/json' },
-});
-
-export const getAll = async () => {
-  const response = await api.get('/');
-  return response.data;
-};
+import api from './api';
 
 export const getById = async (id) => {
-  const response = await api.get(`/${id}`);
+  const response = await api.get(`/contacts/${id}`);
   return response.data;
 };
 
 export const getAllByCampaignId = async (campaignId) => {
-  const response = await api.get(`/campaign/${campaignId}`);
+  const response = await api.get(`/contacts/campaign/${campaignId}`);
   return response.data;
 };
 
 export const create = async (data) => {
-  const response = await api.post('/', data);
+  const response = await api.post('/contacts', data);
   return response.data;
 };
 
 export const update = async (id, data) => {
-  const response = await api.put(`/${id}`, data);
+  const response = await api.put(`/contacts/${id}`, data);
   return response.data;
 };
 
 export const remove = async (id) => {
-  const response = await api.delete(`/${id}`);
+  const response = await api.delete(`/contacts/${id}`);
+  return response.data;
+};
+
+export const searchContacts = async (data) => {
+  const response = await api.post('/contacts/search', data);
   return response.data;
 };

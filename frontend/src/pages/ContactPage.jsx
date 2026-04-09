@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import ContactComponent from '../components/contact/ContactComponent';
-import { getAll, getAllByCampaignId, create, update, remove } from '../services/contactService';
+import { getAllByCampaignId, create, update, remove, searchContacts } from '../services/contactService';
 import { getAll as getAllCampaigns } from '../services/campaignService';
 import { useToast } from '../hooks/useToast';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
@@ -21,12 +21,17 @@ function ContactPage() {
   const loadData = async () => {
     try {
       setLoading(true);
-      const contactsPromise = campaignId ? getAllByCampaignId(campaignId) : getAll();
-      const [contacts, campaignList] = await Promise.all([contactsPromise, getAllCampaigns()]);
-      setItems(contacts);
+      const campaignList = await getAllCampaigns();
       setCampaigns(campaignList);
+
+      if (campaignId) {
+        const contacts = await getAllByCampaignId(campaignId);
+        setItems(contacts);
+      } else {
+        setItems([]);
+      }
     } catch {
-      toast.error('Nao foi possivel carregar os contatos. Verifique se a API esta em execucao.');
+      toast.error('Nao foi possivel carregar os dados. Verifique se a API esta em execucao.');
     } finally {
       setLoading(false);
     }
@@ -62,6 +67,16 @@ function ContactPage() {
     }
   };
 
+  const handleSearch = async (data) => {
+    try {
+      const result = await searchContacts(data);
+      toast.success(`Busca concluida! ${result.totalFound ?? 0} contato(s) encontrado(s).`);
+      await loadData();
+    } catch {
+      toast.error('Erro ao buscar contatos via Hunter.io.');
+    }
+  };
+
   const campaignName = campaignId
     ? campaigns.find((c) => String(c.id) === String(campaignId))?.name
     : null;
@@ -73,7 +88,7 @@ function ContactPage() {
         <p className="text-gray-500 text-sm mt-1">
           {campaignName
             ? `Contatos da campanha: ${campaignName}`
-            : 'Visualize e gerencie os contatos de cada campanha.'}
+            : 'Selecione uma campanha para visualizar seus contatos, ou use a busca Hunter.io.'}
         </p>
       </div>
 
@@ -86,6 +101,7 @@ function ContactPage() {
           onCreate={handleCreate}
           onUpdate={handleUpdate}
           onDelete={handleDelete}
+          onSearch={handleSearch}
           defaultCampaignId={campaignId || ''}
         />
       )}

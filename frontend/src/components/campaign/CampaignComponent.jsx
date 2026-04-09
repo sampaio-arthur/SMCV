@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { Plus, Pencil, Trash2, Eye } from 'lucide-react';
+import { Plus, Pencil, Trash2, Eye, Send, Download } from 'lucide-react';
 import { formatDate } from '../../utils';
 import StatusBadge from '../ui/StatusBadge';
 import EmptyState from '../ui/EmptyState';
@@ -8,22 +8,26 @@ import { useConfirm } from '../../hooks/useConfirm';
 
 const campaignStatusConfig = {
   Draft: { label: 'Rascunho', bg: 'bg-gray-100', text: 'text-gray-600' },
-  Ready: { label: 'Pronto', bg: 'bg-blue-100', text: 'text-blue-700' },
-  Sending: { label: 'Enviando', bg: 'bg-yellow-100', text: 'text-yellow-700', extra: 'animate-pulse' },
+  Running: { label: 'Enviando', bg: 'bg-yellow-100', text: 'text-yellow-700', extra: 'animate-pulse' },
   Completed: { label: 'Concluido', bg: 'bg-green-100', text: 'text-green-700' },
+  Cancelled: { label: 'Cancelado', bg: 'bg-gray-100', text: 'text-gray-500' },
+  Failed: { label: 'Falhou', bg: 'bg-red-100', text: 'text-red-700' },
+  PartialSuccess: { label: 'Parcial', bg: 'bg-orange-100', text: 'text-orange-700' },
 };
 
 const statusFilters = [
   { value: '', label: 'Todas' },
   { value: 'Draft', label: 'Rascunho' },
-  { value: 'Ready', label: 'Pronto' },
-  { value: 'Sending', label: 'Enviando' },
+  { value: 'Running', label: 'Enviando' },
   { value: 'Completed', label: 'Concluido' },
+  { value: 'Cancelled', label: 'Cancelado' },
+  { value: 'Failed', label: 'Falhou' },
+  { value: 'PartialSuccess', label: 'Parcial' },
 ];
 
 const emptyForm = { name: '', niche: '', region: '', emailSubject: '', emailBody: '' };
 
-function CampaignComponent({ items = [], onCreate, onUpdate, onDelete, onViewContacts }) {
+function CampaignComponent({ items = [], onCreate, onUpdate, onDelete, onViewContacts, onSendEmails, onExportCsv }) {
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState(null);
   const [formData, setFormData] = useState(emptyForm);
@@ -35,14 +39,18 @@ function CampaignComponent({ items = [], onCreate, onUpdate, onDelete, onViewCon
     ? items.filter((i) => i.status === statusFilter)
     : items;
 
-  const isLocked = useCallback((status) => status === 'Sending' || status === 'Completed', []);
+  const isLocked = useCallback((status) => status === 'Running' || status === 'Completed', []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
     try {
       if (editing) {
-        await onUpdate(editing.id, formData);
+        await onUpdate(editing.id, {
+          name: formData.name,
+          emailSubject: formData.emailSubject,
+          emailBody: formData.emailBody,
+        });
         setEditing(null);
       } else {
         await onCreate(formData);
@@ -120,30 +128,32 @@ function CampaignComponent({ items = [], onCreate, onUpdate, onDelete, onViewCon
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Nicho *</label>
-              <input
-                type="text"
-                required
-                value={formData.niche}
-                onChange={(e) => setFormData({ ...formData, niche: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Ex: Tecnologia"
-              />
+          {!editing && (
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Nicho *</label>
+                <input
+                  type="text"
+                  required
+                  value={formData.niche}
+                  onChange={(e) => setFormData({ ...formData, niche: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Ex: Tecnologia"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Regiao *</label>
+                <input
+                  type="text"
+                  required
+                  value={formData.region}
+                  onChange={(e) => setFormData({ ...formData, region: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Ex: Florianopolis - SC"
+                />
+              </div>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Regiao *</label>
-              <input
-                type="text"
-                required
-                value={formData.region}
-                onChange={(e) => setFormData({ ...formData, region: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Ex: Florianopolis - SC"
-              />
-            </div>
-          </div>
+          )}
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Assunto do e-mail *</label>
@@ -220,7 +230,7 @@ function CampaignComponent({ items = [], onCreate, onUpdate, onDelete, onViewCon
                     <StatusBadge status={item.status} config={campaignStatusConfig} />
                   </td>
                   <td className="px-4 py-3 text-gray-500">
-                    {item.contacts?.length ?? item.contactCount ?? 0} contato(s)
+                    {item.totalContacts ?? 0} contato(s)
                   </td>
                   <td className="px-4 py-3 text-gray-500">{item.createdAt ? formatDate(item.createdAt) : '—'}</td>
                   <td className="px-4 py-3 text-right">
@@ -230,6 +240,22 @@ function CampaignComponent({ items = [], onCreate, onUpdate, onDelete, onViewCon
                       title="Ver contatos"
                     >
                       <Eye className="w-4 h-4" />
+                    </button>
+                    {item.status === 'Draft' && (
+                      <button
+                        onClick={() => onSendEmails?.(item.id)}
+                        className="p-1.5 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded transition-colors mr-1"
+                        title="Enviar e-mails"
+                      >
+                        <Send className="w-4 h-4" />
+                      </button>
+                    )}
+                    <button
+                      onClick={() => onExportCsv?.(item.id, item.name)}
+                      className="p-1.5 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded transition-colors mr-1"
+                      title="Exportar CSV"
+                    >
+                      <Download className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => handleEdit(item)}
@@ -241,9 +267,9 @@ function CampaignComponent({ items = [], onCreate, onUpdate, onDelete, onViewCon
                     </button>
                     <button
                       onClick={() => confirm(() => onDelete(item.id))}
-                      disabled={item.status === 'Sending'}
+                      disabled={item.status === 'Running'}
                       className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:text-gray-400 disabled:hover:bg-transparent"
-                      title={item.status === 'Sending' ? 'Exclusao bloqueada durante envio' : 'Excluir'}
+                      title={item.status === 'Running' ? 'Exclusao bloqueada durante envio' : 'Excluir'}
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>

@@ -1,5 +1,6 @@
 import { Link, Outlet, useLocation } from 'react-router-dom';
-import { Megaphone, Users, UserCircle, Settings } from 'lucide-react';
+import { Megaphone, Users, UserCircle, Settings, LogOut } from 'lucide-react';
+import { useAuth } from '../hooks/useAuth';
 
 const navItems = [
   { to: '/campaign', label: 'Campanhas', icon: Megaphone },
@@ -10,6 +11,7 @@ const navItems = [
 
 function MainLayout() {
   const location = useLocation();
+  const { user, logout } = useAuth();
 
   return (
     <div className="flex h-screen bg-gray-100">
@@ -47,7 +49,21 @@ function MainLayout() {
         </nav>
 
         <div className="p-4 border-t border-gray-200">
-          <p className="text-xs text-gray-400 text-center">v1.0.0</p>
+          {user && (
+            <div className="flex items-center justify-between">
+              <div className="min-w-0">
+                <p className="text-sm font-medium text-gray-800 truncate">{user.name}</p>
+                <p className="text-xs text-gray-400 truncate">{user.email}</p>
+              </div>
+              <button
+                onClick={logout}
+                className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors shrink-0 ml-2"
+                title="Sair"
+              >
+                <LogOut className="w-4 h-4" />
+              </button>
+            </div>
+          )}
         </div>
       </aside>
 

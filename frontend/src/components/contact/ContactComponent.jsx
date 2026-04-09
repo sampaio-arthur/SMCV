@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { Plus, Pencil, Trash2 } from 'lucide-react';
+import { Plus, Pencil, Trash2, Search } from 'lucide-react';
 import { formatDate } from '../../utils';
 import StatusBadge from '../ui/StatusBadge';
 import EmptyState from '../ui/EmptyState';
@@ -20,13 +20,17 @@ const statusFilters = [
   { value: 'Failed', label: 'Falhou' },
 ];
 
-const emptyForm = { campaignId: '', companyName: '', email: '', region: '' };
+const emptyForm = { campaignId: '', companyName: '', email: '' };
+const emptySearchForm = { niche: '', region: '', limit: '10' };
 
-function ContactComponent({ items = [], campaigns = [], onCreate, onUpdate, onDelete, defaultCampaignId }) {
+function ContactComponent({ items = [], campaigns = [], onCreate, onUpdate, onDelete, onSearch, defaultCampaignId }) {
   const [showForm, setShowForm] = useState(false);
+  const [showSearchForm, setShowSearchForm] = useState(false);
   const [editing, setEditing] = useState(null);
   const [formData, setFormData] = useState({ ...emptyForm, campaignId: defaultCampaignId || '' });
+  const [searchData, setSearchData] = useState({ ...emptySearchForm, campaignId: defaultCampaignId || '' });
   const [submitting, setSubmitting] = useState(false);
+  const [searching, setSearching] = useState(false);
   const [statusFilter, setStatusFilter] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const { confirm, dialogProps } = useConfirm();
@@ -59,19 +63,37 @@ function ContactComponent({ items = [], campaigns = [], onCreate, onUpdate, onDe
     try {
       if (editing) {
         await onUpdate(editing.id, {
-          campaignId: formData.campaignId,
           companyName: formData.companyName,
           email: formData.email,
-          region: formData.region,
         });
         setEditing(null);
       } else {
-        await onCreate(formData);
+        await onCreate({
+          campaignId: formData.campaignId,
+          companyName: formData.companyName,
+          email: formData.email,
+        });
       }
       setFormData({ ...emptyForm, campaignId: defaultCampaignId || '' });
       setShowForm(false);
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handleHunterSearch = async (e) => {
+    e.preventDefault();
+    setSearching(true);
+    try {
+      await onSearch({
+        campaignId: searchData.campaignId,
+        niche: searchData.niche,
+        region: searchData.region,
+        limit: Number(searchData.limit) || 10,
+      });
+      setShowSearchForm(false);
+    } finally {
+      setSearching(false);
     }
   };
 
@@ -81,7 +103,6 @@ function ContactComponent({ items = [], campaigns = [], onCreate, onUpdate, onDe
       campaignId: item.campaignId ?? '',
       companyName: item.companyName ?? '',
       email: item.email ?? '',
-      region: item.region ?? '',
     });
     setShowForm(true);
   };
@@ -101,15 +122,24 @@ function ContactComponent({ items = [], campaigns = [], onCreate, onUpdate, onDe
   return (
     <div className="space-y-4">
       {/* Toolbar */}
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center gap-2">
         <p className="text-sm text-gray-600">{filteredItems.length} contato(s)</p>
-        <button
-          onClick={openNewForm}
-          className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
-        >
-          <Plus className="w-4 h-4" />
-          Novo Contato
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={() => { setShowSearchForm(!showSearchForm); setShowForm(false); }}
+            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-lg transition-colors"
+          >
+            <Search className="w-4 h-4" />
+            Buscar Hunter.io
+          </button>
+          <button
+            onClick={() => { openNewForm(); setShowSearchForm(false); }}
+            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
+          >
+            <Plus className="w-4 h-4" />
+            Novo Contato
+          </button>
+        </div>
       </div>
 
       {/* Summary counters */}
@@ -146,19 +176,18 @@ function ContactComponent({ items = [], campaigns = [], onCreate, onUpdate, onDe
         </div>
       </div>
 
-      {/* Form */}
-      {showForm && (
-        <form onSubmit={handleSubmit} className="bg-white p-4 rounded-lg border border-gray-200 space-y-3">
-          <h3 className="font-semibold text-gray-800">{editing ? 'Editar Contato' : 'Novo Contato'}</h3>
+      {/* Hunter.io Search Form */}
+      {showSearchForm && (
+        <form onSubmit={handleHunterSearch} className="bg-green-50 p-4 rounded-lg border border-green-200 space-y-3">
+          <h3 className="font-semibold text-gray-800">Buscar contatos via Hunter.io</h3>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Campanha *</label>
             <select
               required
-              value={formData.campaignId}
-              onChange={(e) => setFormData({ ...formData, campaignId: e.target.value })}
-              disabled={!!editing}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+              value={searchData.campaignId}
+              onChange={(e) => setSearchData({ ...searchData, campaignId: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
             >
               <option value="">Selecione uma campanha</option>
               {campaigns.map((c) => (
@@ -166,6 +195,84 @@ function ContactComponent({ items = [], campaigns = [], onCreate, onUpdate, onDe
               ))}
             </select>
           </div>
+
+          <div className="grid grid-cols-3 gap-3">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Nicho *</label>
+              <input
+                type="text"
+                required
+                value={searchData.niche}
+                onChange={(e) => setSearchData({ ...searchData, niche: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                placeholder="Ex: Tecnologia"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Regiao *</label>
+              <input
+                type="text"
+                required
+                value={searchData.region}
+                onChange={(e) => setSearchData({ ...searchData, region: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                placeholder="Ex: Florianopolis"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Limite</label>
+              <input
+                type="number"
+                min="1"
+                max="100"
+                value={searchData.limit}
+                onChange={(e) => setSearchData({ ...searchData, limit: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                placeholder="10"
+              />
+            </div>
+          </div>
+
+          <div className="flex gap-2">
+            <button
+              type="submit"
+              disabled={searching}
+              className="px-4 py-2 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {searching ? 'Buscando...' : 'Buscar Contatos'}
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowSearchForm(false)}
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+            >
+              Cancelar
+            </button>
+          </div>
+        </form>
+      )}
+
+      {/* Manual Form */}
+      {showForm && (
+        <form onSubmit={handleSubmit} className="bg-white p-4 rounded-lg border border-gray-200 space-y-3">
+          <h3 className="font-semibold text-gray-800">{editing ? 'Editar Contato' : 'Novo Contato'}</h3>
+
+          {!editing && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Campanha *</label>
+              <select
+                required
+                value={formData.campaignId}
+                onChange={(e) => setFormData({ ...formData, campaignId: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">Selecione uma campanha</option>
+                {campaigns.map((c) => (
+                  <option key={c.id} value={c.id}>{c.name}</option>
+                ))}
+              </select>
+            </div>
+          )}
 
           <div className="grid grid-cols-2 gap-3">
             <div>
@@ -190,17 +297,6 @@ function ContactComponent({ items = [], campaigns = [], onCreate, onUpdate, onDe
                 placeholder="Ex: rh@empresa.com"
               />
             </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Regiao</label>
-            <input
-              type="text"
-              value={formData.region}
-              onChange={(e) => setFormData({ ...formData, region: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Ex: Sao Paulo - SP"
-            />
           </div>
 
           <div className="flex gap-2">
@@ -229,7 +325,7 @@ function ContactComponent({ items = [], campaigns = [], onCreate, onUpdate, onDe
           description={
             searchTerm || statusFilter
               ? 'Nenhum contato corresponde aos filtros aplicados.'
-              : 'Nenhum contato nesta campanha. Adicione contatos para iniciar o envio.'
+              : 'Nenhum contato nesta campanha. Adicione contatos ou use a busca Hunter.io.'
           }
           actionLabel={!searchTerm && !statusFilter ? 'Novo Contato' : undefined}
           onAction={!searchTerm && !statusFilter ? openNewForm : undefined}
@@ -241,7 +337,6 @@ function ContactComponent({ items = [], campaigns = [], onCreate, onUpdate, onDe
               <tr>
                 <th className="px-4 py-3 text-left font-semibold text-gray-600">Empresa</th>
                 <th className="px-4 py-3 text-left font-semibold text-gray-600">E-mail</th>
-                <th className="px-4 py-3 text-left font-semibold text-gray-600">Regiao</th>
                 <th className="px-4 py-3 text-left font-semibold text-gray-600">Status do envio</th>
                 <th className="px-4 py-3 text-left font-semibold text-gray-600">Enviado em</th>
                 <th className="px-4 py-3 text-right font-semibold text-gray-600">Acoes</th>
@@ -252,7 +347,6 @@ function ContactComponent({ items = [], campaigns = [], onCreate, onUpdate, onDe
                 <tr key={item.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-4 py-3 font-medium text-gray-800">{item.companyName}</td>
                   <td className="px-4 py-3 text-gray-500">{item.email}</td>
-                  <td className="px-4 py-3 text-gray-500">{item.region || '—'}</td>
                   <td className="px-4 py-3">
                     <StatusBadge status={item.emailStatus} config={emailStatusConfig} />
                   </td>
