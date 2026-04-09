@@ -11,6 +11,7 @@ Arquivo unico, sem classe — usa top-level statements.
 
 Manter esta ordem no `Program.cs`:
 ```
+0. AddHttpContextAccessor()
 1. AddControllers()
 2. AddEndpointsApiExplorer() + AddSwaggerGen()
 3. AddCors()

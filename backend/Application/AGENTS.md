@@ -58,7 +58,7 @@ Application/
 |---------|------|-----------|
 | `CampaignDetailResponse.cs` | Response | Detalhes completos da campanha com UserId, Name e contatos aninhados. |
 | `CampaignResponse.cs` | Response | Resumo da campanha com UserId, Name e contagem de contatos (sem lista detalhada). |
-| `CreateCampaignRequest.cs` | Request | Criacao de campanha: UserId, Name, Niche, Region, EmailSubject, EmailBody. |
+| `CreateCampaignRequest.cs` | Request | Criacao de campanha: Name, Niche, Region, EmailSubject, EmailBody (UserId extraido do JWT no controller). |
 | `ExportContactsCsvRequest.cs` | Request | Exportacao CSV de contatos por campaign ID. |
 | `SendCampaignEmailsRequest.cs` | Request | Disparo de emails da campanha por campaign ID. |
 | `UpdateCampaignRequest.cs` | Request | Atualizacao de Name, EmailSubject e EmailBody da campanha. |
@@ -91,8 +91,8 @@ Application/
 | Arquivo | Tipo | Descricao |
 |---------|------|-----------|
 | `UserProfileResponse.cs` | Response | Perfil do usuario: Id, UserId, ResumeFilePath, CreatedAt. |
-| `CreateUserProfileRequest.cs` | Request | Criacao de perfil: UserId, ResumeFilePath. |
-| `UpdateUserProfileRequest.cs` | Request | Atualizacao de perfil: ResumeFilePath. |
+| `CreateUserProfileRequest.cs` | Request | Criacao de perfil (vazio — UserId extraido do JWT no controller). |
+| `UpdateUserProfileRequest.cs` | Request | Atualizacao de perfil (vazio — ResumeFilePath so via endpoint de upload dedicado). |
 
 ### DTOs — Root (`SMCV.Application.DTOs`)
 

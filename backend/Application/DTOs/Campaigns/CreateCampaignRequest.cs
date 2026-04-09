@@ -2,7 +2,6 @@ namespace SMCV.Application.DTOs.Campaigns;
 
 public class CreateCampaignRequest
 {
-    public Guid UserId { get; set; }
     public string Name { get; set; } = string.Empty;
     public string Niche { get; set; } = string.Empty;
     public string Region { get; set; } = string.Empty;

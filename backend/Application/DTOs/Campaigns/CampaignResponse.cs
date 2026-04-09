@@ -1,14 +1,15 @@
 namespace SMCV.Application.DTOs.Campaigns;
 
-public record CampaignResponse(
-    Guid Id,
-    Guid UserId,
-    string Name,
-    string Niche,
-    string Region,
-    string EmailSubject,
-    string EmailBody,
-    string Status,
-    DateTime CreatedAt,
-    int TotalContacts
-);
+public class CampaignResponse
+{
+    public Guid Id { get; set; }
+    public Guid UserId { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string Niche { get; set; } = string.Empty;
+    public string Region { get; set; } = string.Empty;
+    public string EmailSubject { get; set; } = string.Empty;
+    public string EmailBody { get; set; } = string.Empty;
+    public string Status { get; set; } = string.Empty;
+    public DateTime CreatedAt { get; set; }
+    public int TotalContacts { get; set; }
+}

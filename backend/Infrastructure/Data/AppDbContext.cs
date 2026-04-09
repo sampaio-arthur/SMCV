@@ -63,7 +63,7 @@ public class AppDbContext : DbContext
             entity.Property(c => c.Region).HasColumnType("varchar(255)").IsRequired();
             entity.Property(c => c.EmailSubject).HasColumnType("varchar(500)").IsRequired();
             entity.Property(c => c.EmailBody).HasColumnType("text").IsRequired();
-            entity.Property(c => c.Status).HasColumnType("int").HasDefaultValue(CampaignStatus.Draft);
+            entity.Property(c => c.Status).HasConversion<string>().HasDefaultValue(CampaignStatus.Draft);
             entity.Property(c => c.CreatedAt).HasColumnType("timestamp with time zone").IsRequired();
 
             entity.HasMany(c => c.Contacts)
@@ -80,7 +80,7 @@ public class AppDbContext : DbContext
             entity.Property(c => c.CampaignId).IsRequired();
             entity.Property(c => c.CompanyName).HasColumnType("varchar(500)").IsRequired();
             entity.Property(c => c.Email).HasColumnType("varchar(255)").IsRequired();
-            entity.Property(c => c.EmailStatus).HasColumnType("int").HasDefaultValue(EmailStatus.Pending);
+            entity.Property(c => c.EmailStatus).HasConversion<string>().HasDefaultValue(EmailStatus.Pending);
             entity.Property(c => c.EmailSentAt).HasColumnType("timestamp with time zone");
             entity.Property(c => c.CreatedAt).HasColumnType("timestamp with time zone").IsRequired();
 

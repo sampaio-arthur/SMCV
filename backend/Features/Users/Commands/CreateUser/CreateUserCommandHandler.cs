@@ -30,6 +30,9 @@ public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, UserR
             Email = request.Email
         };
 
+        if (request.Id.HasValue)
+            user.Id = request.Id.Value;
+
         await _userRepository.AddAsync(user);
         return _mapper.Map<UserResponse>(user);
     }

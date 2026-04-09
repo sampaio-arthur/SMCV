@@ -18,6 +18,9 @@ string RequiredSetting(string key)
         ?? throw new InvalidOperationException($"Environment variable '{key}' was not configured.");
 }
 
+// ─── HttpContextAccessor ──────────────────────────────────────────────────────
+builder.Services.AddHttpContextAccessor();
+
 // ─── Controllers ──────────────────────────────────────────────────────────────
 builder.Services.AddControllers();
 

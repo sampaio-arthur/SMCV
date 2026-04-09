@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -24,18 +25,32 @@ public class UsersController : ControllerBase
 
     [HttpGet]
     [Authorize(Roles = "admin")]
-    public async Task<IActionResult> GetAll([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10) =>
-        Ok(await _mediator.Send(new GetAllUsersQuery(pageNumber, pageSize)));
+    public async Task<IActionResult> GetAll([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+    {
+        if (pageNumber < 1) pageNumber = 1;
+        if (pageSize < 1 || pageSize > 100) pageSize = 10;
+        return Ok(await _mediator.Send(new GetAllUsersQuery(pageNumber, pageSize)));
+    }
 
     [HttpGet("{id:guid}")]
-    public async Task<IActionResult> GetById(Guid id) =>
-        Ok(await _mediator.Send(new GetUserByIdQuery(id)));
+    public async Task<IActionResult> GetById(Guid id)
+    {
+        var currentUserId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+        if (currentUserId != id) return Forbid();
+
+        return Ok(await _mediator.Send(new GetUserByIdQuery(id)));
+    }
 
     [HttpPost]
     [AllowAnonymous]
     public async Task<IActionResult> Create([FromBody] CreateUserRequest request)
     {
-        var command = new CreateUserCommand(request.Name, request.Email);
+        Guid? keycloakId = null;
+        var sub = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (sub is not null && Guid.TryParse(sub, out var parsed))
+            keycloakId = parsed;
+
+        var command = new CreateUserCommand(keycloakId, request.Name, request.Email);
         var result = await _mediator.Send(command);
         return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
     }
@@ -43,6 +58,9 @@ public class UsersController : ControllerBase
     [HttpPut("{id:guid}")]
     public async Task<IActionResult> Update(Guid id, [FromBody] UpdateUserRequest request)
     {
+        var currentUserId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+        if (currentUserId != id) return Forbid();
+
         var result = await _mediator.Send(new UpdateUserCommand(id, request.Name, request.Email));
         return Ok(result);
     }
@@ -50,6 +68,9 @@ public class UsersController : ControllerBase
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id)
     {
+        var currentUserId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+        if (currentUserId != id) return Forbid();
+
         await _mediator.Send(new DeleteUserCommand(id));
         return NoContent();
     }

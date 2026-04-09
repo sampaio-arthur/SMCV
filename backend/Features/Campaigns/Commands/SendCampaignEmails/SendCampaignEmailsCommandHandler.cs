@@ -51,63 +51,68 @@ public class SendCampaignEmailsCommandHandler : IRequestHandler<SendCampaignEmai
         var successCount = 0;
         var failureCount = 0;
 
-        foreach (var contact in campaign.Contacts)
+        try
         {
-            if (contact.EmailStatus == EmailStatus.Sent)
-                continue;
-
-            try
+            foreach (var contact in campaign.Contacts)
             {
-                await _emailSenderService.SendEmailWithAttachmentAsync(
-                    toEmail: contact.Email,
-                    toName: contact.CompanyName,
-                    subject: campaign.EmailSubject,
-                    body: campaign.EmailBody,
-                    attachmentPath: userProfile.ResumeFilePath,
-                    attachmentFileName: Path.GetFileName(userProfile.ResumeFilePath),
-                    replyToEmail: user.Email,
-                    replyToName: user.Name);
+                if (contact.EmailStatus == EmailStatus.Sent)
+                    continue;
 
-                contact.EmailStatus = EmailStatus.Sent;
-                contact.EmailSentAt = DateTime.UtcNow;
-                await _contactRepository.UpdateAsync(contact);
-
-                successCount++;
-            }
-            catch (Exception ex)
-            {
-                contact.EmailStatus = EmailStatus.Failed;
-                await _contactRepository.UpdateAsync(contact);
-
-                if (contact.EmailLog is null)
+                try
                 {
-                    var emailLog = new EmailLog
+                    await _emailSenderService.SendEmailWithAttachmentAsync(
+                        toEmail: contact.Email,
+                        toName: contact.CompanyName,
+                        subject: campaign.EmailSubject,
+                        body: campaign.EmailBody,
+                        attachmentPath: userProfile.ResumeFilePath,
+                        attachmentFileName: Path.GetFileName(userProfile.ResumeFilePath),
+                        replyToEmail: user.Email,
+                        replyToName: user.Name);
+
+                    contact.EmailStatus = EmailStatus.Sent;
+                    contact.EmailSentAt = DateTime.UtcNow;
+                    await _contactRepository.UpdateAsync(contact);
+
+                    successCount++;
+                }
+                catch (Exception ex)
+                {
+                    contact.EmailStatus = EmailStatus.Failed;
+                    await _contactRepository.UpdateAsync(contact);
+
+                    if (contact.EmailLog is null)
                     {
-                        ContactId = contact.Id,
-                        ErrorMessage = ex.Message
-                    };
-                    await _emailLogRepository.AddAsync(emailLog);
-                }
-                else
-                {
-                    contact.EmailLog.ErrorMessage = ex.Message;
-                    await _emailLogRepository.UpdateAsync(contact.EmailLog);
-                }
+                        var emailLog = new EmailLog
+                        {
+                            ContactId = contact.Id,
+                            ErrorMessage = ex.Message
+                        };
+                        await _emailLogRepository.AddAsync(emailLog);
+                    }
+                    else
+                    {
+                        contact.EmailLog.ErrorMessage = ex.Message;
+                        await _emailLogRepository.UpdateAsync(contact.EmailLog);
+                    }
 
-                failureCount++;
+                    failureCount++;
+                }
             }
         }
+        finally
+        {
+            if (successCount == 0 && failureCount > 0)
+                campaign.Status = CampaignStatus.Failed;
+            else if (failureCount == 0 && successCount > 0)
+                campaign.Status = CampaignStatus.Completed;
+            else if (successCount > 0 && failureCount > 0)
+                campaign.Status = CampaignStatus.PartialSuccess;
+            else
+                campaign.Status = CampaignStatus.Completed;
 
-        if (successCount == 0 && failureCount > 0)
-            campaign.Status = CampaignStatus.Failed;
-        else if (failureCount == 0 && successCount > 0)
-            campaign.Status = CampaignStatus.Completed;
-        else if (successCount > 0 && failureCount > 0)
-            campaign.Status = CampaignStatus.PartialSuccess;
-        else
-            campaign.Status = CampaignStatus.Completed; // all were already Sent (skipped)
-
-        await _campaignRepository.UpdateAsync(campaign);
+            await _campaignRepository.UpdateAsync(campaign);
+        }
 
         return successCount;
     }

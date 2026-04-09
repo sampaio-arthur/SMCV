@@ -95,6 +95,9 @@ Features/
     │   │   ├── UpdateUserProfileCommand.cs
     │   │   ├── UpdateUserProfileCommandHandler.cs
     │   │   └── UpdateUserProfileCommandValidator.cs
+    │   ├── UploadResume/
+    │   │   ├── UploadResumeCommand.cs
+    │   │   └── UploadResumeCommandHandler.cs
     │   └── DeleteUserProfile/
     │       ├── DeleteUserProfileCommand.cs
     │       └── DeleteUserProfileCommandHandler.cs
@@ -118,10 +121,10 @@ Todos os handlers estao implementados e funcionais:
 
 | Handler | Tipo | Namespace | Descricao |
 |---------|------|-----------|-----------|
-| `CreateCampaignCommandHandler` | Command | `SMCV.Features.Campaigns.Commands.CreateCampaign` | Cria campanha em status Draft. Command: UserId, Name, Niche, Region, EmailSubject, EmailBody. Validator incluso. |
+| `CreateCampaignCommandHandler` | Command | `SMCV.Features.Campaigns.Commands.CreateCampaign` | Cria campanha em status Draft. UserId extraido do JWT no controller. Command: UserId, Name, Niche, Region, EmailSubject, EmailBody. Validator incluso. |
 | `DeleteCampaignCommandHandler` | Command | `SMCV.Features.Campaigns.Commands.DeleteCampaign` | Deleta campanha. Valida existencia e impede exclusao se status Running. |
 | `ExportContactsCsvCommandHandler` | Command | `SMCV.Features.Campaigns.Commands.ExportContactsCsv` | Busca contatos da campanha e gera CSV via ICsvExportService. |
-| `SendCampaignEmailsCommandHandler` | Command | `SMCV.Features.Campaigns.Commands.SendCampaignEmails` | Envia emails para contatos. Injeta IUserRepository e IUserProfileRepository para obter remetente e resume do UserProfile. Query otimizada (sem N+1 para EmailLog). Status final: Completed, Failed ou PartialSuccess conforme resultado dos envios. |
+| `SendCampaignEmailsCommandHandler` | Command | `SMCV.Features.Campaigns.Commands.SendCampaignEmails` | Envia emails para contatos. Injeta IUserRepository e IUserProfileRepository para obter remetente e resume do UserProfile. Query otimizada (sem N+1 para EmailLog). Loop de envio envolvido em try/finally para garantir persistencia do status. Status final: Completed, Failed ou PartialSuccess conforme resultado dos envios. |
 | `UpdateCampaignCommandHandler` | Command | `SMCV.Features.Campaigns.Commands.UpdateCampaign` | Atualiza Name, EmailSubject e EmailBody. Valida status Draft. Validator incluso. |
 | `GetAllCampaignsQueryHandler` | Query | `SMCV.Features.Campaigns.Queries.GetAllCampaigns` | Lista todas as campanhas com eager loading de contacts. |
 | `GetCampaignByIdQueryHandler` | Query | `SMCV.Features.Campaigns.Queries.GetCampaignById` | Busca campanha por ID com contacts. Lanca NotFoundException se nao encontrada. |
@@ -149,7 +152,7 @@ Todos os handlers estao implementados e funcionais:
 
 | Handler | Tipo | Namespace | Descricao |
 |---------|------|-----------|-----------|
-| `CreateUserCommandHandler` | Command | `SMCV.Features.Users.Commands.CreateUser` | Cria usuario (sem PasswordHash — autenticacao via Keycloak). Validator incluso. |
+| `CreateUserCommandHandler` | Command | `SMCV.Features.Users.Commands.CreateUser` | Cria usuario (sem PasswordHash — autenticacao via Keycloak). Se autenticado, User.Id = JWT sub. Validator incluso. |
 | `UpdateUserCommandHandler` | Command | `SMCV.Features.Users.Commands.UpdateUser` | Atualiza dados do usuario. Valida unicidade de email. Validator incluso (FluentValidation). |
 | `DeleteUserCommandHandler` | Command | `SMCV.Features.Users.Commands.DeleteUser` | Deleta usuario por ID. Valida existencia. |
 | `GetAllUsersQueryHandler` | Query | `SMCV.Features.Users.Queries.GetAllUsers` | Lista usuarios com paginacao (PageNumber, PageSize). Usa GetAllPagedAsync. |
@@ -159,8 +162,9 @@ Todos os handlers estao implementados e funcionais:
 
 | Handler | Tipo | Namespace | Descricao |
 |---------|------|-----------|-----------|
-| `CreateUserProfileCommandHandler` | Command | `SMCV.Features.UserProfiles.Commands.CreateUserProfile` | Cria perfil de usuario. Validator incluso. |
-| `UpdateUserProfileCommandHandler` | Command | `SMCV.Features.UserProfiles.Commands.UpdateUserProfile` | Atualiza perfil (incluindo ResumeFilePath). Validator incluso. |
+| `CreateUserProfileCommandHandler` | Command | `SMCV.Features.UserProfiles.Commands.CreateUserProfile` | Cria perfil de usuario. UserId extraido do JWT no controller. Validator incluso. |
+| `UpdateUserProfileCommandHandler` | Command | `SMCV.Features.UserProfiles.Commands.UpdateUserProfile` | Atualiza perfil (sem ResumeFilePath — apenas via upload dedicado). Validator incluso. |
+| `UploadResumeCommandHandler` | Command | `SMCV.Features.UserProfiles.Commands.UploadResume` | Atualiza ResumeFilePath do perfil. Usado exclusivamente pelo endpoint de upload de curriculo. |
 | `DeleteUserProfileCommandHandler` | Command | `SMCV.Features.UserProfiles.Commands.DeleteUserProfile` | Deleta perfil por ID. Valida existencia. |
 | `GetAllUserProfilesQueryHandler` | Query | `SMCV.Features.UserProfiles.Queries.GetAllUserProfiles` | Lista perfis de usuario com paginacao (PageNumber, PageSize). Usa GetAllPagedAsync. |
 | `GetUserProfileByIdQueryHandler` | Query | `SMCV.Features.UserProfiles.Queries.GetUserProfileById` | Busca perfil por ID. Lanca NotFoundException se nao encontrado. |

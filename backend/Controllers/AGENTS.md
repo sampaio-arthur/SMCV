@@ -12,11 +12,11 @@ Na arquitetura CQRS, controllers chamam `_mediator.Send()` em vez de chamar Serv
 
 | Arquivo | Namespace | Descricao |
 |---------|-----------|-----------|
-| `CampaignsController.cs` | `SMCV.Controllers` | CRUD de campanhas, envio de emails, exportacao CSV. Recebe [FromBody] (sem multipart/IFormFile). Requer [Authorize]. |
+| `CampaignsController.cs` | `SMCV.Controllers` | CRUD de campanhas, envio de emails, exportacao CSV. UserId extraido do JWT no POST (sem UserId no body). Requer [Authorize]. |
 | `ContactsController.cs` | `SMCV.Controllers` | CRUD de contatos, busca via Hunter.io, filtro por campanha. Requer [Authorize]. |
 | `EmailLogsController.cs` | `SMCV.Controllers` | Consulta de logs de email por contato ou por campanha. Requer [Authorize]. |
-| `UsersController.cs` | `SMCV.Controllers` | CRUD de usuarios. POST e [AllowAnonymous], demais endpoints requerem [Authorize]. GetAll com paginacao (pageNumber, pageSize) e [Authorize(Roles = "admin")]. |
-| `UserProfilesController.cs` | `SMCV.Controllers` | CRUD de perfis de usuario e endpoint upload-resume. Requer [Authorize]. GetAll com paginacao (pageNumber, pageSize). |
+| `UsersController.cs` | `SMCV.Controllers` | CRUD de usuarios. POST e [AllowAnonymous] (com JWT optional para setar User.Id = sub). GET/PUT/DELETE com ownership check (403 se userId != JWT sub). GetAll com paginacao (pageNumber, pageSize) e [Authorize(Roles = "admin")]. |
+| `UserProfilesController.cs` | `SMCV.Controllers` | CRUD de perfis de usuario e endpoint upload-resume. UserId extraido do JWT no POST. GET/PUT/DELETE/UploadResume com ownership check (403 se profile.UserId != JWT sub). Injeta IUserProfileRepository para ownership. GetAll com paginacao (pageNumber, pageSize). Requer [Authorize]. |
 
 ## REGRAS OBRIGATORIAS
 
