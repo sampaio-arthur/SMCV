@@ -8,72 +8,79 @@ Automatiza o processo de organizar campanhas de e-mail e enviar currículos em m
 
 ## Pré-requisitos
 
-- .NET 8 SDK
-- PostgreSQL 15+
-- Node.js 18+
-- Conta SMTP (Gmail, Outlook, etc.)
-- Docker e Docker Compose (opcional)
-
-## Configuração do Banco
-
-Criar o banco PostgreSQL:
-
-```sql
-CREATE DATABASE jobprospector;
-```
+- Docker e Docker Compose
+- Conta Gmail (para envio de e-mails via SMTP)
 
 ## Configuração
 
-Copie o arquivo de exemplo e preencha com suas credenciais:
+### 1. Criar o arquivo `.env`
+
+Copie o arquivo de exemplo:
 
 ```bash
 cp .env.example .env
 ```
 
-Edite o `.env` com seus valores reais. **Nunca commite o `.env`.**
+### 2. Configurar variáveis de banco de dados
 
-| Variável | Descrição | Exemplo |
-|----------|-----------|---------|
-| `DB_HOST` | Host do PostgreSQL | `localhost` |
-| `DB_PORT` | Porta do PostgreSQL | `5432` |
-| `DB_NAME` | Nome do banco | `jobprospector` |
-| `DB_USER` | Usuário do banco | `postgres` |
-| `DB_PASSWORD` | Senha do banco | `change-me` |
-| `POSTGRES_DB` | Nome do banco (Docker) | `jobprospector` |
-| `POSTGRES_USER` | Usuário (Docker) | `postgres` |
-| `POSTGRES_PASSWORD` | Senha (Docker) | `change-me` |
-| `SMTP_HOST` | Servidor SMTP | `smtp.gmail.com` |
-| `SMTP_PORT` | Porta SMTP | `587` |
-| `SMTP_SENDER_EMAIL` | E-mail remetente | `your@email.com` |
-| `SMTP_SENDER_PASSWORD` | Senha ou App Password | `your_app_password` |
-| `SMTP_SENDER_NAME` | Nome do remetente | `Job Prospector` |
+No `.env`, defina as credenciais do PostgreSQL. Os valores de `DB_*` e `POSTGRES_*` devem ser iguais:
 
-## Execução com Docker
+```env
+DB_HOST=db
+DB_PORT=5432
+DB_NAME=jobprospector
+DB_USER=postgres
+DB_PASSWORD=sua_senha_segura
+
+POSTGRES_DB=jobprospector
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=sua_senha_segura
+```
+
+> `DB_HOST` deve ser `db` (nome do serviço no Docker Compose).
+> `DB_PASSWORD` e `POSTGRES_PASSWORD` devem ser iguais.
+
+### 3. Configurar e-mail SMTP (Gmail)
+
+O sistema usa SMTP para enviar e-mails. Para usar o Gmail, você precisa gerar uma **Senha de App** (App Password):
+
+1. Acesse sua conta Google em [myaccount.google.com](https://myaccount.google.com)
+2. Vá em **Segurança**
+3. Na seção **Como fazer login no Google**, ative a **Verificação em duas etapas** (obrigatório)
+4. Depois de ativar, volte em **Segurança** → **Verificação em duas etapas** → **Senhas de app** (no final da página)
+5. Crie uma nova senha de app selecionando **Outro** e dando um nome (ex: "Job Prospector")
+6. O Google vai gerar uma senha de 16 caracteres (ex: `abcd efgh ijkl mnop`)
+7. Copie essa senha e cole no `.env` **sem espaços**
+
+```env
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_SENDER_EMAIL=seu_email@gmail.com
+SMTP_SENDER_PASSWORD=abcdefghijklmnop
+SMTP_SENDER_NAME=Job Prospector
+```
+
+> **Nunca use sua senha pessoal do Google.** Use sempre a Senha de App gerada.
+> **Nunca commite o arquivo `.env`.**
+
+## Execução
 
 ```bash
 docker-compose up -d --build
 ```
 
-- Frontend: http://localhost:3000
-- Backend API: http://localhost:8080
-- Swagger: http://localhost:8080/swagger
+O Docker Compose sobe os três serviços (banco, backend e frontend). O banco é criado e as migrations são aplicadas automaticamente no startup.
 
-## Execução Local
+| Serviço | URL |
+|---------|-----|
+| Frontend | http://localhost:3000 |
+| Backend API | http://localhost:8080 |
+| Swagger | http://localhost:8080/swagger |
 
-### Backend
-
-```bash
-cd backend
-dotnet ef database update   # aplica migrations
-dotnet run                  # API em :8080
-```
-
-### Frontend
+Para parar:
 
 ```bash
-cd frontend
-npm install
-npm run dev                 # Vite em :5173
+docker-compose down
 ```
 
 ## Endpoints
