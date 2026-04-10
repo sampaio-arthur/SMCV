@@ -11,14 +11,19 @@ function ContactPage() {
   const [campaigns, setCampaigns] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchParams] = useSearchParams();
-  const campaignId = searchParams.get('campaignId');
+  const urlCampaignId = searchParams.get('campaignId');
+  const [selectedCampaignId, setSelectedCampaignId] = useState(urlCampaignId || '');
   const toast = useToast();
 
   useEffect(() => {
-    loadData();
-  }, [campaignId]);
+    if (urlCampaignId) setSelectedCampaignId(urlCampaignId);
+  }, [urlCampaignId]);
 
-  const loadData = async () => {
+  useEffect(() => {
+    loadData(selectedCampaignId);
+  }, [selectedCampaignId]);
+
+  const loadData = async (campaignId) => {
     try {
       setLoading(true);
       const campaignList = await getAllCampaigns();
@@ -41,7 +46,11 @@ function ContactPage() {
     try {
       await create(item);
       toast.success('Contato criado com sucesso!');
-      await loadData();
+      if (item.campaignId && item.campaignId !== selectedCampaignId) {
+        setSelectedCampaignId(item.campaignId);
+      } else {
+        await loadData(selectedCampaignId);
+      }
     } catch {
       toast.error('Nao foi possivel criar o contato. Verifique os campos e tente novamente.');
     }
@@ -51,7 +60,7 @@ function ContactPage() {
     try {
       await update(id, item);
       toast.success('Contato atualizado com sucesso!');
-      await loadData();
+      await loadData(selectedCampaignId);
     } catch {
       toast.error('Nao foi possivel atualizar o contato. Verifique sua conexao.');
     }
@@ -61,7 +70,7 @@ function ContactPage() {
     try {
       await remove(id);
       toast.success('Contato excluido com sucesso!');
-      await loadData();
+      await loadData(selectedCampaignId);
     } catch {
       toast.error('Nao foi possivel excluir o contato.');
     }
@@ -71,14 +80,18 @@ function ContactPage() {
     try {
       const result = await searchContacts(data);
       toast.success(`Busca concluida! ${result.totalFound ?? 0} contato(s) encontrado(s).`);
-      await loadData();
+      if (data.campaignId && data.campaignId !== selectedCampaignId) {
+        setSelectedCampaignId(data.campaignId);
+      } else {
+        await loadData(selectedCampaignId);
+      }
     } catch {
       toast.error('Erro ao buscar contatos via Hunter.io.');
     }
   };
 
-  const campaignName = campaignId
-    ? campaigns.find((c) => String(c.id) === String(campaignId))?.name
+  const campaignName = selectedCampaignId
+    ? campaigns.find((c) => String(c.id) === String(selectedCampaignId))?.name
     : null;
 
   return (
@@ -102,7 +115,7 @@ function ContactPage() {
           onUpdate={handleUpdate}
           onDelete={handleDelete}
           onSearch={handleSearch}
-          defaultCampaignId={campaignId || ''}
+          defaultCampaignId={selectedCampaignId || ''}
         />
       )}
     </div>
