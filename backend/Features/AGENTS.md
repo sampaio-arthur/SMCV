@@ -59,9 +59,6 @@ Features/
 │   │   ├── DeleteContact/
 │   │   │   ├── DeleteContactCommand.cs
 │   │   │   └── DeleteContactCommandHandler.cs
-│   │   ├── SearchContacts/
-│   │   │   ├── SearchContactsCommand.cs
-│   │   │   └── SearchContactsCommandHandler.cs
 │   │   └── UpdateContact/
 │   │       ├── UpdateContactCommand.cs
 │   │       └── UpdateContactCommandHandler.cs
@@ -158,7 +155,6 @@ Todos os handlers estao implementados e funcionais:
 |---------|------|-----------|-----------|
 | `CreateContactCommandHandler` | Command | `SMCV.Features.Contacts.Commands.CreateContact` | Cria contato manual com CampaignId, CompanyName, Email. Valida existencia da campanha e unicidade de email. Validator incluso. |
 | `DeleteContactCommandHandler` | Command | `SMCV.Features.Contacts.Commands.DeleteContact` | Deleta contato por ID. Valida existencia. |
-| `SearchContactsCommandHandler` | Command | `SMCV.Features.Contacts.Commands.SearchContacts` | Busca contatos via Hunter.io (CompanyName + Email), filtra duplicatas, cria novos contatos no banco. |
 | `UpdateContactCommandHandler` | Command | `SMCV.Features.Contacts.Commands.UpdateContact` | Atualiza CompanyName e Email do contato. Valida existencia. |
 | `GetContactByIdQueryHandler` | Query | `SMCV.Features.Contacts.Queries.GetContactById` | Busca contato por ID. Lanca NotFoundException se nao encontrado. |
 | `GetContactsByCampaignQueryHandler` | Query | `SMCV.Features.Contacts.Queries.GetContactsByCampaign` | Lista contatos de uma campanha. Valida existencia da campanha. |

@@ -54,7 +54,7 @@ backend/
 ├── Infrastructure/
 │   ├── Data/             ← DbContext, DbContextFactory, Migrations
 │   ├── Repositories/     ← implementacao de acesso a dados (Base, Campaign, Contact, EmailLog, User, UserProfile)
-│   └── ExternalServices/ ← integracao com APIs externas (Hunter.io, SMTP, CSV)
+│   └── ExternalServices/ ← integracao com APIs externas (SMTP, CSV)
 ├── Application/
 │   ├── DTOs/             ← objetos de transferencia (Auth/, Campaigns/, Contacts/, EmailLogs/, Users/, UserProfiles/)
 │   ├── Interfaces/       ← contratos de repositorios e servicos

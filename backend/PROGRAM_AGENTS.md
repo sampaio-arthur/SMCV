@@ -37,14 +37,12 @@ builder.Services.AddScoped<IUserProfileRepository, UserProfileRepository>();
 
 ### External Services
 ```csharp
-builder.Services.AddScoped<IHunterService, HunterService>();
 builder.Services.AddScoped<IEmailSenderService, EmailSenderService>();
 builder.Services.AddScoped<ICsvExportService, CsvExportService>();
 ```
 
 ### HttpClient e Options
 ```csharp
-builder.Services.AddHttpClient<HunterService>();
 builder.Services.Configure<EmailSettings>(...);
 ```
 

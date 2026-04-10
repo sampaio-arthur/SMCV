@@ -25,8 +25,6 @@ Application/
 │   ├── Contacts/
 │   │   ├── ContactResponse.cs
 │   │   ├── CreateContactRequest.cs
-│   │   ├── SearchContactsRequest.cs
-│   │   ├── SearchContactsResponse.cs
 │   │   └── UpdateContactRequest.cs
 │   ├── EmailLogs/
 │   │   └── EmailLogResponse.cs
@@ -40,13 +38,11 @@ Application/
 │   │   └── UpdateUserProfileRequest.cs
 │   └── ErrorResponse.cs
 ├── Interfaces/
-│   ├── HunterContactResult.cs
 │   ├── ICampaignRepository.cs
 │   ├── IContactRepository.cs
 │   ├── ICsvExportService.cs
 │   ├── IEmailLogRepository.cs
 │   ├── IEmailSenderService.cs
-│   ├── IHunterService.cs
 │   ├── IRepository.cs
 │   ├── IUserRepository.cs
 │   └── IUserProfileRepository.cs
@@ -80,8 +76,6 @@ Application/
 |---------|------|-----------|
 | `ContactResponse.cs` | Response | Contato com CompanyName, Email, EmailStatus, EmailSentAt e referencia a campanha. |
 | `CreateContactRequest.cs` | Request | Criacao de contato: CampaignId, CompanyName, Email. |
-| `SearchContactsRequest.cs` | Request | Busca de contatos via Hunter.io: niche, region, limit. |
-| `SearchContactsResponse.cs` | Response | Resultado da busca: total encontrado e lista de contatos adicionados. |
 | `UpdateContactRequest.cs` | Request | Atualizacao de contato: CompanyName, Email. |
 
 ### DTOs — EmailLogs (`SMCV.Application.DTOs.EmailLogs`)
@@ -122,10 +116,8 @@ Application/
 | `IEmailLogRepository.cs` | Extensao de IRepository para EmailLog com busca por contact/campaign. | `EmailLogRepository.cs` |
 | `IUserRepository.cs` | Extensao de IRepository para User com GetByEmailAsync e GetAllPagedAsync(pageNumber, pageSize). | `UserRepository.cs` |
 | `IUserProfileRepository.cs` | Extensao de IRepository para UserProfile com GetByUserIdAsync e GetAllPagedAsync(pageNumber, pageSize). | `UserProfileRepository.cs` |
-| `IHunterService.cs` | Busca de contatos por niche/region via Hunter.io. | `HunterService.cs` |
 | `IEmailSenderService.cs` | Envio de email com anexos via SMTP. Aceita replyToEmail e replyToName (From usa SMTP SenderEmail, Reply-To usa email do usuario). | `EmailSenderService.cs` |
 | `ICsvExportService.cs` | Geracao de CSV a partir de lista de contatos. | `CsvExportService.cs` |
-| `HunterContactResult.cs` | Record com CompanyName e Email — resultado individual da API Hunter.io (nao e interface). | — |
 
 ### Mappings (`SMCV.Application.Mappings`)
 

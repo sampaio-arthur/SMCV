@@ -84,13 +84,6 @@ builder.Services.AddScoped<IUserProfileRepository, UserProfileRepository>();
 builder.Services.AddScoped<IEmailSenderService, EmailSenderService>();
 builder.Services.AddScoped<ICsvExportService, CsvExportService>();
 
-// ─── HttpClient para Apollo.io ───────────────────────────────────────────────
-builder.Services.AddHttpClient<IHunterService, HunterService>(client =>
-{
-    client.BaseAddress = new Uri("https://api.apollo.io/");
-    client.DefaultRequestHeaders.Add("Accept", "application/json");
-});
-
 // ─── EmailSettings via IOptions ──────────────────────────────────────────────
 builder.Services.Configure<EmailSettings>(opts =>
 {

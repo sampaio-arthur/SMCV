@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import ContactComponent from '../components/contact/ContactComponent';
-import { getAllByCampaignId, create, update, remove, searchContacts } from '../services/contactService';
+import { getAllByCampaignId, create, update, remove } from '../services/contactService';
 import { getAll as getAllCampaigns } from '../services/campaignService';
 import { useToast } from '../hooks/useToast';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
@@ -91,20 +91,6 @@ function ContactPage() {
     }
   };
 
-  const handleSearch = async (data) => {
-    try {
-      const result = await searchContacts(data);
-      toast.success(`Busca concluida! ${result.totalFound ?? 0} contato(s) encontrado(s).`);
-      if (data.campaignId && data.campaignId !== selectedCampaignId) {
-        setSelectedCampaignId(data.campaignId);
-      } else {
-        await loadContacts(selectedCampaignId);
-      }
-    } catch (err) {
-      toast.error(await getErrorMessage(err, 'Erro ao buscar contatos via Hunter.io.'));
-    }
-  };
-
   const selectedCampaign = campaigns.find((c) => String(c.id) === String(selectedCampaignId));
 
   return (
@@ -114,7 +100,7 @@ function ContactPage() {
         <p className="text-gray-500 text-sm mt-1">
           {selectedCampaign
             ? `Contatos da campanha: ${selectedCampaign.name}`
-            : 'Selecione uma campanha para visualizar seus contatos, ou use a busca Hunter.io.'}
+            : 'Selecione uma campanha para visualizar seus contatos.'}
         </p>
       </div>
 
@@ -148,7 +134,6 @@ function ContactPage() {
               onCreate={handleCreate}
               onUpdate={handleUpdate}
               onDelete={handleDelete}
-              onSearch={handleSearch}
               defaultCampaignId={selectedCampaignId || ''}
             />
           )}

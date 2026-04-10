@@ -1,17 +1,16 @@
 # SMCV — Job Prospector
 
-Sistema de prospecção automatizada de empregos via e-mail. Busca contatos de empresas por nicho/região usando a API Hunter.io, permite gerenciamento de campanhas e disparo de e-mails com currículo anexado.
+Sistema de prospecção automatizada de empregos via e-mail. Permite gerenciamento de campanhas, contatos e disparo de e-mails com currículo anexado.
 
 ## Problema que resolve
 
-Automatiza o processo manual de buscar contatos de empresas, organizar campanhas de e-mail e enviar currículos em massa — reduzindo o tempo de prospecção de horas para minutos.
+Automatiza o processo de organizar campanhas de e-mail e enviar currículos em massa — reduzindo o tempo de prospecção de horas para minutos.
 
 ## Pré-requisitos
 
 - .NET 8 SDK
 - PostgreSQL 15+
 - Node.js 18+
-- Conta Hunter.io (free tier: [criar conta](https://hunter.io/users/sign_up))
 - Conta SMTP (Gmail, Outlook, etc.)
 - Docker e Docker Compose (opcional)
 
@@ -43,7 +42,6 @@ Edite o `.env` com seus valores reais. **Nunca commite o `.env`.**
 | `POSTGRES_DB` | Nome do banco (Docker) | `jobprospector` |
 | `POSTGRES_USER` | Usuário (Docker) | `postgres` |
 | `POSTGRES_PASSWORD` | Senha (Docker) | `change-me` |
-| `HUNTER_API_KEY` | Chave da API Hunter.io | `your_key_here` |
 | `SMTP_HOST` | Servidor SMTP | `smtp.gmail.com` |
 | `SMTP_PORT` | Porta SMTP | `587` |
 | `SMTP_SENDER_EMAIL` | E-mail remetente | `your@email.com` |
@@ -114,7 +112,6 @@ Autenticação via sessão (email + senha). Endpoints de auth:
 | POST | `/api/contacts` | Criar contato manualmente |
 | PUT | `/api/contacts/{id}` | Atualizar contato |
 | DELETE | `/api/contacts/{id}` | Excluir contato |
-| POST | `/api/contacts/search` | Buscar contatos via Hunter.io |
 | GET | `/api/emaillogs/contact/{contactId}` | Log de e-mail por contato |
 | GET | `/api/emaillogs/campaign/{campaignId}` | Logs de e-mail por campanha |
 
@@ -158,5 +155,4 @@ Contact              EmailLog            ├─ EmailBody
 ## Limitações Conhecidas
 
 - Envio de e-mails é síncrono (sem fila/background job)
-- Hunter.io free tier: 25 buscas/mês
 - Sem rate limiting no envio de e-mails

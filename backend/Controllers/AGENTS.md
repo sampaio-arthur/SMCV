@@ -14,7 +14,7 @@ Na arquitetura CQRS, controllers chamam `_mediator.Send()` em vez de chamar Serv
 |---------|-----------|-----------|
 | `AuthController.cs` | `SMCV.Controllers` | Registro, login e logout via sessao. Delega para MediatR: RegisterUserCommand, LoginUserCommand, GetCurrentUserQuery. Seta/limpa sessao (userId) no controller apos retorno do handler. |
 | `CampaignsController.cs` | `SMCV.Controllers` | CRUD de campanhas, envio de emails, exportacao CSV. UserId extraido da sessao no POST. |
-| `ContactsController.cs` | `SMCV.Controllers` | CRUD de contatos, busca via Hunter.io, filtro por campanha. |
+| `ContactsController.cs` | `SMCV.Controllers` | CRUD de contatos, filtro por campanha. |
 | `EmailLogsController.cs` | `SMCV.Controllers` | Consulta de logs de email por contato ou por campanha. |
 | `UsersController.cs` | `SMCV.Controllers` | CRUD de usuarios com paginacao (pageNumber, pageSize). |
 | `UserProfilesController.cs` | `SMCV.Controllers` | CRUD de perfis de usuario e endpoint upload-resume. UserId extraido da sessao no POST. |

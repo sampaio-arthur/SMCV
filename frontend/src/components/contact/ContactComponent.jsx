@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { Plus, Pencil, Trash2, Search } from 'lucide-react';
+import { Plus, Pencil, Trash2 } from 'lucide-react';
 import { formatDate } from '../../utils';
 import StatusBadge from '../ui/StatusBadge';
 import EmptyState from '../ui/EmptyState';
@@ -21,16 +21,12 @@ const statusFilters = [
 ];
 
 const emptyForm = { campaignId: '', companyName: '', email: '' };
-const emptySearchForm = { campaignId: '' };
 
-function ContactComponent({ items = [], campaigns = [], onCreate, onUpdate, onDelete, onSearch, defaultCampaignId }) {
+function ContactComponent({ items = [], campaigns = [], onCreate, onUpdate, onDelete, defaultCampaignId }) {
   const [showForm, setShowForm] = useState(false);
-  const [showSearchForm, setShowSearchForm] = useState(false);
   const [editing, setEditing] = useState(null);
   const [formData, setFormData] = useState({ ...emptyForm, campaignId: defaultCampaignId || '' });
-  const [searchData, setSearchData] = useState({ ...emptySearchForm, campaignId: defaultCampaignId || '' });
   const [submitting, setSubmitting] = useState(false);
-  const [searching, setSearching] = useState(false);
   const [statusFilter, setStatusFilter] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const { confirm, dialogProps } = useConfirm();
@@ -81,24 +77,6 @@ function ContactComponent({ items = [], campaigns = [], onCreate, onUpdate, onDe
     }
   };
 
-  const handleHunterSearch = async (e) => {
-    e.preventDefault();
-    const campaign = campaigns.find((c) => String(c.id) === String(searchData.campaignId));
-    if (!campaign) return;
-    setSearching(true);
-    try {
-      await onSearch({
-        campaignId: campaign.id,
-        niche: campaign.niche,
-        region: campaign.region,
-        limit: 10,
-      });
-      setShowSearchForm(false);
-    } finally {
-      setSearching(false);
-    }
-  };
-
   const handleEdit = (item) => {
     setEditing(item);
     setFormData({
@@ -126,22 +104,13 @@ function ContactComponent({ items = [], campaigns = [], onCreate, onUpdate, onDe
       {/* Toolbar */}
       <div className="flex justify-between items-center gap-2">
         <p className="text-sm text-gray-600">{filteredItems.length} contato(s)</p>
-        <div className="flex gap-2">
-          <button
-            onClick={() => { setShowSearchForm(!showSearchForm); setShowForm(false); }}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-lg transition-colors"
-          >
-            <Search className="w-4 h-4" />
-            Buscar Hunter.io
-          </button>
-          <button
-            onClick={() => { openNewForm(); setShowSearchForm(false); }}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
-          >
-            <Plus className="w-4 h-4" />
-            Novo Contato
-          </button>
-        </div>
+        <button
+          onClick={openNewForm}
+          className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
+        >
+          <Plus className="w-4 h-4" />
+          Novo Contato
+        </button>
       </div>
 
       {/* Summary counters */}
@@ -177,45 +146,6 @@ function ContactComponent({ items = [], campaigns = [], onCreate, onUpdate, onDe
           />
         </div>
       </div>
-
-      {/* Hunter.io Search Form */}
-      {showSearchForm && (
-        <form onSubmit={handleHunterSearch} className="bg-green-50 p-4 rounded-lg border border-green-200 space-y-3">
-          <h3 className="font-semibold text-gray-800">Buscar contatos via Hunter.io</h3>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Campanha *</label>
-            <select
-              required
-              value={searchData.campaignId}
-              onChange={(e) => setSearchData({ ...searchData, campaignId: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-            >
-              <option value="">Selecione uma campanha</option>
-              {campaigns.map((c) => (
-                <option key={c.id} value={c.id}>{c.name}</option>
-              ))}
-            </select>
-          </div>
-
-          <div className="flex gap-2">
-            <button
-              type="submit"
-              disabled={searching}
-              className="px-4 py-2 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {searching ? 'Buscando...' : 'Buscar Contatos'}
-            </button>
-            <button
-              type="button"
-              onClick={() => setShowSearchForm(false)}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
-            >
-              Cancelar
-            </button>
-          </div>
-        </form>
-      )}
 
       {/* Manual Form */}
       {showForm && (
@@ -290,7 +220,7 @@ function ContactComponent({ items = [], campaigns = [], onCreate, onUpdate, onDe
           description={
             searchTerm || statusFilter
               ? 'Nenhum contato corresponde aos filtros aplicados.'
-              : 'Nenhum contato nesta campanha. Adicione contatos ou use a busca Hunter.io.'
+              : 'Nenhum contato nesta campanha. Adicione contatos manualmente.'
           }
           actionLabel={!searchTerm && !statusFilter ? 'Novo Contato' : undefined}
           onAction={!searchTerm && !statusFilter ? openNewForm : undefined}

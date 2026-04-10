@@ -24,8 +24,3 @@ export const remove = async (id) => {
   const response = await api.delete(`/contacts/${id}`);
   return response.data;
 };
-
-export const searchContacts = async (data) => {
-  const response = await api.post('/contacts/search', data);
-  return response.data;
-};

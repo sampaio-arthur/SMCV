@@ -4,7 +4,6 @@ using SMCV.Application.DTOs;
 using SMCV.Application.DTOs.Contacts;
 using SMCV.Features.Contacts.Commands.CreateContact;
 using SMCV.Features.Contacts.Commands.DeleteContact;
-using SMCV.Features.Contacts.Commands.SearchContacts;
 using SMCV.Features.Contacts.Commands.UpdateContact;
 using SMCV.Features.Contacts.Queries.GetContactById;
 using SMCV.Features.Contacts.Queries.GetContactsByCampaign;
@@ -72,18 +71,4 @@ public class ContactsController : ControllerBase
         return NoContent();
     }
 
-    [HttpPost("search")]
-    [ProducesResponseType(typeof(SearchContactsResponse), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Search([FromBody] SearchContactsRequest request)
-    {
-        var command = new SearchContactsCommand(
-            request.CampaignId,
-            request.Niche,
-            request.Region,
-            request.Limit);
-
-        var result = await _mediator.Send(command);
-        return Ok(result);
-    }
 }
