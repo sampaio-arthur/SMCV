@@ -58,7 +58,7 @@ Infrastructure/
 
 | Arquivo | Interface | Descricao |
 |---------|-----------|-----------|
-| `HunterService.cs` | `IHunterService` | Integracao simplificada com API Hunter.io: retorna apenas CompanyName e Email. Usa HttpClient. |
+| `HunterService.cs` | `IHunterService` | Integracao com Apollo.io People Search + People Enrichment: busca por nicho (industry_tag_ids) e regiao (person_locations). Retorna HunterContactResult com CompanyName e Email. |
 | `EmailSenderService.cs` | `IEmailSenderService` | Envio de email SMTP via MailKit com suporte a anexos. From usa SMTP SenderEmail, Reply-To usa replyToEmail/replyToName do usuario. Configurado via `EmailSettings`. |
 | `CsvExportService.cs` | `ICsvExportService` | Geracao de CSV com colunas CompanyName, Email, EmailStatus, CampaignId. Escaping e UTF-8 BOM. |
 | `EmailSettings.cs` | — | Classe de configuracao SMTP: host, port, sender email/password/name. Bind via `IOptions<EmailSettings>`. |
