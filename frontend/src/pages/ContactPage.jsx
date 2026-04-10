@@ -9,36 +9,50 @@ import LoadingSpinner from '../components/ui/LoadingSpinner';
 function ContactPage() {
   const [items, setItems] = useState([]);
   const [campaigns, setCampaigns] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [searchParams] = useSearchParams();
-  const urlCampaignId = searchParams.get('campaignId');
-  const [selectedCampaignId, setSelectedCampaignId] = useState(urlCampaignId || '');
+  const [campaignsLoading, setCampaignsLoading] = useState(true);
+  const [contactsLoading, setContactsLoading] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [selectedCampaignId, setSelectedCampaignId] = useState(searchParams.get('campaignId') || '');
   const toast = useToast();
 
   useEffect(() => {
-    if (urlCampaignId) setSelectedCampaignId(urlCampaignId);
-  }, [urlCampaignId]);
+    (async () => {
+      try {
+        setCampaignsLoading(true);
+        const campaignList = await getAllCampaigns();
+        setCampaigns(campaignList);
+        if (!selectedCampaignId && campaignList.length > 0) {
+          setSelectedCampaignId(campaignList[0].id);
+        }
+      } catch {
+        toast.error('Nao foi possivel carregar as campanhas. Verifique se a API esta em execucao.');
+      } finally {
+        setCampaignsLoading(false);
+      }
+    })();
+  }, []);
 
   useEffect(() => {
-    loadData(selectedCampaignId);
+    if (!selectedCampaignId) {
+      setItems([]);
+      return;
+    }
+    const current = searchParams.get('campaignId');
+    if (current !== selectedCampaignId) {
+      setSearchParams({ campaignId: selectedCampaignId }, { replace: true });
+    }
+    loadContacts(selectedCampaignId);
   }, [selectedCampaignId]);
 
-  const loadData = async (campaignId) => {
+  const loadContacts = async (campaignId) => {
     try {
-      setLoading(true);
-      const campaignList = await getAllCampaigns();
-      setCampaigns(campaignList);
-
-      if (campaignId) {
-        const contacts = await getAllByCampaignId(campaignId);
-        setItems(contacts);
-      } else {
-        setItems([]);
-      }
+      setContactsLoading(true);
+      const contacts = await getAllByCampaignId(campaignId);
+      setItems(contacts);
     } catch {
-      toast.error('Nao foi possivel carregar os dados. Verifique se a API esta em execucao.');
+      toast.error('Nao foi possivel carregar os contatos.');
     } finally {
-      setLoading(false);
+      setContactsLoading(false);
     }
   };
 
@@ -49,7 +63,7 @@ function ContactPage() {
       if (item.campaignId && item.campaignId !== selectedCampaignId) {
         setSelectedCampaignId(item.campaignId);
       } else {
-        await loadData(selectedCampaignId);
+        await loadContacts(selectedCampaignId);
       }
     } catch {
       toast.error('Nao foi possivel criar o contato. Verifique os campos e tente novamente.');
@@ -60,7 +74,7 @@ function ContactPage() {
     try {
       await update(id, item);
       toast.success('Contato atualizado com sucesso!');
-      await loadData(selectedCampaignId);
+      await loadContacts(selectedCampaignId);
     } catch {
       toast.error('Nao foi possivel atualizar o contato. Verifique sua conexao.');
     }
@@ -70,7 +84,7 @@ function ContactPage() {
     try {
       await remove(id);
       toast.success('Contato excluido com sucesso!');
-      await loadData(selectedCampaignId);
+      await loadContacts(selectedCampaignId);
     } catch {
       toast.error('Nao foi possivel excluir o contato.');
     }
@@ -83,40 +97,61 @@ function ContactPage() {
       if (data.campaignId && data.campaignId !== selectedCampaignId) {
         setSelectedCampaignId(data.campaignId);
       } else {
-        await loadData(selectedCampaignId);
+        await loadContacts(selectedCampaignId);
       }
     } catch {
       toast.error('Erro ao buscar contatos via Hunter.io.');
     }
   };
 
-  const campaignName = selectedCampaignId
-    ? campaigns.find((c) => String(c.id) === String(selectedCampaignId))?.name
-    : null;
+  const selectedCampaign = campaigns.find((c) => String(c.id) === String(selectedCampaignId));
 
   return (
     <div className="p-6">
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-800">Contatos</h1>
         <p className="text-gray-500 text-sm mt-1">
-          {campaignName
-            ? `Contatos da campanha: ${campaignName}`
+          {selectedCampaign
+            ? `Contatos da campanha: ${selectedCampaign.name}`
             : 'Selecione uma campanha para visualizar seus contatos, ou use a busca Hunter.io.'}
         </p>
       </div>
 
-      {loading ? (
+      {campaignsLoading ? (
         <LoadingSpinner />
+      ) : campaigns.length === 0 ? (
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-sm text-yellow-800">
+          Nenhuma campanha cadastrada. Crie uma campanha antes de gerenciar contatos.
+        </div>
       ) : (
-        <ContactComponent
-          items={items}
-          campaigns={campaigns}
-          onCreate={handleCreate}
-          onUpdate={handleUpdate}
-          onDelete={handleDelete}
-          onSearch={handleSearch}
-          defaultCampaignId={selectedCampaignId || ''}
-        />
+        <>
+          <div className="mb-4 max-w-sm">
+            <label className="block text-sm font-medium text-gray-700 mb-1">Campanha</label>
+            <select
+              value={selectedCampaignId}
+              onChange={(e) => setSelectedCampaignId(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              {campaigns.map((c) => (
+                <option key={c.id} value={c.id}>{c.name}</option>
+              ))}
+            </select>
+          </div>
+
+          {contactsLoading ? (
+            <LoadingSpinner />
+          ) : (
+            <ContactComponent
+              items={items}
+              campaigns={campaigns}
+              onCreate={handleCreate}
+              onUpdate={handleUpdate}
+              onDelete={handleDelete}
+              onSearch={handleSearch}
+              defaultCampaignId={selectedCampaignId || ''}
+            />
+          )}
+        </>
       )}
     </div>
   );
