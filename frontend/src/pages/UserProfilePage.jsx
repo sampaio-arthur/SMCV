@@ -4,6 +4,7 @@ import { getAll, create, remove, uploadResume } from '../services/userProfileSer
 import { getAll as getAllUsers } from '../services/userService';
 import { useToast } from '../hooks/useToast';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
+import { getErrorMessage } from '../utils';
 
 function UserProfilePage() {
   const [items, setItems] = useState([]);
@@ -21,8 +22,8 @@ function UserProfilePage() {
       const [profiles, userList] = await Promise.all([getAll(), getAllUsers()]);
       setItems(profiles);
       setUsers(userList);
-    } catch {
-      toast.error('Nao foi possivel carregar os perfis. Verifique se a API esta em execucao.');
+    } catch (err) {
+      toast.error(await getErrorMessage(err, 'Nao foi possivel carregar os perfis. Verifique se a API esta em execucao.'));
     } finally {
       setLoading(false);
     }
@@ -34,10 +35,7 @@ function UserProfilePage() {
       toast.success('Perfil criado com sucesso!');
       await loadData();
     } catch (err) {
-      const msg = err.response?.status === 401
-        ? 'Voce precisa estar logado para criar um perfil.'
-        : 'Nao foi possivel criar o perfil.';
-      toast.error(msg);
+      toast.error(await getErrorMessage(err, 'Nao foi possivel criar o perfil.'));
     }
   };
 
@@ -46,8 +44,8 @@ function UserProfilePage() {
       await remove(id);
       toast.success('Perfil excluido com sucesso!');
       await loadData();
-    } catch {
-      toast.error('Nao foi possivel excluir o perfil.');
+    } catch (err) {
+      toast.error(await getErrorMessage(err, 'Nao foi possivel excluir o perfil.'));
     }
   };
 
@@ -56,8 +54,8 @@ function UserProfilePage() {
       await uploadResume(id, file);
       toast.success('Curriculo enviado com sucesso!');
       await loadData();
-    } catch {
-      toast.error('Erro ao enviar o curriculo. Verifique o arquivo e tente novamente.');
+    } catch (err) {
+      toast.error(await getErrorMessage(err, 'Erro ao enviar o curriculo.'));
     }
   };
 

@@ -5,6 +5,7 @@ import { getAllByCampaignId, create, update, remove, searchContacts } from '../s
 import { getAll as getAllCampaigns } from '../services/campaignService';
 import { useToast } from '../hooks/useToast';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
+import { getErrorMessage } from '../utils';
 
 function ContactPage() {
   const [items, setItems] = useState([]);
@@ -24,8 +25,8 @@ function ContactPage() {
         if (!selectedCampaignId && campaignList.length > 0) {
           setSelectedCampaignId(campaignList[0].id);
         }
-      } catch {
-        toast.error('Nao foi possivel carregar as campanhas. Verifique se a API esta em execucao.');
+      } catch (err) {
+        toast.error(await getErrorMessage(err, 'Nao foi possivel carregar as campanhas. Verifique se a API esta em execucao.'));
       } finally {
         setCampaignsLoading(false);
       }
@@ -49,8 +50,8 @@ function ContactPage() {
       setContactsLoading(true);
       const contacts = await getAllByCampaignId(campaignId);
       setItems(contacts);
-    } catch {
-      toast.error('Nao foi possivel carregar os contatos.');
+    } catch (err) {
+      toast.error(await getErrorMessage(err, 'Nao foi possivel carregar os contatos.'));
     } finally {
       setContactsLoading(false);
     }
@@ -65,8 +66,8 @@ function ContactPage() {
       } else {
         await loadContacts(selectedCampaignId);
       }
-    } catch {
-      toast.error('Nao foi possivel criar o contato. Verifique os campos e tente novamente.');
+    } catch (err) {
+      toast.error(await getErrorMessage(err, 'Nao foi possivel criar o contato.'));
     }
   };
 
@@ -75,8 +76,8 @@ function ContactPage() {
       await update(id, item);
       toast.success('Contato atualizado com sucesso!');
       await loadContacts(selectedCampaignId);
-    } catch {
-      toast.error('Nao foi possivel atualizar o contato. Verifique sua conexao.');
+    } catch (err) {
+      toast.error(await getErrorMessage(err, 'Nao foi possivel atualizar o contato.'));
     }
   };
 
@@ -85,8 +86,8 @@ function ContactPage() {
       await remove(id);
       toast.success('Contato excluido com sucesso!');
       await loadContacts(selectedCampaignId);
-    } catch {
-      toast.error('Nao foi possivel excluir o contato.');
+    } catch (err) {
+      toast.error(await getErrorMessage(err, 'Nao foi possivel excluir o contato.'));
     }
   };
 
@@ -99,8 +100,8 @@ function ContactPage() {
       } else {
         await loadContacts(selectedCampaignId);
       }
-    } catch {
-      toast.error('Erro ao buscar contatos via Hunter.io.');
+    } catch (err) {
+      toast.error(await getErrorMessage(err, 'Erro ao buscar contatos via Hunter.io.'));
     }
   };
 

@@ -4,6 +4,7 @@ import CampaignComponent from '../components/campaign/CampaignComponent';
 import { getAll, create, update, remove, sendEmails, exportCsv } from '../services/campaignService';
 import { useToast } from '../hooks/useToast';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
+import { getErrorMessage } from '../utils';
 
 function CampaignPage() {
   const [items, setItems] = useState([]);
@@ -20,8 +21,8 @@ function CampaignPage() {
       setLoading(true);
       const data = await getAll();
       setItems(data);
-    } catch {
-      toast.error('Nao foi possivel carregar as campanhas. Verifique se a API esta em execucao.');
+    } catch (err) {
+      toast.error(await getErrorMessage(err, 'Nao foi possivel carregar as campanhas. Verifique se a API esta em execucao.'));
     } finally {
       setLoading(false);
     }
@@ -32,8 +33,8 @@ function CampaignPage() {
       await create(item);
       toast.success('Campanha criada com sucesso!');
       await loadItems();
-    } catch {
-      toast.error('Nao foi possivel criar a campanha. Verifique os campos e tente novamente.');
+    } catch (err) {
+      toast.error(await getErrorMessage(err, 'Nao foi possivel criar a campanha.'));
     }
   };
 
@@ -42,8 +43,8 @@ function CampaignPage() {
       await update(id, item);
       toast.success('Campanha atualizada com sucesso!');
       await loadItems();
-    } catch {
-      toast.error('Nao foi possivel atualizar a campanha. Verifique sua conexao.');
+    } catch (err) {
+      toast.error(await getErrorMessage(err, 'Nao foi possivel atualizar a campanha.'));
     }
   };
 
@@ -52,8 +53,8 @@ function CampaignPage() {
       await remove(id);
       toast.success('Campanha excluida com sucesso!');
       await loadItems();
-    } catch {
-      toast.error('Nao foi possivel excluir a campanha.');
+    } catch (err) {
+      toast.error(await getErrorMessage(err, 'Nao foi possivel excluir a campanha.'));
     }
   };
 
@@ -66,8 +67,8 @@ function CampaignPage() {
       const result = await sendEmails(id);
       toast.success(`E-mails disparados! ${result.emailsSent ?? 0} enviado(s).`);
       await loadItems();
-    } catch {
-      toast.error('Erro ao disparar e-mails da campanha.');
+    } catch (err) {
+      toast.error(await getErrorMessage(err, 'Erro ao disparar e-mails da campanha.'));
     }
   };
 
@@ -83,8 +84,8 @@ function CampaignPage() {
       link.remove();
       window.URL.revokeObjectURL(url);
       toast.success('CSV exportado com sucesso!');
-    } catch {
-      toast.error('Erro ao exportar CSV.');
+    } catch (err) {
+      toast.error(await getErrorMessage(err, 'Erro ao exportar CSV.'));
     }
   };
 

@@ -33,6 +33,32 @@ export function sleep(ms) {
 }
 
 /**
+ * Extract a user-facing error message from an axios error, matching the
+ * backend's ExceptionHandlingMiddleware shape: `{ error, details }`.
+ * Handles Blob response bodies (responseType: 'blob') by parsing them.
+ * @param {unknown} err
+ * @param {string} fallback
+ * @returns {Promise<string>}
+ */
+export async function getErrorMessage(err, fallback = 'Ocorreu um erro inesperado.') {
+  const data = err?.response?.data;
+  if (!data) return fallback;
+
+  if (typeof Blob !== 'undefined' && data instanceof Blob) {
+    try {
+      const text = await data.text();
+      const parsed = JSON.parse(text);
+      return parsed?.error || fallback;
+    } catch {
+      return fallback;
+    }
+  }
+
+  if (typeof data === 'string') return data || fallback;
+  return data.error || fallback;
+}
+
+/**
  * Safely access nested object properties without throwing.
  * @param {object} obj
  * @param {string} path  e.g. 'user.address.city'

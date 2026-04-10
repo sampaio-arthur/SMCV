@@ -3,6 +3,7 @@ import UserComponent from '../components/user/UserComponent';
 import { getAll, create, update, remove } from '../services/userService';
 import { useToast } from '../hooks/useToast';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
+import { getErrorMessage } from '../utils';
 
 function UserPage() {
   const [items, setItems] = useState([]);
@@ -18,8 +19,8 @@ function UserPage() {
       setLoading(true);
       const data = await getAll();
       setItems(data);
-    } catch {
-      toast.error('Nao foi possivel carregar os usuarios. Verifique se a API esta em execucao.');
+    } catch (err) {
+      toast.error(await getErrorMessage(err, 'Nao foi possivel carregar os usuarios. Verifique se a API esta em execucao.'));
     } finally {
       setLoading(false);
     }
@@ -31,10 +32,7 @@ function UserPage() {
       toast.success('Usuario criado com sucesso!');
       await loadItems();
     } catch (err) {
-      const msg = err.response?.status === 409
-        ? 'Este e-mail ja esta cadastrado.'
-        : 'Nao foi possivel criar o usuario. Verifique os campos e tente novamente.';
-      toast.error(msg);
+      toast.error(await getErrorMessage(err, 'Nao foi possivel criar o usuario.'));
     }
   };
 
@@ -43,8 +41,8 @@ function UserPage() {
       await update(id, item);
       toast.success('Usuario atualizado com sucesso!');
       await loadItems();
-    } catch {
-      toast.error('Nao foi possivel atualizar o usuario. Verifique sua conexao.');
+    } catch (err) {
+      toast.error(await getErrorMessage(err, 'Nao foi possivel atualizar o usuario.'));
     }
   };
 
@@ -53,8 +51,8 @@ function UserPage() {
       await remove(id);
       toast.success('Usuario excluido com sucesso!');
       await loadItems();
-    } catch {
-      toast.error('Nao foi possivel excluir o usuario.');
+    } catch (err) {
+      toast.error(await getErrorMessage(err, 'Nao foi possivel excluir o usuario.'));
     }
   };
 

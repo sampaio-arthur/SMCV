@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { useToast } from '../hooks/useToast';
+import { getErrorMessage } from '../utils';
 
 function LoginPage() {
   const { user, login, register } = useAuth();
@@ -24,10 +25,7 @@ function LoginPage() {
         toast.success('Login realizado com sucesso!');
       }
     } catch (err) {
-      const msg = err.response?.data?.message
-        || err.response?.data?.Message
-        || (isRegister ? 'Erro ao criar conta.' : 'E-mail ou senha invalidos.');
-      toast.error(msg);
+      toast.error(await getErrorMessage(err, isRegister ? 'Erro ao criar conta.' : 'E-mail ou senha invalidos.'));
     } finally {
       setSubmitting(false);
     }
