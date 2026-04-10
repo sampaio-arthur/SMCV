@@ -21,7 +21,7 @@ const statusFilters = [
 ];
 
 const emptyForm = { campaignId: '', companyName: '', email: '' };
-const emptySearchForm = { niche: '', region: '', limit: '10' };
+const emptySearchForm = { campaignId: '' };
 
 function ContactComponent({ items = [], campaigns = [], onCreate, onUpdate, onDelete, onSearch, defaultCampaignId }) {
   const [showForm, setShowForm] = useState(false);
@@ -83,13 +83,15 @@ function ContactComponent({ items = [], campaigns = [], onCreate, onUpdate, onDe
 
   const handleHunterSearch = async (e) => {
     e.preventDefault();
+    const campaign = campaigns.find((c) => String(c.id) === String(searchData.campaignId));
+    if (!campaign) return;
     setSearching(true);
     try {
       await onSearch({
-        campaignId: searchData.campaignId,
-        niche: searchData.niche,
-        region: searchData.region,
-        limit: Number(searchData.limit) || 10,
+        campaignId: campaign.id,
+        niche: campaign.niche,
+        region: campaign.region,
+        limit: 10,
       });
       setShowSearchForm(false);
     } finally {
@@ -194,43 +196,6 @@ function ContactComponent({ items = [], campaigns = [], onCreate, onUpdate, onDe
                 <option key={c.id} value={c.id}>{c.name}</option>
               ))}
             </select>
-          </div>
-
-          <div className="grid grid-cols-3 gap-3">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Nicho *</label>
-              <input
-                type="text"
-                required
-                value={searchData.niche}
-                onChange={(e) => setSearchData({ ...searchData, niche: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-                placeholder="Ex: Tecnologia"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Regiao *</label>
-              <input
-                type="text"
-                required
-                value={searchData.region}
-                onChange={(e) => setSearchData({ ...searchData, region: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-                placeholder="Ex: Florianopolis"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Limite</label>
-              <input
-                type="number"
-                min="1"
-                max="100"
-                value={searchData.limit}
-                onChange={(e) => setSearchData({ ...searchData, limit: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-                placeholder="10"
-              />
-            </div>
           </div>
 
           <div className="flex gap-2">
