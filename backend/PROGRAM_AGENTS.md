@@ -1,6 +1,7 @@
 # Program.cs — Regras para o Agente
 
 > Leia `backend/AGENTS.md` antes deste arquivo.
+> Arquivo: `src/SMCV.Api/Program.cs`
 
 ## RESPONSABILIDADE
 
@@ -16,48 +17,30 @@ Manter esta ordem no `Program.cs`:
 2. AddEndpointsApiExplorer() + AddSwaggerGen()
 3. AddCors()
 4. AddDistributedMemoryCache() + AddSession()
-5. AddDbContext<AppDbContext>()
-6. AddMediatR() + AddValidatorsFromAssembly() + AddAutoMapper()
-7. AddScoped — Repositories
-8. AddScoped — External Services
-9. AddHttpClient — clientes HTTP tipados
-10. Configure<T> — configuracoes via IOptions
+5. AddApplication()       — AutoMapper (SMCV.Application)
+6. AddFeatures()          — MediatR + FluentValidation (SMCV.Features)
+7. AddInfrastructure()    — DbContext, Repositories, External Services, IOptions (SMCV.Infrastructure)
 ```
 
-## REGISTROS ATUAIS NO DI
+## STARTUP MODULES
 
-### Repositories
-```csharp
-builder.Services.AddScoped<ICampaignRepository, CampaignRepository>();
-builder.Services.AddScoped<IContactRepository, ContactRepository>();
-builder.Services.AddScoped<IEmailLogRepository, EmailLogRepository>();
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IUserProfileRepository, UserProfileRepository>();
-```
+Cada camada registra seus proprios servicos via extension method em `IServiceCollection`.
+O `Program.cs` NAO conhece implementacoes concretas de repositories ou services — apenas chama os modulos.
 
-### External Services
-```csharp
-builder.Services.AddScoped<IEmailSenderService, EmailSenderService>();
-builder.Services.AddScoped<ICsvExportService, CsvExportService>();
-```
-
-### HttpClient e Options
-```csharp
-builder.Services.Configure<EmailSettings>(...);
-```
+| Modulo | Arquivo | Registra |
+|--------|---------|----------|
+| `AddApplication()` | `src/SMCV.Application/ApplicationServiceExtensions.cs` | AutoMapper (assembly scan) |
+| `AddFeatures()` | `src/SMCV.Features/FeaturesServiceExtensions.cs` | MediatR + FluentValidation (assembly scan) |
+| `AddInfrastructure(connectionString, configureEmail)` | `src/SMCV.Infrastructure/InfrastructureServiceExtensions.cs` | DbContext, Repositories, External Services, EmailSettings via IOptions |
 
 ## COMO REGISTRAR NOVO RECURSO
 
-```csharp
-// Em "Repositórios", apos os registros existentes:
-builder.Services.AddScoped<INovoRepository, NovoRepository>();
+- **Novo Repository:** adicionar `AddScoped<IXxx, Xxx>()` em `InfrastructureServiceExtensions.cs`
+- **Novo External Service:** adicionar `AddScoped<IXxx, Xxx>()` em `InfrastructureServiceExtensions.cs`
+- **Novo Handler/Validator:** automatico via assembly scan em `AddFeatures()`
+- **Novo Mapping Profile:** automatico via assembly scan em `AddApplication()`
 
-// Em "Serviços Externos":
-builder.Services.AddScoped<INovoService, NovoService>();
-```
-
-- Sempre usar `AddScoped` (um por request HTTP)
-- Adicionar os `using` necessarios no topo do arquivo
+NAO registrar manualmente no `Program.cs` — usar o extension method da camada correspondente.
 
 ## CORS
 

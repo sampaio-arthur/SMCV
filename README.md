@@ -163,3 +163,86 @@ Contact              EmailLog            ├─ EmailBody
 
 - Envio de e-mails é síncrono (sem fila/background job)
 - Sem rate limiting no envio de e-mails
+
+---
+
+## Ponderações do Professor (Matheus Cataneo)
+
+As alterações abaixo são **exclusivamente estruturais** — nenhum código-fonte de regra de negócio, controller, handler, repository ou serviço foi alterado. Por isso, **não foram realizados testes funcionais**: o comportamento da aplicação permanece idêntico. A ideia é deixar o projeto mais próximo do que se encontra em equipes de mercado, mesmo sendo um projeto menor onde parte dessa estrutura seria opcional.
+
+### O que mudou e por quê
+
+#### 1. Separação em múltiplos projetos (.csproj)
+
+O backend foi dividido em 6 projetos independentes dentro de `backend/src/`:
+
+| Projeto | Responsabilidade |
+|---------|-----------------|
+| `SMCV.Api` | Host HTTP — controllers, middleware, pipeline, Program.cs |
+| `SMCV.Application` | Contratos (interfaces), DTOs e mappings — sem implementação concreta |
+| `SMCV.Domain` | Entidades de banco e enums — zero dependência externa |
+| `SMCV.Infrastructure` | Implementações concretas — DbContext, repositories, serviços SMTP/CSV |
+| `SMCV.Features` | Handlers CQRS (MediatR), validators (FluentValidation) — lógica de negócio |
+| `SMCV.Common` | Utilitários transversais — Result pattern, exceções, middleware |
+
+**Por que isso importa:** cada projeto define um **boundary de compilação**. Isso significa que o compilador impede violações de arquitetura. Por exemplo, `SMCV.Domain` não consegue referenciar `SMCV.Infrastructure` — se alguém tentar usar o `DbContext` dentro de uma entidade, o código simplesmente não compila. Em um projeto monolítico de arquivo único, essa restrição só existe como convenção (que é facilmente quebrada).
+
+**Em empresas de mercado**, essa separação é padrão em projetos .NET de médio/grande porte (Clean Architecture, Onion Architecture, Hexagonal). Permite que equipes diferentes trabalhem em camadas diferentes com menor risco de conflito, e facilita a adoção futura de testes unitários por camada.
+
+#### 2. Solution file (.slnx)
+
+Substituição do `.sln` antigo por um `.slnx` (formato XML simplificado do .NET 9+). Agrupa os 6 projetos em um único ponto de build:
+
+```bash
+dotnet build SMCV.slnx    # compila tudo de uma vez
+```
+
+#### 3. Central Package Management (Directory.Packages.props)
+
+Todas as versões de pacotes NuGet são definidas em um único arquivo `Directory.Packages.props` na raiz. Cada `.csproj` apenas declara **qual** pacote usa, sem repetir a versão:
+
+```xml
+<!-- No .csproj: sem versão -->
+<PackageReference Include="MediatR" />
+
+<!-- No Directory.Packages.props: versão centralizada -->
+<PackageVersion Include="MediatR" Version="12.4.1" />
+```
+
+**Por que isso importa:** em projetos com muitos `.csproj`, sem isso cada projeto pode acabar em versões diferentes do mesmo pacote (um com MediatR 12.0, outro com 12.4), causando bugs sutis em runtime. Em empresas com dezenas de projetos na mesma solution, é prática padrão.
+
+#### 4. Directory.Build.props (configuração compartilhada)
+
+Propriedades comuns como `TargetFramework`, `Nullable`, `ImplicitUsings` são definidas uma única vez em `Directory.Build.props` e herdadas por todos os projetos. Evita duplicação e garante consistência.
+
+#### 5. Startup Modules (extension methods de DI)
+
+Cada camada agora registra seus próprios serviços no container de injeção de dependência, em vez de tudo ficar no `Program.cs`:
+
+| Módulo | Arquivo | O que registra |
+|--------|---------|----------------|
+| `AddApplication()` | `ApplicationServiceExtensions.cs` | AutoMapper |
+| `AddFeatures()` | `FeaturesServiceExtensions.cs` | MediatR + FluentValidation |
+| `AddInfrastructure(conn, emailOpts)` | `InfrastructureServiceExtensions.cs` | DbContext, repositories, services externos, EmailSettings |
+
+**Antes** — o `Program.cs` conhecia cada repositório e serviço pelo nome:
+```csharp
+builder.Services.AddScoped<ICampaignRepository, CampaignRepository>();
+builder.Services.AddScoped<IContactRepository, ContactRepository>();
+// ... mais 5 registros manuais
+```
+
+**Depois** — o `Program.cs` só conhece os módulos:
+```csharp
+builder.Services.AddApplication();
+builder.Services.AddFeatures();
+builder.Services.AddInfrastructure(connectionString, opts => { ... });
+```
+
+**Por que isso importa:** completa a separação em projetos. Sem os startup modules, o `Program.cs` (que fica no `Api`) precisava conhecer todas as classes concretas do `Infrastructure` — o que anulava o benefício do boundary de compilação. Agora cada camada é autônoma: quem cria um repositório novo registra ele no extension method da própria camada, sem tocar no `Program.cs`.
+
+### Nota importante
+
+Nenhuma dessas mudanças altera o funcionamento do sistema. O código-fonte dos controllers, handlers, repositories, entidades e serviços permanece **exatamente igual**. As mudanças são de organização de projetos, referências e registro de dependências — puramente estruturais.
+
+Essa MR é para avaliação: revise, aprove ou rejeite conforme achar adequado.

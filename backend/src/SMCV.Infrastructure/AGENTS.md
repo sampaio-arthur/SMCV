@@ -10,7 +10,8 @@ Contem acesso a banco, servicos concretos e integracoes externas.
 ## ESTRUTURA
 
 ```
-Infrastructure/
+src/SMCV.Infrastructure/
+├── InfrastructureServiceExtensions.cs   ← Startup module (AddInfrastructure)
 ├── Data/
 │   ├── AppDbContext.cs
 │   ├── AppDbContextFactory.cs
@@ -86,7 +87,7 @@ O `docker-compose.yml` e responsavel por injetar essas variaveis no container do
 - Namespace: `SMCV.Infrastructure.ExternalServices`
 - Implementar interface de `Application/Interfaces/`
 - Configuracoes via `IOptions<T>` ou `Environment.GetEnvironmentVariable` (nunca hardcoded, nunca via appsettings.json)
-- Registrar no DI em `Program.cs` com `AddScoped`
+- Registrar no DI em `InfrastructureServiceExtensions.cs` com `AddScoped`
 
 ## REGRAS OBRIGATORIAS — DbContext
 
@@ -97,7 +98,7 @@ O `docker-compose.yml` e responsavel por injetar essas variaveis no container do
 ## REGRAS OBRIGATORIAS — Migrations
 
 - Namespace: `SMCV.Infrastructure.Data.Migrations`
-- Gerar via `dotnet ef migrations add NomeDaMigration`
+- Gerar via `dotnet ef migrations add NomeDaMigration --project src/SMCV.Infrastructure --startup-project src/SMCV.Api`
 - NAO editar migrations geradas manualmente
 - Auto-migrate habilitado no `Program.cs`
 

@@ -16,12 +16,12 @@ Autenticacao simples via sessao (email + senha com BCrypt). Sem JWT, sem OAuth.
 
 | Tarefa | Arquivo a ler |
 |--------|--------------|
-| Criar/alterar endpoint HTTP | Controllers/AGENTS.md |
-| Criar/alterar entidade de banco | Domain/AGENTS.md |
-| Criar/alterar DTO ou contrato | Application/AGENTS.md |
-| Criar/alterar handler CQRS | Features/AGENTS.md |
-| Alterar DbContext, migrations ou repositorio | Infrastructure/AGENTS.md |
-| Criar/alterar Result ou excecao | Common/AGENTS.md |
+| Criar/alterar endpoint HTTP | src/SMCV.Api/Controllers/AGENTS.md |
+| Criar/alterar entidade de banco | src/SMCV.Domain/AGENTS.md |
+| Criar/alterar DTO ou contrato | src/SMCV.Application/AGENTS.md |
+| Criar/alterar handler CQRS | src/SMCV.Features/AGENTS.md |
+| Alterar DbContext, migrations ou repositorio | src/SMCV.Infrastructure/AGENTS.md |
+| Criar/alterar Result ou excecao | src/SMCV.Common/AGENTS.md |
 | Alterar pipeline ou DI | PROGRAM_AGENTS.md |
 
 ## REGRAS GLOBAIS
@@ -37,33 +37,38 @@ Autenticacao simples via sessao (email + senha com BCrypt). Sem JWT, sem OAuth.
 9. **Registrar no DI** — todo novo Repository/Service deve ser registrado em `Program.cs`
 10. **Validacao via FluentValidation** — validators em `Features/{Dominio}/Commands/`
 
-## ESTRUTURA DE PASTAS
+## ESTRUTURA DE PROJETOS (Multi-projeto)
 
 ```
 backend/
-├── Controllers/          ← roteamento HTTP, delega para MediatR
-├── Features/             ← nucleo CQRS por dominio (Commands + Queries)
-│   ├── Campaigns/
-│   ├── Contacts/
-│   ├── EmailLogs/
-│   ├── Users/
-│   └── UserProfiles/
-├── Domain/
-│   ├── Entities/         ← entidades EF Core (Campaign, Contact, EmailLog, User, UserProfile)
-│   └── Enums/            ← enums do dominio (CampaignStatus, EmailStatus)
-├── Infrastructure/
-│   ├── Data/             ← DbContext, DbContextFactory, Migrations
-│   ├── Repositories/     ← implementacao de acesso a dados (Base, Campaign, Contact, EmailLog, User, UserProfile)
-│   └── ExternalServices/ ← integracao com APIs externas (SMTP, CSV)
-├── Application/
-│   ├── DTOs/             ← objetos de transferencia (Auth/, Campaigns/, Contacts/, EmailLogs/, Users/, UserProfiles/)
-│   ├── Interfaces/       ← contratos de repositorios e servicos
-│   └── Mappings/         ← AutoMapper profiles
-├── Common/
-│   ├── Exceptions/       ← excecoes customizadas (Business, NotFound)
-│   ├── Middleware/        ← ExceptionHandlingMiddleware
-│   └── ResultPattern/    ← ApiResponse<T> para respostas padronizadas
-└── Program.cs
+├── SMCV.slnx                          ← solution file
+├── src/
+│   ├── SMCV.Domain/                   ← entidades e enums (sem dependencias)
+│   │   ├── Entities/
+│   │   └── Enums/
+│   ├── SMCV.Common/                   ← excecoes e result pattern (sem dependencias)
+│   │   ├── Exceptions/
+│   │   └── ResultPattern/
+│   ├── SMCV.Application/             ← DTOs, interfaces, mappings (depende de Domain)
+│   │   ├── DTOs/
+│   │   ├── Interfaces/
+│   │   └── Mappings/
+│   ├── SMCV.Infrastructure/          ← DbContext, repos, services (depende de Domain, Application)
+│   │   ├── Data/
+│   │   ├── Repositories/
+│   │   └── ExternalServices/
+│   ├── SMCV.Features/                ← nucleo CQRS (depende de Domain, Application, Common)
+│   │   ├── Auth/
+│   │   ├── Campaigns/
+│   │   ├── Contacts/
+│   │   ├── EmailLogs/
+│   │   ├── Users/
+│   │   └── UserProfiles/
+│   └── SMCV.Api/                     ← controllers, middleware, Program.cs (depende de todos)
+│       ├── Controllers/
+│       ├── Middleware/
+│       ├── Program.cs
+│       └── appsettings*.json
 ```
 
 ## FLUXO DE DADOS (CQRS)

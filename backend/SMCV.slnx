@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/SMCV.Api/SMCV.Api.csproj" />
+    <Project Path="src/SMCV.Application/SMCV.Application.csproj" />
+    <Project Path="src/SMCV.Common/SMCV.Common.csproj" />
+    <Project Path="src/SMCV.Domain/SMCV.Domain.csproj" />
+    <Project Path="src/SMCV.Features/SMCV.Features.csproj" />
+    <Project Path="src/SMCV.Infrastructure/SMCV.Infrastructure.csproj" />
+  </Folder>
+</Solution>

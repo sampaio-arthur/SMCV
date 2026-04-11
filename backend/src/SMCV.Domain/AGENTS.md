@@ -10,7 +10,7 @@ Esta camada NAO depende de nenhuma outra — e a base da aplicacao.
 ## ESTRUTURA
 
 ```
-Domain/
+src/SMCV.Domain/
 ├── Entities/
 │   ├── Campaign.cs
 │   ├── Contact.cs

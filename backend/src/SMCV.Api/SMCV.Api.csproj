@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <RootNamespace>SMCV</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Swashbuckle.AspNetCore" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SMCV.Common\SMCV.Common.csproj" />
+    <ProjectReference Include="..\SMCV.Application\SMCV.Application.csproj" />
+    <ProjectReference Include="..\SMCV.Infrastructure\SMCV.Infrastructure.csproj" />
+    <ProjectReference Include="..\SMCV.Features\SMCV.Features.csproj" />
+  </ItemGroup>
+
+</Project>

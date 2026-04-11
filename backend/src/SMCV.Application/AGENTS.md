@@ -10,7 +10,8 @@ Camada de abstracao entre Domain e Infrastructure.
 ## ESTRUTURA
 
 ```
-Application/
+src/SMCV.Application/
+├── ApplicationServiceExtensions.cs   ← Startup module (AddApplication)
 ├── DTOs/
 │   ├── Auth/
 │   │   ├── LoginRequest.cs

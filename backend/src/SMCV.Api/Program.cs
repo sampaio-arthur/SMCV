@@ -1,12 +1,11 @@
-using System.Reflection;
-using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
-using SMCV.Application.Interfaces;
+using SMCV.Application;
 using SMCV.Common.Middleware;
+using SMCV.Features;
+using SMCV.Infrastructure;
 using SMCV.Infrastructure.Data;
 using SMCV.Infrastructure.ExternalServices;
-using SMCV.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -56,7 +55,7 @@ builder.Services.AddSession(options =>
     options.Cookie.SameSite = SameSiteMode.Lax;
 });
 
-// ─── Database ─────────────────────────────────────────────────────────────────
+// ─── Application / Features / Infrastructure ─────────────────────────────────
 var connectionString = string.Join(";", [
     $"Host={RequiredSetting("DB_HOST")}",
     $"Port={RequiredSetting("DB_PORT")}",
@@ -65,27 +64,9 @@ var connectionString = string.Join(";", [
     $"Password={RequiredSetting("DB_PASSWORD")}"
 ]);
 
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(connectionString));
-
-// ─── MediatR + FluentValidation + AutoMapper ─────────────────────────────────
-builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
-builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
-builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
-
-// ─── Repositórios ─────────────────────────────────────────────────────────────
-builder.Services.AddScoped<ICampaignRepository, CampaignRepository>();
-builder.Services.AddScoped<IContactRepository, ContactRepository>();
-builder.Services.AddScoped<IEmailLogRepository, EmailLogRepository>();
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IUserProfileRepository, UserProfileRepository>();
-
-// ─── Serviços Externos ───────────────────────────────────────────────────────
-builder.Services.AddScoped<IEmailSenderService, EmailSenderService>();
-builder.Services.AddScoped<ICsvExportService, CsvExportService>();
-
-// ─── EmailSettings via IOptions ──────────────────────────────────────────────
-builder.Services.Configure<EmailSettings>(opts =>
+builder.Services.AddApplication();
+builder.Services.AddFeatures();
+builder.Services.AddInfrastructure(connectionString, opts =>
 {
     opts.SmtpHost = RequiredSetting("SMTP_HOST");
     opts.SmtpPort = int.Parse(RequiredSetting("SMTP_PORT"));

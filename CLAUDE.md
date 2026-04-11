@@ -15,10 +15,9 @@ docker-compose up -d --build    # rebuild + start
 docker-compose down             # stop
 
 # Backend (from backend/)
-dotnet run                      # API on :8080
-dotnet build
-dotnet ef migrations add Name
-dotnet ef database update
+dotnet build SMCV.slnx                              # build all projects
+dotnet run --project src/SMCV.Api                    # API on :8080
+dotnet ef migrations add Name --project src/SMCV.Infrastructure --startup-project src/SMCV.Api
 
 # Frontend (from frontend/)
 npm run dev                     # Vite on :5173
@@ -42,24 +41,24 @@ Arquitetura CQRS: Controller -> MediatR Handler -> Repository -> PostgreSQL.
 
 | Tarefa | Arquivo |
 |--------|---------|
-| Endpoint HTTP | `backend/Controllers/AGENTS.md` |
-| Handler CQRS (logica de negocio) | `backend/Features/AGENTS.md` |
-| Entidade de banco / Enums | `backend/Domain/AGENTS.md` |
-| DTO / Interfaces / Mappings | `backend/Application/AGENTS.md` |
-| DbContext / Repositories / APIs externas | `backend/Infrastructure/AGENTS.md` |
-| Result / Excecoes | `backend/Common/AGENTS.md` |
+| Endpoint HTTP | `backend/src/SMCV.Api/Controllers/AGENTS.md` |
+| Handler CQRS (logica de negocio) | `backend/src/SMCV.Features/AGENTS.md` |
+| Entidade de banco / Enums | `backend/src/SMCV.Domain/AGENTS.md` |
+| DTO / Interfaces / Mappings | `backend/src/SMCV.Application/AGENTS.md` |
+| DbContext / Repositories / APIs externas | `backend/src/SMCV.Infrastructure/AGENTS.md` |
+| Result / Excecoes | `backend/src/SMCV.Common/AGENTS.md` |
 | Program.cs / DI / pipeline | `backend/PROGRAM_AGENTS.md` |
 
 ## Adding a New Resource
 
 ### Backend
-1. `Domain/Entities/Xxx.cs` + `DbSet` em `AppDbContext` + migration
-2. `Application/DTOs/XxxRequestDto.cs` + `XxxResponseDto.cs`
-3. `Application/Interfaces/IXxxRepository.cs`
-4. `Infrastructure/Repositories/XxxRepository.cs`
-5. `Features/Xxx/Commands/` + `Features/Xxx/Queries/` (handlers CQRS)
-6. `Controllers/XxxController.cs`
-7. Registrar no DI em `Program.cs` (`AddScoped`)
+1. `src/SMCV.Domain/Entities/Xxx.cs` + `DbSet` em `AppDbContext` + migration
+2. `src/SMCV.Application/DTOs/XxxRequestDto.cs` + `XxxResponseDto.cs`
+3. `src/SMCV.Application/Interfaces/IXxxRepository.cs`
+4. `src/SMCV.Infrastructure/Repositories/XxxRepository.cs`
+5. `src/SMCV.Features/Xxx/Commands/` + `src/SMCV.Features/Xxx/Queries/` (handlers CQRS)
+6. `src/SMCV.Api/Controllers/XxxController.cs`
+7. Registrar no DI em `src/SMCV.Api/Program.cs` (`AddScoped`)
 
 ### Frontend
 1. `services/xxxService.js`
@@ -102,13 +101,13 @@ Sempre que qualquer uma das seguintes ações for realizada, o(s) AGENTS.md corr
 
 | Ação | AGENTS.md a atualizar |
 |------|-----------------------|
-| Criar nova entidade | `backend/Domain/AGENTS.md` |
-| Criar novo DTO ou Interface | `backend/Application/AGENTS.md` |
-| Criar novo Repository ou ExternalService | `backend/Infrastructure/AGENTS.md` |
-| Criar novo Handler CQRS | `backend/Features/AGENTS.md` |
-| Criar novo Controller | `backend/Controllers/AGENTS.md` |
+| Criar nova entidade | `backend/src/SMCV.Domain/AGENTS.md` |
+| Criar novo DTO ou Interface | `backend/src/SMCV.Application/AGENTS.md` |
+| Criar novo Repository ou ExternalService | `backend/src/SMCV.Infrastructure/AGENTS.md` |
+| Criar novo Handler CQRS | `backend/src/SMCV.Features/AGENTS.md` |
+| Criar novo Controller | `backend/src/SMCV.Api/Controllers/AGENTS.md` |
 | Alterar Program.cs (DI, middleware) | `backend/PROGRAM_AGENTS.md` |
-| Alterar Result ou Exceção | `backend/Common/AGENTS.md` |
+| Alterar Result ou Exceção | `backend/src/SMCV.Common/AGENTS.md` |
 | Qualquer alteração estrutural | `backend/AGENTS.md` (navigation map) |
 
 ### Como atualizar

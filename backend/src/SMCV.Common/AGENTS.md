@@ -10,15 +10,15 @@ Nenhuma logica de negocio — apenas infraestrutura transversal.
 ## ESTRUTURA
 
 ```
-Common/
+src/SMCV.Common/
 ├── Exceptions/
 │   ├── BusinessException.cs
 │   └── NotFoundException.cs
-├── Middleware/
-│   └── ExceptionHandlingMiddleware.cs
 └── ResultPattern/
     └── ApiResponse.cs
 ```
+
+> **Nota:** `ExceptionHandlingMiddleware` foi movido para `src/SMCV.Api/Middleware/` pois depende de ASP.NET Core (HttpContext, RequestDelegate). O namespace permanece `SMCV.Common.Middleware` por compatibilidade.
 
 ## ARQUIVOS EXISTENTES
 
@@ -29,12 +29,6 @@ Common/
 | `BusinessException.cs` | Excecao para erros de logica de negocio. Recebe mensagem como parametro. |
 | `NotFoundException.cs` | Excecao para entidade nao encontrada. Recebe tipo da entidade e ID, formata mensagem automaticamente. |
 
-### Middleware (`SMCV.Common.Middleware`)
-
-| Arquivo | Descricao |
-|---------|-----------|
-| `ExceptionHandlingMiddleware.cs` | Captura todas as excecoes e mapeia para HTTP status codes e JSON. Inclui detalhes de debug em Development. |
-
 ### ResultPattern (`SMCV.Common.ResultPattern`)
 
 | Arquivo | Descricao |
@@ -43,7 +37,7 @@ Common/
 
 ## REGRAS OBRIGATORIAS
 
-- Namespace: `SMCV.Common.Exceptions`, `SMCV.Common.Middleware` ou `SMCV.Common.ResultPattern`
+- Namespace: `SMCV.Common.Exceptions` ou `SMCV.Common.ResultPattern`
 - Classes genericas e reutilizaveis — nao especificas de um dominio
 - Excecoes herdam de `Exception` ou derivadas
 

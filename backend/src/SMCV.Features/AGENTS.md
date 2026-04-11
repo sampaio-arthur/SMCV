@@ -11,7 +11,8 @@ Validators (FluentValidation) ficam junto aos Commands que validam.
 ## ESTRUTURA
 
 ```
-Features/
+src/SMCV.Features/
+├── FeaturesServiceExtensions.cs   ← Startup module (AddFeatures)
 ├── Auth/
 │   ├── Commands/
 │   │   ├── RegisterUser/

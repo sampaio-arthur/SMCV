@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>SMCV.Features</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" />
+    <PackageReference Include="BCrypt.Net-Next" />
+    <PackageReference Include="FluentValidation" />
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
+    <PackageReference Include="MediatR" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SMCV.Domain\SMCV.Domain.csproj" />
+    <ProjectReference Include="..\SMCV.Application\SMCV.Application.csproj" />
+    <ProjectReference Include="..\SMCV.Common\SMCV.Common.csproj" />
+  </ItemGroup>
+
+</Project>
