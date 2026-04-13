@@ -1,9 +1,11 @@
 # Build stage
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 
 # Copiar solution e csproj primeiro (cache de restore)
-COPY ["SMCV.sln", "./"]
+COPY ["SMCV.slnx", "./"]
+COPY ["Directory.Build.props", "./"]
+COPY ["Directory.Packages.props", "./"]
 COPY ["src/SMCV.Domain/SMCV.Domain.csproj", "src/SMCV.Domain/"]
 COPY ["src/SMCV.Common/SMCV.Common.csproj", "src/SMCV.Common/"]
 COPY ["src/SMCV.Application/SMCV.Application.csproj", "src/SMCV.Application/"]
@@ -16,7 +18,7 @@ COPY . .
 RUN dotnet publish src/SMCV.Api/SMCV.Api.csproj -c Release -o /app/publish /p:UseAppHost=false
 
 # Runtime stage
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
+FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS final
 WORKDIR /app
 
 RUN apt-get update && apt-get install -y tzdata
