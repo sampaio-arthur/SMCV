@@ -71,11 +71,11 @@ docker-compose up -d --build
 
 O Docker Compose sobe os três serviços (banco, backend e frontend). O banco é criado e as migrations são aplicadas automaticamente no startup.
 
-| Serviço | URL |
-|---------|-----|
-| Frontend | http://localhost:3000 |
-| Backend API | http://localhost:8080 |
-| Swagger | http://localhost:8080/swagger |
+| Serviço     | URL                           |
+| ----------- | ----------------------------- |
+| Frontend    | http://localhost:3000         |
+| Backend API | http://localhost:8080         |
+| Swagger     | http://localhost:8080/swagger |
 
 Para parar:
 
@@ -89,38 +89,38 @@ Documentação interativa disponível em `/swagger`.
 
 Autenticação via sessão (email + senha). Endpoints de auth:
 
-| Método | Rota | Descrição |
-|--------|------|-----------|
-| POST | `/api/auth/register` | Registrar novo usuário |
-| POST | `/api/auth/login` | Login (inicia sessão) |
-| POST | `/api/auth/logout` | Logout (limpa sessão) |
-| GET | `/api/auth/me` | Dados do usuário logado |
-| GET | `/api/users` | Listar usuários |
-| GET | `/api/users/{id}` | Detalhes do usuário |
-| POST | `/api/users` | Criar usuário |
-| PUT | `/api/users/{id}` | Atualizar usuário |
-| DELETE | `/api/users/{id}` | Excluir usuário |
-| GET | `/api/userprofiles` | Listar perfis |
-| GET | `/api/userprofiles/{id}` | Detalhes do perfil |
-| GET | `/api/userprofiles/user/{userId}` | Perfil por usuário |
-| POST | `/api/userprofiles` | Criar perfil |
-| POST | `/api/userprofiles/{id}/upload-resume` | Upload de currículo (PDF) |
-| PUT | `/api/userprofiles/{id}` | Atualizar perfil |
-| DELETE | `/api/userprofiles/{id}` | Excluir perfil |
-| GET | `/api/campaigns` | Listar campanhas |
-| GET | `/api/campaigns/{id}` | Detalhes da campanha com contatos |
-| POST | `/api/campaigns` | Criar campanha (JSON) |
-| PUT | `/api/campaigns/{id}` | Atualizar campanha |
-| DELETE | `/api/campaigns/{id}` | Excluir campanha |
-| POST | `/api/campaigns/{id}/send` | Disparar e-mails da campanha |
-| GET | `/api/campaigns/{id}/export-csv` | Exportar contatos em CSV |
-| GET | `/api/contacts/{id}` | Detalhes do contato |
-| GET | `/api/contacts/campaign/{campaignId}` | Contatos de uma campanha |
-| POST | `/api/contacts` | Criar contato manualmente |
-| PUT | `/api/contacts/{id}` | Atualizar contato |
-| DELETE | `/api/contacts/{id}` | Excluir contato |
-| GET | `/api/emaillogs/contact/{contactId}` | Log de e-mail por contato |
-| GET | `/api/emaillogs/campaign/{campaignId}` | Logs de e-mail por campanha |
+| Método | Rota                                   | Descrição                         |
+| ------ | -------------------------------------- | --------------------------------- |
+| POST   | `/api/auth/register`                   | Registrar novo usuário            |
+| POST   | `/api/auth/login`                      | Login (inicia sessão)             |
+| POST   | `/api/auth/logout`                     | Logout (limpa sessão)             |
+| GET    | `/api/auth/me`                         | Dados do usuário logado           |
+| GET    | `/api/users`                           | Listar usuários                   |
+| GET    | `/api/users/{id}`                      | Detalhes do usuário               |
+| POST   | `/api/users`                           | Criar usuário                     |
+| PUT    | `/api/users/{id}`                      | Atualizar usuário                 |
+| DELETE | `/api/users/{id}`                      | Excluir usuário                   |
+| GET    | `/api/userprofiles`                    | Listar perfis                     |
+| GET    | `/api/userprofiles/{id}`               | Detalhes do perfil                |
+| GET    | `/api/userprofiles/user/{userId}`      | Perfil por usuário                |
+| POST   | `/api/userprofiles`                    | Criar perfil                      |
+| POST   | `/api/userprofiles/{id}/upload-resume` | Upload de currículo (PDF)         |
+| PUT    | `/api/userprofiles/{id}`               | Atualizar perfil                  |
+| DELETE | `/api/userprofiles/{id}`               | Excluir perfil                    |
+| GET    | `/api/campaigns`                       | Listar campanhas                  |
+| GET    | `/api/campaigns/{id}`                  | Detalhes da campanha com contatos |
+| POST   | `/api/campaigns`                       | Criar campanha (JSON)             |
+| PUT    | `/api/campaigns/{id}`                  | Atualizar campanha                |
+| DELETE | `/api/campaigns/{id}`                  | Excluir campanha                  |
+| POST   | `/api/campaigns/{id}/send`             | Disparar e-mails da campanha      |
+| GET    | `/api/campaigns/{id}/export-csv`       | Exportar contatos em CSV          |
+| GET    | `/api/contacts/{id}`                   | Detalhes do contato               |
+| GET    | `/api/contacts/campaign/{campaignId}`  | Contatos de uma campanha          |
+| POST   | `/api/contacts`                        | Criar contato manualmente         |
+| PUT    | `/api/contacts/{id}`                   | Atualizar contato                 |
+| DELETE | `/api/contacts/{id}`                   | Excluir contato                   |
+| GET    | `/api/emaillogs/contact/{contactId}`   | Log de e-mail por contato         |
+| GET    | `/api/emaillogs/campaign/{campaignId}` | Logs de e-mail por campanha       |
 
 ## Diagrama de Entidades
 
@@ -153,7 +153,7 @@ Contact              EmailLog            ├─ EmailBody
 
 ## Stack
 
-- **Backend:** ASP.NET Core 8, EF Core, MediatR (CQRS), AutoMapper, FluentValidation, MailKit, BCrypt
+- **Backend:** ASP.NET Core 9, EF Core, MediatR (CQRS), AutoMapper, FluentValidation, MailKit, BCrypt
 - **Frontend:** React 19, Vite, Tailwind CSS
 - **Banco:** PostgreSQL 15+
 - **Auth:** Sessão simples (email + senha com BCrypt)
@@ -166,40 +166,38 @@ Contact              EmailLog            ├─ EmailBody
 
 ---
 
-## Ponderações do Professor (Matheus Cataneo)
+## Arquitetura do Backend — Decisões Estruturais
 
-As alterações abaixo são **exclusivamente estruturais** — nenhum código-fonte de regra de negócio, controller, handler, repository ou serviço foi alterado. Por isso, **não foram realizados testes funcionais**: o comportamento da aplicação permanece idêntico. A ideia é deixar o projeto mais próximo do que se encontra em equipes de mercado, mesmo sendo um projeto menor onde parte dessa estrutura seria opcional.
+O objetivo é alinhar o projeto com práticas adotadas em equipes de mercado, mesmo sendo um projeto de menor porte onde parte dessa estrutura seria opcional.
 
-### O que mudou e por quê
-
-#### 1. Separação em múltiplos projetos (.csproj)
+### Separação em múltiplos projetos (.csproj)
 
 O backend foi dividido em 6 projetos independentes dentro de `backend/src/`:
 
-| Projeto | Responsabilidade |
-|---------|-----------------|
-| `SMCV.Api` | Host HTTP — controllers, middleware, pipeline, Program.cs |
-| `SMCV.Application` | Contratos (interfaces), DTOs e mappings — sem implementação concreta |
-| `SMCV.Domain` | Entidades de banco e enums — zero dependência externa |
-| `SMCV.Infrastructure` | Implementações concretas — DbContext, repositories, serviços SMTP/CSV |
-| `SMCV.Features` | Handlers CQRS (MediatR), validators (FluentValidation) — lógica de negócio |
-| `SMCV.Common` | Utilitários transversais — Result pattern, exceções, middleware |
+| Projeto               | Responsabilidade                                                           |
+| --------------------- | -------------------------------------------------------------------------- |
+| `SMCV.Api`            | Host HTTP — controllers, middleware, pipeline, Program.cs                  |
+| `SMCV.Application`    | Contratos (interfaces), DTOs e mappings — sem implementação concreta       |
+| `SMCV.Domain`         | Entidades de banco e enums — zero dependência externa                      |
+| `SMCV.Infrastructure` | Implementações concretas — DbContext, repositories, serviços SMTP/CSV      |
+| `SMCV.Features`       | Handlers CQRS (MediatR), validators (FluentValidation) — lógica de negócio |
+| `SMCV.Common`         | Utilitários transversais — Result pattern, exceções, middleware            |
 
-**Por que isso importa:** cada projeto define um **boundary de compilação**. Isso significa que o compilador impede violações de arquitetura. Por exemplo, `SMCV.Domain` não consegue referenciar `SMCV.Infrastructure` — se alguém tentar usar o `DbContext` dentro de uma entidade, o código simplesmente não compila. Em um projeto monolítico de arquivo único, essa restrição só existe como convenção (que é facilmente quebrada).
+Cada projeto define um **boundary de compilação**, o que significa que o compilador impede violações de arquitetura automaticamente. Por exemplo, `SMCV.Domain` não consegue referenciar `SMCV.Infrastructure` — se alguém tentar usar o `DbContext` dentro de uma entidade, o código simplesmente não compila. Em um projeto monolítico, essa restrição existiria apenas como convenção (facilmente quebrada).
 
-**Em empresas de mercado**, essa separação é padrão em projetos .NET de médio/grande porte (Clean Architecture, Onion Architecture, Hexagonal). Permite que equipes diferentes trabalhem em camadas diferentes com menor risco de conflito, e facilita a adoção futura de testes unitários por camada.
+Em projetos .NET de médio/grande porte, essa separação é padrão (Clean Architecture, Onion Architecture, Hexagonal). Permite que equipes diferentes trabalhem em camadas diferentes com menor risco de conflito e facilita a adoção futura de testes unitários por camada.
 
-#### 2. Solution file (.slnx)
+### Solution file (.slnx)
 
-Substituição do `.sln` antigo por um `.slnx` (formato XML simplificado do .NET 9+). Agrupa os 6 projetos em um único ponto de build:
+O `.sln` tradicional foi substituído por um `.slnx` (formato XML simplificado do .NET 9+), que agrupa os 6 projetos em um único ponto de build:
 
 ```bash
 dotnet build SMCV.slnx    # compila tudo de uma vez
 ```
 
-#### 3. Central Package Management (Directory.Packages.props)
+### Central Package Management (Directory.Packages.props)
 
-Todas as versões de pacotes NuGet são definidas em um único arquivo `Directory.Packages.props` na raiz. Cada `.csproj` apenas declara **qual** pacote usa, sem repetir a versão:
+Todas as versões de pacotes NuGet são definidas em um único arquivo `Directory.Packages.props` na raiz do backend. Cada `.csproj` apenas declara **qual** pacote usa, sem repetir a versão:
 
 ```xml
 <!-- No .csproj: sem versão -->
@@ -209,23 +207,24 @@ Todas as versões de pacotes NuGet são definidas em um único arquivo `Director
 <PackageVersion Include="MediatR" Version="12.4.1" />
 ```
 
-**Por que isso importa:** em projetos com muitos `.csproj`, sem isso cada projeto pode acabar em versões diferentes do mesmo pacote (um com MediatR 12.0, outro com 12.4), causando bugs sutis em runtime. Em empresas com dezenas de projetos na mesma solution, é prática padrão.
+Sem essa centralização, cada projeto pode acabar em versões diferentes do mesmo pacote (um com MediatR 12.0, outro com 12.4), causando bugs sutis em runtime. Em solutions com dezenas de projetos, é considerada prática padrão.
 
-#### 4. Directory.Build.props (configuração compartilhada)
+### Directory.Build.props (configuração compartilhada)
 
-Propriedades comuns como `TargetFramework`, `Nullable`, `ImplicitUsings` são definidas uma única vez em `Directory.Build.props` e herdadas por todos os projetos. Evita duplicação e garante consistência.
+Propriedades comuns como `TargetFramework`, `Nullable` e `ImplicitUsings` são definidas uma única vez em `Directory.Build.props` e herdadas por todos os projetos. Isso evita duplicação e garante consistência.
 
-#### 5. Startup Modules (extension methods de DI)
+### Startup Modules (extension methods de DI)
 
-Cada camada agora registra seus próprios serviços no container de injeção de dependência, em vez de tudo ficar no `Program.cs`:
+Cada camada registra seus próprios serviços no container de injeção de dependência, em vez de concentrar tudo no `Program.cs`:
 
-| Módulo | Arquivo | O que registra |
-|--------|---------|----------------|
-| `AddApplication()` | `ApplicationServiceExtensions.cs` | AutoMapper |
-| `AddFeatures()` | `FeaturesServiceExtensions.cs` | MediatR + FluentValidation |
+| Módulo                               | Arquivo                              | O que registra                                            |
+| ------------------------------------ | ------------------------------------ | --------------------------------------------------------- |
+| `AddApplication()`                   | `ApplicationServiceExtensions.cs`    | AutoMapper                                                |
+| `AddFeatures()`                      | `FeaturesServiceExtensions.cs`       | MediatR + FluentValidation                                |
 | `AddInfrastructure(conn, emailOpts)` | `InfrastructureServiceExtensions.cs` | DbContext, repositories, services externos, EmailSettings |
 
 **Antes** — o `Program.cs` conhecia cada repositório e serviço pelo nome:
+
 ```csharp
 builder.Services.AddScoped<ICampaignRepository, CampaignRepository>();
 builder.Services.AddScoped<IContactRepository, ContactRepository>();
@@ -233,16 +232,11 @@ builder.Services.AddScoped<IContactRepository, ContactRepository>();
 ```
 
 **Depois** — o `Program.cs` só conhece os módulos:
+
 ```csharp
 builder.Services.AddApplication();
 builder.Services.AddFeatures();
 builder.Services.AddInfrastructure(connectionString, opts => { ... });
 ```
 
-**Por que isso importa:** completa a separação em projetos. Sem os startup modules, o `Program.cs` (que fica no `Api`) precisava conhecer todas as classes concretas do `Infrastructure` — o que anulava o benefício do boundary de compilação. Agora cada camada é autônoma: quem cria um repositório novo registra ele no extension method da própria camada, sem tocar no `Program.cs`.
-
-### Nota importante
-
-Nenhuma dessas mudanças altera o funcionamento do sistema. O código-fonte dos controllers, handlers, repositories, entidades e serviços permanece **exatamente igual**. As mudanças são de organização de projetos, referências e registro de dependências — puramente estruturais.
-
-Essa MR é para avaliação: revise, aprove ou rejeite conforme achar adequado.
+Isso completa a separação em projetos. Sem os startup modules, o `Program.cs` (que fica no `Api`) precisaria conhecer todas as classes concretas do `Infrastructure`, anulando o benefício do boundary de compilação. Com essa abordagem, cada camada é autônoma: ao criar um repositório novo, basta registrá-lo no extension method da própria camada, sem tocar no `Program.cs`.
