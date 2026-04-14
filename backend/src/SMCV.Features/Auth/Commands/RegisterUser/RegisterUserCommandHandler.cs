@@ -26,6 +26,7 @@ public class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, U
 
         var user = new User
         {
+            Id = Guid.NewGuid(),
             Name = request.Name,
             Email = request.Email,
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password)

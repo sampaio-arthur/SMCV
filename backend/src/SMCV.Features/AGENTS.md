@@ -134,7 +134,7 @@ Todos os handlers estao implementados e funcionais:
 
 | Handler | Tipo | Namespace | Descricao |
 |---------|------|-----------|-----------|
-| `RegisterUserCommandHandler` | Command | `SMCV.Features.Auth.Commands.RegisterUser` | Valida unicidade de email, faz BCrypt hash da senha e cria o usuario. Retorna `UserResponse`. |
+| `RegisterUserCommandHandler` | Command | `SMCV.Features.Auth.Commands.RegisterUser` | Valida unicidade de email, faz BCrypt hash da senha e cria o usuario. Gera Id via `Guid.NewGuid()` internamente — Id nunca vem do request. Retorna `UserResponse`. |
 | `LoginUserCommandHandler` | Command | `SMCV.Features.Auth.Commands.LoginUser` | Valida credenciais (email + BCrypt.Verify). Lanca `BusinessException` se invalidas. Retorna `UserResponse`. Sessao setada no controller. |
 | `GetCurrentUserQueryHandler` | Query | `SMCV.Features.Auth.Queries.GetCurrentUser` | Busca usuario pelo `UserId` extraido da sessao no controller. Lanca `NotFoundException` se nao encontrado. |
 
@@ -173,7 +173,7 @@ Todos os handlers estao implementados e funcionais:
 
 | Handler | Tipo | Namespace | Descricao |
 |---------|------|-----------|-----------|
-| `CreateUserCommandHandler` | Command | `SMCV.Features.Users.Commands.CreateUser` | Cria usuario. Validator incluso. |
+| `CreateUserCommandHandler` | Command | `SMCV.Features.Users.Commands.CreateUser` | Cria usuario. Gera Id via `Guid.NewGuid()` internamente — Id nunca vem do request. Validator incluso. |
 | `UpdateUserCommandHandler` | Command | `SMCV.Features.Users.Commands.UpdateUser` | Atualiza dados do usuario. Valida unicidade de email. Validator incluso (FluentValidation). |
 | `DeleteUserCommandHandler` | Command | `SMCV.Features.Users.Commands.DeleteUser` | Deleta usuario por ID. Valida existencia. |
 | `GetAllUsersQueryHandler` | Query | `SMCV.Features.Users.Queries.GetAllUsers` | Lista usuarios com paginacao (PageNumber, PageSize). Usa GetAllPagedAsync. |
@@ -200,6 +200,10 @@ Todos os handlers estao implementados e funcionais:
 - Handler injeta Repository/Services via construtor
 - Retorno de Commands: DTO ou tipo primitivo via `IRequest<T>`
 - Retorno de Queries: DTO ou lista de DTOs via `IRequest<T>`
+
+## NOTAS SOBRE IDs
+
+> Id do User (e demais entidades) é gerado pelos handlers via `Guid.NewGuid()`. `ValueGeneratedNever` está configurado no DbContext — o banco nunca gera o Id, a aplicação sempre fornece.
 
 ## PROIBICOES
 

@@ -26,12 +26,10 @@ public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, UserR
 
         var user = new User
         {
+            Id = Guid.NewGuid(),
             Name = request.Name,
             Email = request.Email
         };
-
-        if (request.Id.HasValue)
-            user.Id = request.Id.Value;
 
         await _userRepository.AddAsync(user);
         return _mapper.Map<UserResponse>(user);
