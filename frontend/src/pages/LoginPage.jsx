@@ -72,7 +72,7 @@ function LoginPage() {
               value={form.password}
               onChange={(e) => setForm({ ...form, password: e.target.value })}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Minimo 8 caracteres"
+              placeholder="Digite a senha"
             />
           </div>
 

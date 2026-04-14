@@ -74,6 +74,21 @@ public class SendCampaignEmailsCommandHandler : IRequestHandler<SendCampaignEmai
                     contact.EmailSentAt = DateTime.UtcNow;
                     await _contactRepository.UpdateAsync(contact);
 
+                    if (contact.EmailLog is null)
+                    {
+                        var emailLog = new EmailLog
+                        {
+                            ContactId = contact.Id,
+                            ErrorMessage = null
+                        };
+                        await _emailLogRepository.AddAsync(emailLog);
+                    }
+                    else
+                    {
+                        contact.EmailLog.ErrorMessage = null;
+                        await _emailLogRepository.UpdateAsync(contact.EmailLog);
+                    }
+
                     successCount++;
                 }
                 catch (Exception ex)
