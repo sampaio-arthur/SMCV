@@ -28,7 +28,8 @@ function MainLayout() {
           </p>
           <ul className="space-y-1">
             {navItems.map((item) => {
-              const active = location.pathname.startsWith(item.to);
+              const active =
+                location.pathname === item.to || location.pathname.startsWith(`${item.to}/`);
               return (
                 <li key={item.to}>
                   <Link
