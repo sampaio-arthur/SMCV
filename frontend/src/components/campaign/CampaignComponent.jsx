@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { Plus, Pencil, Trash2, Eye, Send, Download } from 'lucide-react';
+import { Plus, Pencil, Trash2, Eye, Send, Download, Loader2, RefreshCw } from 'lucide-react';
 import { formatDate } from '../../utils';
 import StatusBadge from '../ui/StatusBadge';
 import EmptyState from '../ui/EmptyState';
@@ -18,7 +18,6 @@ const campaignStatusConfig = {
 const statusFilters = [
   { value: '', label: 'Todas' },
   { value: 'Draft', label: 'Rascunho' },
-  { value: 'Running', label: 'Enviando' },
   { value: 'Completed', label: 'Concluido' },
   { value: 'Cancelled', label: 'Cancelado' },
   { value: 'Failed', label: 'Falhou' },
@@ -27,7 +26,16 @@ const statusFilters = [
 
 const emptyForm = { name: '', niche: '', region: '', emailSubject: '', emailBody: '' };
 
-function CampaignComponent({ items = [], onCreate, onUpdate, onDelete, onViewContacts, onSendEmails, onExportCsv }) {
+function CampaignComponent({
+  items = [],
+  onCreate,
+  onUpdate,
+  onDelete,
+  onViewContacts,
+  onSendEmails,
+  onExportCsv,
+  sendingCampaignIds = new Set(),
+}) {
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState(null);
   const [formData, setFormData] = useState(emptyForm);
@@ -40,6 +48,15 @@ function CampaignComponent({ items = [], onCreate, onUpdate, onDelete, onViewCon
     : items;
 
   const isLocked = useCallback((status) => status === 'Running' || status === 'Completed', []);
+  const canSendEmails = useCallback(
+    (status) => status === 'Draft' || status === 'Failed' || status === 'PartialSuccess',
+    []
+  );
+  const isRetryStatus = useCallback((status) => status === 'Failed' || status === 'PartialSuccess', []);
+  const isCampaignSending = useCallback(
+    (item) => sendingCampaignIds.has(item.id) || item.status === 'Running',
+    [sendingCampaignIds]
+  );
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -78,6 +95,37 @@ function CampaignComponent({ items = [], onCreate, onUpdate, onDelete, onViewCon
     setEditing(null);
     setFormData(emptyForm);
     setShowForm(false);
+  };
+
+  const renderSendAction = (item) => {
+    const isSending = isCampaignSending(item);
+
+    if (isSending) {
+      return (
+        <button
+          type="button"
+          disabled
+          className="p-1.5 text-yellow-600 bg-yellow-50 rounded transition-colors mr-1 cursor-wait"
+          title="Enviando e-mails"
+        >
+          <Loader2 className="w-4 h-4 animate-spin" />
+        </button>
+      );
+    }
+
+    if (!canSendEmails(item.status)) return null;
+
+    const SendIcon = isRetryStatus(item.status) ? RefreshCw : Send;
+
+    return (
+      <button
+        onClick={() => onSendEmails?.(item.id)}
+        className="p-1.5 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded transition-colors mr-1"
+        title={isRetryStatus(item.status) ? 'Tentar reenviar e-mails' : 'Enviar e-mails'}
+      >
+        <SendIcon className="w-4 h-4" />
+      </button>
+    );
   };
 
   return (
@@ -241,15 +289,7 @@ function CampaignComponent({ items = [], onCreate, onUpdate, onDelete, onViewCon
                     >
                       <Eye className="w-4 h-4" />
                     </button>
-                    {item.status === 'Draft' && (
-                      <button
-                        onClick={() => onSendEmails?.(item.id)}
-                        className="p-1.5 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded transition-colors mr-1"
-                        title="Enviar e-mails"
-                      >
-                        <Send className="w-4 h-4" />
-                      </button>
-                    )}
+                    {renderSendAction(item)}
                     <button
                       onClick={() => onExportCsv?.(item.id, item.name)}
                       className="p-1.5 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded transition-colors mr-1"
@@ -259,17 +299,17 @@ function CampaignComponent({ items = [], onCreate, onUpdate, onDelete, onViewCon
                     </button>
                     <button
                       onClick={() => handleEdit(item)}
-                      disabled={isLocked(item.status)}
+                      disabled={isLocked(item.status) || isCampaignSending(item)}
                       className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors mr-1 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:text-gray-400 disabled:hover:bg-transparent"
-                      title={isLocked(item.status) ? 'Edicao bloqueada' : 'Editar'}
+                      title={isLocked(item.status) || isCampaignSending(item) ? 'Edicao bloqueada' : 'Editar'}
                     >
                       <Pencil className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => confirm(() => onDelete(item.id))}
-                      disabled={item.status === 'Running'}
+                      disabled={isCampaignSending(item)}
                       className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:text-gray-400 disabled:hover:bg-transparent"
-                      title={item.status === 'Running' ? 'Exclusao bloqueada durante envio' : 'Excluir'}
+                      title={isCampaignSending(item) ? 'Exclusao bloqueada durante envio' : 'Excluir'}
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>

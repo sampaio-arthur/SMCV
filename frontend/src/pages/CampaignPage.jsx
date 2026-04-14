@@ -9,6 +9,7 @@ import { getErrorMessage } from '../utils';
 function CampaignPage() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [sendingCampaignIds, setSendingCampaignIds] = useState(() => new Set());
   const { success: toastSuccess, error: toastError } = useToast();
   const toastErrorRef = useRef(toastError);
   const navigate = useNavigate();
@@ -68,12 +69,30 @@ function CampaignPage() {
   };
 
   const handleSendEmails = async (id) => {
+    setSendingCampaignIds(prev => {
+      const next = new Set(prev);
+      next.add(id);
+      return next;
+    });
+
     try {
       const result = await sendEmails(id);
-      toastSuccess(`E-mails disparados! ${result.emailsSent ?? 0} enviado(s).`);
-      await loadItems();
+      const emailsSent = result.emailsSent ?? 0;
+
+      if (emailsSent > 0) {
+        toastSuccess(`E-mails disparados! ${emailsSent} enviado(s).`);
+      } else {
+        toastError('Nenhum e-mail foi enviado. A campanha foi marcada como falhou.');
+      }
     } catch (err) {
       toastError(await getErrorMessage(err, 'Erro ao disparar e-mails da campanha.'));
+    } finally {
+      setSendingCampaignIds(prev => {
+        const next = new Set(prev);
+        next.delete(id);
+        return next;
+      });
+      await loadItems();
     }
   };
 
@@ -114,6 +133,7 @@ function CampaignPage() {
           onViewContacts={handleViewContacts}
           onSendEmails={handleSendEmails}
           onExportCsv={handleExportCsv}
+          sendingCampaignIds={sendingCampaignIds}
         />
       )}
     </div>
