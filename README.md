@@ -189,7 +189,7 @@ Em projetos .NET de médio/grande porte, essa separação é padrão (Clean Arch
 
 ### Solution file (.slnx)
 
-O `.sln` tradicional foi substituído por um `.slnx` (formato XML simplificado do .NET 9+), que agrupa os 6 projetos em um único ponto de build:
+O `.slnx` (formato XML simplificado do .NET 9+), agrupa os 6 projetos em um único ponto de build:
 
 ```bash
 dotnet build SMCV.slnx    # compila tudo de uma vez
@@ -223,15 +223,7 @@ Cada camada registra seus próprios serviços no container de injeção de depen
 | `AddFeatures()`                      | `FeaturesServiceExtensions.cs`       | MediatR + FluentValidation                                |
 | `AddInfrastructure(conn, emailOpts)` | `InfrastructureServiceExtensions.cs` | DbContext, repositories, services externos, EmailSettings |
 
-**Antes** — o `Program.cs` conhecia cada repositório e serviço pelo nome:
-
-```csharp
-builder.Services.AddScoped<ICampaignRepository, CampaignRepository>();
-builder.Services.AddScoped<IContactRepository, ContactRepository>();
-// ... mais 5 registros manuais
-```
-
-**Depois** — o `Program.cs` só conhece os módulos:
+o `Program.cs` só conhece os módulos:
 
 ```csharp
 builder.Services.AddApplication();
