@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import UserComponent from '../components/user/UserComponent';
 import { getAll, create, update, remove } from '../services/userService';
 import { useToast } from '../hooks/useToast';
@@ -8,51 +8,56 @@ import { getErrorMessage } from '../utils';
 function UserPage() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
-  const toast = useToast();
+  const { success: toastSuccess, error: toastError } = useToast();
+  const toastErrorRef = useRef(toastError);
 
   useEffect(() => {
-    loadItems();
-  }, []);
+    toastErrorRef.current = toastError;
+  }, [toastError]);
 
-  const loadItems = async () => {
+  const loadItems = useCallback(async () => {
     try {
       setLoading(true);
       const data = await getAll();
       setItems(data);
     } catch (err) {
-      toast.error(await getErrorMessage(err, 'Nao foi possivel carregar os usuarios. Verifique se a API esta em execucao.'));
+      toastErrorRef.current(await getErrorMessage(err, 'Nao foi possivel carregar os usuarios. Verifique se a API esta em execucao.'));
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    loadItems();
+  }, [loadItems]);
 
   const handleCreate = async (item) => {
     try {
-      await create(item);
-      toast.success('Usuario criado com sucesso!');
-      await loadItems();
+      const novoUsuario = await create(item);
+      setItems(prev => [...prev, novoUsuario]);
+      toastSuccess('Usuario criado com sucesso!');
     } catch (err) {
-      toast.error(await getErrorMessage(err, 'Nao foi possivel criar o usuario.'));
+      toastError(await getErrorMessage(err, 'Nao foi possivel criar o usuario.'));
     }
   };
 
   const handleUpdate = async (id, item) => {
     try {
-      await update(id, item);
-      toast.success('Usuario atualizado com sucesso!');
-      await loadItems();
+      const usuarioAtualizado = await update(id, item);
+      setItems(prev => prev.map(u => u.id === id ? usuarioAtualizado : u));
+      toastSuccess('Usuario atualizado com sucesso!');
     } catch (err) {
-      toast.error(await getErrorMessage(err, 'Nao foi possivel atualizar o usuario.'));
+      toastError(await getErrorMessage(err, 'Nao foi possivel atualizar o usuario.'));
     }
   };
 
   const handleDelete = async (id) => {
     try {
       await remove(id);
-      toast.success('Usuario excluido com sucesso!');
-      await loadItems();
+      setItems(prev => prev.filter(u => u.id !== id));
+      toastSuccess('Usuario excluido com sucesso!');
     } catch (err) {
-      toast.error(await getErrorMessage(err, 'Nao foi possivel excluir o usuario.'));
+      toastError(await getErrorMessage(err, 'Nao foi possivel excluir o usuario.'));
     }
   };
 

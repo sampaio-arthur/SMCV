@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import UserProfileComponent from '../components/userProfile/UserProfileComponent';
 import { getAll, create, remove, uploadResume } from '../services/userProfileService';
 import { getAll as getAllUsers } from '../services/userService';
@@ -10,52 +10,57 @@ function UserProfilePage() {
   const [items, setItems] = useState([]);
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const toast = useToast();
+  const { success: toastSuccess, error: toastError } = useToast();
+  const toastErrorRef = useRef(toastError);
 
   useEffect(() => {
-    loadData();
-  }, []);
+    toastErrorRef.current = toastError;
+  }, [toastError]);
 
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     try {
       setLoading(true);
       const [profiles, userList] = await Promise.all([getAll(), getAllUsers()]);
       setItems(profiles);
       setUsers(userList);
     } catch (err) {
-      toast.error(await getErrorMessage(err, 'Nao foi possivel carregar os perfis. Verifique se a API esta em execucao.'));
+      toastErrorRef.current(await getErrorMessage(err, 'Nao foi possivel carregar os perfis. Verifique se a API esta em execucao.'));
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
 
   const handleCreate = async () => {
     try {
-      await create();
-      toast.success('Perfil criado com sucesso!');
-      await loadData();
+      const novoPerfil = await create();
+      setItems(prev => [...prev, novoPerfil]);
+      toastSuccess('Perfil criado com sucesso!');
     } catch (err) {
-      toast.error(await getErrorMessage(err, 'Nao foi possivel criar o perfil.'));
+      toastError(await getErrorMessage(err, 'Nao foi possivel criar o perfil.'));
     }
   };
 
   const handleDelete = async (id) => {
     try {
       await remove(id);
-      toast.success('Perfil excluido com sucesso!');
-      await loadData();
+      setItems(prev => prev.filter(p => p.id !== id));
+      toastSuccess('Perfil excluido com sucesso!');
     } catch (err) {
-      toast.error(await getErrorMessage(err, 'Nao foi possivel excluir o perfil.'));
+      toastError(await getErrorMessage(err, 'Nao foi possivel excluir o perfil.'));
     }
   };
 
   const handleUploadResume = async (id, file) => {
     try {
-      await uploadResume(id, file);
-      toast.success('Curriculo enviado com sucesso!');
-      await loadData();
+      const perfilAtualizado = await uploadResume(id, file);
+      setItems(prev => prev.map(p => p.id === id ? perfilAtualizado : p));
+      toastSuccess('Curriculo enviado com sucesso!');
     } catch (err) {
-      toast.error(await getErrorMessage(err, 'Erro ao enviar o curriculo.'));
+      toastError(await getErrorMessage(err, 'Erro ao enviar o curriculo.'));
     }
   };
 

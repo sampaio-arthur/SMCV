@@ -1,5 +1,5 @@
+import { LogOut, Megaphone, Settings, UserCircle, Users } from 'lucide-react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
-import { Megaphone, Users, UserCircle, Settings, LogOut } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 
 const navItems = [
@@ -19,7 +19,7 @@ function MainLayout() {
       <aside className="w-64 bg-white border-r border-gray-200 flex flex-col shrink-0">
         <div className="p-5 border-b border-gray-200">
           <h1 className="text-lg font-bold text-gray-800">SMCV</h1>
-          <p className="text-xs text-gray-500 mt-0.5">Marketing por Curriculo</p>
+          <p className="text-xs text-gray-500 mt-0.5">Job Prospector</p>
         </div>
 
         <nav className="flex-1 p-4">

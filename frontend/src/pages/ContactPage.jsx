@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import ContactComponent from '../components/contact/ContactComponent';
 import { getAllByCampaignId, create, update, remove } from '../services/contactService';
@@ -14,8 +14,28 @@ function ContactPage() {
   const [contactsLoading, setContactsLoading] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
   const [selectedCampaignId, setSelectedCampaignId] = useState(searchParams.get('campaignId') || '');
-  const toast = useToast();
+  const { success: toastSuccess, error: toastError } = useToast();
+  const toastErrorRef = useRef(toastError);
 
+  useEffect(() => {
+    toastErrorRef.current = toastError;
+  }, [toastError]);
+
+  const loadContacts = useCallback(async (campaignId) => {
+    try {
+      setContactsLoading(true);
+      const contacts = await getAllByCampaignId(campaignId);
+      setItems(contacts);
+    } catch (err) {
+      toastErrorRef.current(await getErrorMessage(err, 'Nao foi possivel carregar os contatos.'));
+    } finally {
+      setContactsLoading(false);
+    }
+  }, []);
+
+  // Carregamento inicial das campanhas. selectedCampaignId é excluído
+  // intencionalmente das deps — este useEffect o modifica, incluí-lo causaria loop.
+  /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
     (async () => {
       try {
@@ -26,68 +46,57 @@ function ContactPage() {
           setSelectedCampaignId(campaignList[0].id);
         }
       } catch (err) {
-        toast.error(await getErrorMessage(err, 'Nao foi possivel carregar as campanhas. Verifique se a API esta em execucao.'));
+        toastErrorRef.current(await getErrorMessage(err, 'Nao foi possivel carregar as campanhas. Verifique se a API esta em execucao.'));
       } finally {
         setCampaignsLoading(false);
       }
     })();
   }, []);
+  /* eslint-enable react-hooks/exhaustive-deps */
 
   useEffect(() => {
     if (!selectedCampaignId) {
       setItems([]);
       return;
     }
-    const current = searchParams.get('campaignId');
+    const current = new URLSearchParams(window.location.search).get('campaignId');
     if (current !== selectedCampaignId) {
       setSearchParams({ campaignId: selectedCampaignId }, { replace: true });
     }
     loadContacts(selectedCampaignId);
-  }, [selectedCampaignId]);
-
-  const loadContacts = async (campaignId) => {
-    try {
-      setContactsLoading(true);
-      const contacts = await getAllByCampaignId(campaignId);
-      setItems(contacts);
-    } catch (err) {
-      toast.error(await getErrorMessage(err, 'Nao foi possivel carregar os contatos.'));
-    } finally {
-      setContactsLoading(false);
-    }
-  };
+  }, [selectedCampaignId, loadContacts, setSearchParams]);
 
   const handleCreate = async (item) => {
     try {
-      await create(item);
-      toast.success('Contato criado com sucesso!');
+      const novoContato = await create(item);
+      toastSuccess('Contato criado com sucesso!');
       if (item.campaignId && item.campaignId !== selectedCampaignId) {
         setSelectedCampaignId(item.campaignId);
       } else {
-        await loadContacts(selectedCampaignId);
+        setItems(prev => [...prev, novoContato]);
       }
     } catch (err) {
-      toast.error(await getErrorMessage(err, 'Nao foi possivel criar o contato.'));
+      toastError(await getErrorMessage(err, 'Nao foi possivel criar o contato.'));
     }
   };
 
   const handleUpdate = async (id, item) => {
     try {
-      await update(id, item);
-      toast.success('Contato atualizado com sucesso!');
-      await loadContacts(selectedCampaignId);
+      const contatoAtualizado = await update(id, item);
+      setItems(prev => prev.map(c => c.id === id ? contatoAtualizado : c));
+      toastSuccess('Contato atualizado com sucesso!');
     } catch (err) {
-      toast.error(await getErrorMessage(err, 'Nao foi possivel atualizar o contato.'));
+      toastError(await getErrorMessage(err, 'Nao foi possivel atualizar o contato.'));
     }
   };
 
   const handleDelete = async (id) => {
     try {
       await remove(id);
-      toast.success('Contato excluido com sucesso!');
-      await loadContacts(selectedCampaignId);
+      setItems(prev => prev.filter(c => c.id !== id));
+      toastSuccess('Contato excluido com sucesso!');
     } catch (err) {
-      toast.error(await getErrorMessage(err, 'Nao foi possivel excluir o contato.'));
+      toastError(await getErrorMessage(err, 'Nao foi possivel excluir o contato.'));
     }
   };
 

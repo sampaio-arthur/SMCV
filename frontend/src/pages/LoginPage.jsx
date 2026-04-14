@@ -35,7 +35,7 @@ function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="w-full max-w-sm bg-white rounded-xl shadow-lg p-8">
         <h1 className="text-2xl font-bold text-gray-800 text-center mb-1">SMCV</h1>
-        <p className="text-sm text-gray-500 text-center mb-6">Marketing por Curriculo</p>
+        <p className="text-sm text-gray-500 text-center mb-6">Job Prospector</p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {isRegister && (

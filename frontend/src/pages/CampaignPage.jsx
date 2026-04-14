@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import CampaignComponent from '../components/campaign/CampaignComponent';
 import { getAll, create, update, remove, sendEmails, exportCsv } from '../services/campaignService';
@@ -9,52 +9,57 @@ import { getErrorMessage } from '../utils';
 function CampaignPage() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
-  const toast = useToast();
+  const { success: toastSuccess, error: toastError } = useToast();
+  const toastErrorRef = useRef(toastError);
   const navigate = useNavigate();
 
   useEffect(() => {
-    loadItems();
-  }, []);
+    toastErrorRef.current = toastError;
+  }, [toastError]);
 
-  const loadItems = async () => {
+  const loadItems = useCallback(async () => {
     try {
       setLoading(true);
       const data = await getAll();
       setItems(data);
     } catch (err) {
-      toast.error(await getErrorMessage(err, 'Nao foi possivel carregar as campanhas. Verifique se a API esta em execucao.'));
+      toastErrorRef.current(await getErrorMessage(err, 'Nao foi possivel carregar as campanhas. Verifique se a API esta em execucao.'));
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    loadItems();
+  }, [loadItems]);
 
   const handleCreate = async (item) => {
     try {
-      await create(item);
-      toast.success('Campanha criada com sucesso!');
-      await loadItems();
+      const novaCampanha = await create(item);
+      setItems(prev => [...prev, novaCampanha]);
+      toastSuccess('Campanha criada com sucesso!');
     } catch (err) {
-      toast.error(await getErrorMessage(err, 'Nao foi possivel criar a campanha.'));
+      toastError(await getErrorMessage(err, 'Nao foi possivel criar a campanha.'));
     }
   };
 
   const handleUpdate = async (id, item) => {
     try {
-      await update(id, item);
-      toast.success('Campanha atualizada com sucesso!');
-      await loadItems();
+      const campanhaAtualizada = await update(id, item);
+      setItems(prev => prev.map(c => c.id === id ? campanhaAtualizada : c));
+      toastSuccess('Campanha atualizada com sucesso!');
     } catch (err) {
-      toast.error(await getErrorMessage(err, 'Nao foi possivel atualizar a campanha.'));
+      toastError(await getErrorMessage(err, 'Nao foi possivel atualizar a campanha.'));
     }
   };
 
   const handleDelete = async (id) => {
     try {
       await remove(id);
-      toast.success('Campanha excluida com sucesso!');
-      await loadItems();
+      setItems(prev => prev.filter(c => c.id !== id));
+      toastSuccess('Campanha excluida com sucesso!');
     } catch (err) {
-      toast.error(await getErrorMessage(err, 'Nao foi possivel excluir a campanha.'));
+      toastError(await getErrorMessage(err, 'Nao foi possivel excluir a campanha.'));
     }
   };
 
@@ -65,10 +70,10 @@ function CampaignPage() {
   const handleSendEmails = async (id) => {
     try {
       const result = await sendEmails(id);
-      toast.success(`E-mails disparados! ${result.emailsSent ?? 0} enviado(s).`);
+      toastSuccess(`E-mails disparados! ${result.emailsSent ?? 0} enviado(s).`);
       await loadItems();
     } catch (err) {
-      toast.error(await getErrorMessage(err, 'Erro ao disparar e-mails da campanha.'));
+      toastError(await getErrorMessage(err, 'Erro ao disparar e-mails da campanha.'));
     }
   };
 
@@ -83,9 +88,9 @@ function CampaignPage() {
       link.click();
       link.remove();
       window.URL.revokeObjectURL(url);
-      toast.success('CSV exportado com sucesso!');
+      toastSuccess('CSV exportado com sucesso!');
     } catch (err) {
-      toast.error(await getErrorMessage(err, 'Erro ao exportar CSV.'));
+      toastError(await getErrorMessage(err, 'Erro ao exportar CSV.'));
     }
   };
 

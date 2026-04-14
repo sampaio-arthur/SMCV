@@ -18,13 +18,33 @@ Cada page segue o padrao Container:
 | `CampaignPage.jsx` | `/campaign` | Campanhas | Campanhas de envio de curriculo |
 | `ContactPage.jsx` | `/contact` | Contatos | Contatos vinculados a campanhas |
 
-## Fluxo de dados tipico
+## Fluxo de dados típico
 
-```
+### Carregamento inicial
 useEffect → loadItems() → service.getAll() → setItems(data)
-handler → service.create(data) → toast.success() → loadItems()
-handler → try/catch → toast.error("Mensagem contextualizada")
-```
+
+### Create (sem re-fetch)
+handler → const novoItem = await service.create(data)
+       → setItems(prev => [...prev, novoItem])
+       → toast.success()
+
+### Update (sem re-fetch)
+handler → const itemAtualizado = await service.update(id, data)
+       → setItems(prev => prev.map(x => x.id === id ? itemAtualizado : x))
+       → toast.success()
+
+### Delete (sem re-fetch)
+handler → await service.remove(id)
+       → setItems(prev => prev.filter(x => x.id !== id))
+       → toast.success()
+
+### Exceções onde re-fetch é necessário
+- handleSendEmails (CampaignPage): altera status de múltiplos contatos no backend
+- handleUploadResume (UserProfilePage): somente se endpoint retornar 204 sem body
+
+### Princípio
+A atualização local só ocorre APÓS sucesso da API.
+Se a API falhar, o catch é acionado e setItems nunca executa.
 
 ## Particularidades
 
@@ -56,3 +76,24 @@ Todas as mensagens seguem o padrao:
 - **NENHUMA** page chama Axios diretamente — sempre via service
 - Toda page exibe LoadingSpinner durante carregamento
 - Toda page usa `useToast` para feedback
+- Funções de carregamento usadas em useEffect devem ser envoltas em useCallback
+- handlers de create/update/delete usam atualização de estado local — loadItems() não é chamado neles
+
+## Padrão useCallback
+
+Funções de carregamento usadas em useEffect DEVEM ser envoltas em useCallback:
+
+```jsx
+const loadItems = useCallback(async () => {
+  // lógica de carregamento
+}, []);
+
+useEffect(() => {
+  loadItems();
+}, [loadItems]);
+```
+
+useCallback([]) garante referência estável — o useEffect roda apenas uma vez.
+
+Exceção: useEffects com IIFEs internas ou que modificam suas próprias dependências
+devem usar eslint-disable-next-line com comentário justificando o motivo.
