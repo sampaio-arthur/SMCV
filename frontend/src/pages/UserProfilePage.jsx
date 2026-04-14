@@ -1,10 +1,10 @@
-import { useEffect, useState, useCallback, useRef } from 'react';
-import UserProfileComponent from '../components/userProfile/UserProfileComponent';
-import { getAll, create, remove, uploadResume } from '../services/userProfileService';
-import { getAll as getAllUsers } from '../services/userService';
-import { useToast } from '../hooks/useToast';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
-import { getErrorMessage } from '../utils';
+import UserProfileComponent from '../components/userProfile/UserProfileComponent';
+import { useToast } from '../hooks/useToast';
+import { MAX_RESUME_FILE_SIZE_BYTES, create, getAll, remove, uploadResume } from '../services/userProfileService';
+import { getAll as getAllUsers } from '../services/userService';
+import { formatFileSize, getErrorMessage } from '../utils';
 
 function UserProfilePage() {
   const [items, setItems] = useState([]);
@@ -55,6 +55,11 @@ function UserProfilePage() {
   };
 
   const handleUploadResume = async (id, file) => {
+    if (file.size > MAX_RESUME_FILE_SIZE_BYTES) {
+      toastError(`Arquivo muito grande. O tamanho maximo permitido é ${formatFileSize(MAX_RESUME_FILE_SIZE_BYTES)}.`);
+      return;
+    }
+
     try {
       const perfilAtualizado = await uploadResume(id, file);
       setItems(prev => prev.map(p => p.id === id ? perfilAtualizado : p));

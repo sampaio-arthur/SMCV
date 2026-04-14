@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using SMCV.Application;
@@ -8,6 +9,10 @@ using SMCV.Infrastructure.Data;
 using SMCV.Infrastructure.ExternalServices;
 
 var builder = WebApplication.CreateBuilder(args);
+const long DefaultResumeMaxFileSizeBytes = 25 * 1024 * 1024;
+const string ResumeMaxFileSizeConfigKey = "ResumeUpload:MaxFileSizeBytes";
+var resumeMaxFileSizeBytes = builder.Configuration.GetValue<long?>(ResumeMaxFileSizeConfigKey)
+    ?? DefaultResumeMaxFileSizeBytes;
 
 string RequiredSetting(string key)
 {
@@ -15,8 +20,18 @@ string RequiredSetting(string key)
         ?? throw new InvalidOperationException($"Environment variable '{key}' was not configured.");
 }
 
+static bool IsResumeUploadRequest(PathString path)
+{
+    return path.StartsWithSegments("/api/userprofiles", out var remainingPath)
+        && remainingPath.Value?.EndsWith("/upload-resume", StringComparison.OrdinalIgnoreCase) == true;
+}
+
 // ─── HttpContextAccessor ──────────────────────────────────────────────────────
 builder.Services.AddHttpContextAccessor();
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = resumeMaxFileSizeBytes;
+});
 
 // ─── Controllers ──────────────────────────────────────────────────────────────
 builder.Services.AddControllers();
@@ -88,6 +103,19 @@ app.UseSwagger();
 app.UseSwaggerUI();
 app.UseStaticFiles();
 app.UseCors("AllowReactApp");
+app.Use(async (context, next) =>
+{
+    if (IsResumeUploadRequest(context.Request.Path))
+    {
+        var maxRequestBodySizeFeature = context.Features.Get<IHttpMaxRequestBodySizeFeature>();
+        if (maxRequestBodySizeFeature is { IsReadOnly: false })
+        {
+            maxRequestBodySizeFeature.MaxRequestBodySize = resumeMaxFileSizeBytes;
+        }
+    }
+
+    await next();
+});
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseSession();
 app.MapControllers();

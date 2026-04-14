@@ -33,6 +33,24 @@ export function sleep(ms) {
 }
 
 /**
+ * Format a byte count to a user-facing file size.
+ * @param {number} bytes
+ * @returns {string}
+ */
+export function formatFileSize(bytes) {
+  const units = ['B', 'KB', 'MB', 'GB'];
+  let size = bytes;
+  let unitIndex = 0;
+
+  while (size >= 1024 && unitIndex < units.length - 1) {
+    size /= 1024;
+    unitIndex += 1;
+  }
+
+  return `${Number(size.toFixed(1))} ${units[unitIndex]}`;
+}
+
+/**
  * Extract a user-facing error message from an axios error, matching the
  * backend's ExceptionHandlingMiddleware shape: `{ error, details }`.
  * Handles Blob response bodies (responseType: 'blob') by parsing them.
@@ -41,6 +59,10 @@ export function sleep(ms) {
  * @returns {Promise<string>}
  */
 export async function getErrorMessage(err, fallback = 'Ocorreu um erro inesperado.') {
+  if (err?.response?.status === 413) {
+    return 'Arquivo muito grande. Envie um arquivo menor e tente novamente.';
+  }
+
   const data = err?.response?.data;
   if (!data) return fallback;
 
@@ -48,14 +70,14 @@ export async function getErrorMessage(err, fallback = 'Ocorreu um erro inesperad
     try {
       const text = await data.text();
       const parsed = JSON.parse(text);
-      return parsed?.error || fallback;
+      return parsed?.error || parsed?.message || fallback;
     } catch {
       return fallback;
     }
   }
 
   if (typeof data === 'string') return data || fallback;
-  return data.error || fallback;
+  return data.error || data.message || data.title || fallback;
 }
 
 /**

@@ -1,5 +1,7 @@
 import api from './api';
 
+export const MAX_RESUME_FILE_SIZE_BYTES = 25 * 1024 * 1024;
+
 export const getAll = async (pageNumber = 1, pageSize = 100) => {
   const response = await api.get('/userprofiles', { params: { pageNumber, pageSize } });
   return response.data;

@@ -1,5 +1,7 @@
 using MediatR;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using SMCV.Application.DTOs.UserProfiles;
 using SMCV.Application.Interfaces;
 using SMCV.Features.UserProfiles.Commands.CreateUserProfile;
@@ -18,11 +20,16 @@ public class UserProfilesController : ControllerBase
 {
     private readonly IMediator _mediator;
     private readonly IUserProfileRepository _userProfileRepository;
+    private readonly long _maxResumeFileSizeBytes;
 
-    public UserProfilesController(IMediator mediator, IUserProfileRepository userProfileRepository)
+    public UserProfilesController(
+        IMediator mediator,
+        IUserProfileRepository userProfileRepository,
+        IOptions<FormOptions> formOptions)
     {
         _mediator = mediator;
         _userProfileRepository = userProfileRepository;
+        _maxResumeFileSizeBytes = formOptions.Value.MultipartBodyLengthLimit;
     }
 
     [HttpGet]
@@ -59,6 +66,9 @@ public class UserProfilesController : ControllerBase
     {
         if (resumeFile is null || resumeFile.Length == 0)
             return BadRequest(new { message = "Arquivo inválido." });
+
+        if (resumeFile.Length > _maxResumeFileSizeBytes)
+            return StatusCode(StatusCodes.Status413PayloadTooLarge, new { error = "Arquivo muito grande. Envie um arquivo menor." });
 
         var allowedExtensions = new[] { ".pdf" };
         var extension = Path.GetExtension(resumeFile.FileName).ToLowerInvariant();
