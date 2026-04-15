@@ -20,15 +20,18 @@ public class UserProfilesController : ControllerBase
 {
     private readonly IMediator _mediator;
     private readonly IUserProfileRepository _userProfileRepository;
+    private readonly IFileStorageService _fileStorageService;
     private readonly long _maxResumeFileSizeBytes;
 
     public UserProfilesController(
         IMediator mediator,
         IUserProfileRepository userProfileRepository,
+        IFileStorageService fileStorageService,
         IOptions<FormOptions> formOptions)
     {
         _mediator = mediator;
         _userProfileRepository = userProfileRepository;
+        _fileStorageService = fileStorageService;
         _maxResumeFileSizeBytes = formOptions.Value.MultipartBodyLengthLimit;
     }
 
@@ -75,18 +78,14 @@ public class UserProfilesController : ControllerBase
         if (!allowedExtensions.Contains(extension))
             return BadRequest(new { message = "Apenas arquivos .pdf são permitidos." });
 
-        var uploadsDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "resumes");
-        Directory.CreateDirectory(uploadsDir);
+        using var stream = resumeFile.OpenReadStream();
+        var objectKey = await _fileStorageService.UploadAsync(
+            stream,
+            Path.GetFileName(resumeFile.FileName),
+            resumeFile.ContentType,
+            cancellationToken: HttpContext.RequestAborted);
 
-        var fileName = $"{Guid.NewGuid()}_{Path.GetFileName(resumeFile.FileName)}";
-        var filePath = Path.Combine(uploadsDir, fileName);
-
-        using (var stream = new FileStream(filePath, FileMode.Create))
-        {
-            await resumeFile.CopyToAsync(stream);
-        }
-
-        var result = await _mediator.Send(new UploadResumeCommand(id, filePath));
+        var result = await _mediator.Send(new UploadResumeCommand(id, objectKey));
         return Ok(result);
     }
 

@@ -17,7 +17,7 @@ public class EmailSenderService : IEmailSenderService
     public async Task SendEmailWithAttachmentAsync(
         string toEmail, string toName,
         string subject, string body,
-        string attachmentPath, string attachmentFileName,
+        byte[] attachmentBytes, string attachmentFileName,
         string replyToEmail, string replyToName)
     {
         var message = new MimeMessage();
@@ -27,7 +27,7 @@ public class EmailSenderService : IEmailSenderService
         message.Subject = subject;
 
         var builder = new BodyBuilder { HtmlBody = body };
-        builder.Attachments.Add(attachmentFileName, await File.ReadAllBytesAsync(attachmentPath));
+        builder.Attachments.Add(attachmentFileName, attachmentBytes);
         message.Body = builder.ToMessageBody();
 
         using var client = new SmtpClient();

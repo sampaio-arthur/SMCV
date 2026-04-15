@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Minio;
 using SMCV.Application.Interfaces;
 using SMCV.Infrastructure.Data;
 using SMCV.Infrastructure.ExternalServices;
@@ -12,7 +13,8 @@ public static class InfrastructureServiceExtensions
     public static IServiceCollection AddInfrastructure(
         this IServiceCollection services,
         string connectionString,
-        Action<EmailSettings> configureEmail)
+        Action<EmailSettings> configureEmail,
+        Action<MinioSettings> configureMinio)
     {
         // Database
         services.AddDbContext<AppDbContext>(options =>
@@ -31,6 +33,24 @@ public static class InfrastructureServiceExtensions
 
         // Email Settings
         services.Configure(configureEmail);
+
+        // MinIO Settings
+        var minioSettings = new MinioSettings();
+        configureMinio(minioSettings);
+        services.AddSingleton(minioSettings);
+
+        // MinIO Client
+        services.AddSingleton<IMinioClient>(sp =>
+        {
+            return new MinioClient()
+                .WithEndpoint(minioSettings.Endpoint)
+                .WithCredentials(minioSettings.AccessKey, minioSettings.SecretKey)
+                .WithSSL(minioSettings.UseSSL)
+                .Build();
+        });
+
+        // File Storage Service
+        services.AddScoped<IFileStorageService, MinioFileStorageService>();
 
         return services;
     }

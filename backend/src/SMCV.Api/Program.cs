@@ -81,14 +81,23 @@ var connectionString = string.Join(";", [
 
 builder.Services.AddApplication();
 builder.Services.AddFeatures();
-builder.Services.AddInfrastructure(connectionString, opts =>
-{
-    opts.SmtpHost = RequiredSetting("SMTP_HOST");
-    opts.SmtpPort = int.Parse(RequiredSetting("SMTP_PORT"));
-    opts.SenderEmail = RequiredSetting("SMTP_SENDER_EMAIL");
-    opts.SenderPassword = RequiredSetting("SMTP_SENDER_PASSWORD");
-    opts.SenderName = RequiredSetting("SMTP_SENDER_NAME");
-});
+builder.Services.AddInfrastructure(connectionString,
+    email =>
+    {
+        email.SmtpHost = RequiredSetting("SMTP_HOST");
+        email.SmtpPort = int.Parse(RequiredSetting("SMTP_PORT"));
+        email.SenderEmail = RequiredSetting("SMTP_SENDER_EMAIL");
+        email.SenderPassword = RequiredSetting("SMTP_SENDER_PASSWORD");
+        email.SenderName = RequiredSetting("SMTP_SENDER_NAME");
+    },
+    minio =>
+    {
+        minio.Endpoint = RequiredSetting("MINIO_ENDPOINT");
+        minio.AccessKey = RequiredSetting("MINIO_ACCESS_KEY");
+        minio.SecretKey = RequiredSetting("MINIO_SECRET_KEY");
+        minio.BucketName = RequiredSetting("MINIO_BUCKET_NAME");
+        minio.UseSSL = bool.TryParse(Environment.GetEnvironmentVariable("MINIO_USE_SSL"), out var ssl) && ssl;
+    });
 
 // ─── Build & Pipeline ─────────────────────────────────────────────────────────
 var app = builder.Build();

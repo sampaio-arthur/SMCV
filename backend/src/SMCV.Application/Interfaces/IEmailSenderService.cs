@@ -7,7 +7,7 @@ public interface IEmailSenderService
         string toName,
         string subject,
         string body,
-        string attachmentPath,
+        byte[] attachmentBytes,
         string attachmentFileName,
         string replyToEmail,
         string replyToName);

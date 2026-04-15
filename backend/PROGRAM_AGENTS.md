@@ -31,7 +31,7 @@ O `Program.cs` NAO conhece implementacoes concretas de repositories ou services 
 |--------|---------|----------|
 | `AddApplication()` | `src/SMCV.Application/ApplicationServiceExtensions.cs` | AutoMapper (assembly scan) |
 | `AddFeatures()` | `src/SMCV.Features/FeaturesServiceExtensions.cs` | MediatR + FluentValidation (assembly scan) |
-| `AddInfrastructure(connectionString, configureEmail)` | `src/SMCV.Infrastructure/InfrastructureServiceExtensions.cs` | DbContext, Repositories, External Services, EmailSettings via IOptions |
+| `AddInfrastructure(connectionString, configureEmail, configureMinio)` | `src/SMCV.Infrastructure/InfrastructureServiceExtensions.cs` | DbContext, Repositories, External Services, EmailSettings via IOptions, MinIO (IMinioClient Singleton, MinioSettings Singleton, IFileStorageService Scoped) |
 
 ## COMO REGISTRAR NOVO RECURSO
 

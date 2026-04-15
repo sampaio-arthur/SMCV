@@ -12,6 +12,7 @@ public class SendCampaignEmailsCommandHandler : IRequestHandler<SendCampaignEmai
     private readonly IContactRepository _contactRepository;
     private readonly IEmailLogRepository _emailLogRepository;
     private readonly IEmailSenderService _emailSenderService;
+    private readonly IFileStorageService _fileStorageService;
     private readonly IUserRepository _userRepository;
     private readonly IUserProfileRepository _userProfileRepository;
 
@@ -20,6 +21,7 @@ public class SendCampaignEmailsCommandHandler : IRequestHandler<SendCampaignEmai
         IContactRepository contactRepository,
         IEmailLogRepository emailLogRepository,
         IEmailSenderService emailSenderService,
+        IFileStorageService fileStorageService,
         IUserRepository userRepository,
         IUserProfileRepository userProfileRepository)
     {
@@ -27,6 +29,7 @@ public class SendCampaignEmailsCommandHandler : IRequestHandler<SendCampaignEmai
         _contactRepository = contactRepository;
         _emailLogRepository = emailLogRepository;
         _emailSenderService = emailSenderService;
+        _fileStorageService = fileStorageService;
         _userRepository = userRepository;
         _userProfileRepository = userProfileRepository;
     }
@@ -60,13 +63,16 @@ public class SendCampaignEmailsCommandHandler : IRequestHandler<SendCampaignEmai
 
                 try
                 {
+                    var resumeBytes = await _fileStorageService.DownloadAsync(userProfile.ResumeFilePath!);
+                    var resumeFileName = userProfile.ResumeFilePath!.Split('/').Last();
+
                     await _emailSenderService.SendEmailWithAttachmentAsync(
                         toEmail: contact.Email,
                         toName: contact.CompanyName,
                         subject: campaign.EmailSubject,
                         body: campaign.EmailBody,
-                        attachmentPath: userProfile.ResumeFilePath,
-                        attachmentFileName: Path.GetFileName(userProfile.ResumeFilePath),
+                        attachmentBytes: resumeBytes,
+                        attachmentFileName: resumeFileName,
                         replyToEmail: user.Email,
                         replyToName: user.Name);
 

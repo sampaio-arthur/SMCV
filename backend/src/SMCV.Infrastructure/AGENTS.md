@@ -31,7 +31,9 @@ src/SMCV.Infrastructure/
 └── ExternalServices/
     ├── CsvExportService.cs
     ├── EmailSenderService.cs
-    └── EmailSettings.cs
+    ├── EmailSettings.cs
+    ├── MinioFileStorageService.cs
+    └── MinioSettings.cs
 ```
 
 ## ARQUIVOS EXISTENTES
@@ -58,9 +60,11 @@ src/SMCV.Infrastructure/
 
 | Arquivo | Interface | Descricao |
 |---------|-----------|-----------|
-| `EmailSenderService.cs` | `IEmailSenderService` | Envio de email SMTP via MailKit com suporte a anexos. From usa SMTP SenderEmail, Reply-To usa replyToEmail/replyToName do usuario. Configurado via `EmailSettings`. |
+| `EmailSenderService.cs` | `IEmailSenderService` | Envio de email SMTP via MailKit com suporte a anexos via byte[]. From usa SMTP SenderEmail, Reply-To usa replyToEmail/replyToName do usuario. Configurado via `EmailSettings`. |
 | `CsvExportService.cs` | `ICsvExportService` | Geracao de CSV com colunas CompanyName, Email, EmailStatus, CampaignId. Escaping e UTF-8 BOM. |
 | `EmailSettings.cs` | — | Classe de configuracao SMTP: host, port, sender email/password/name. Bind via `IOptions<EmailSettings>`. |
+| `MinioFileStorageService.cs` | `IFileStorageService` | Upload/download de arquivos via MinIO SDK. Cria bucket automaticamente se nao existir. Object keys no formato `resumes/{guid}_{filename}`. |
+| `MinioSettings.cs` | — | Classe de configuracao MinIO: Endpoint, AccessKey, SecretKey, BucketName, UseSSL. Injetada como Singleton. |
 
 ## REGRAS OBRIGATORIAS — Repositories
 

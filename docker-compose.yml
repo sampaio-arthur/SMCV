@@ -14,6 +14,22 @@ services:
     networks:
       - app-network
 
+  minio:
+    image: minio/minio:latest
+    container_name: minio
+    restart: always
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ACCESS_KEY}
+      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY}
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio-data:/data
+    networks:
+      - app-network
+
   backend:
     build: ./backend
     container_name: backend
@@ -22,6 +38,7 @@ services:
       - "8080:8080"
     depends_on:
       - db
+      - minio
     environment:
       DB_HOST: ${DB_HOST}
       DB_PORT: ${DB_PORT}
@@ -33,6 +50,11 @@ services:
       SMTP_SENDER_EMAIL: ${SMTP_SENDER_EMAIL}
       SMTP_SENDER_PASSWORD: ${SMTP_SENDER_PASSWORD}
       SMTP_SENDER_NAME: ${SMTP_SENDER_NAME}
+      MINIO_ENDPOINT: minio:9000
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
+      MINIO_BUCKET_NAME: ${MINIO_BUCKET_NAME}
+      MINIO_USE_SSL: "false"
     networks:
       - app-network
 
@@ -49,6 +71,7 @@ services:
 
 volumes:
   db-data:
+  minio-data:
 
 networks:
   app-network:
