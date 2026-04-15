@@ -45,7 +45,7 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> Me()
     {
         var userId = HttpContext.Session.GetString("userId");
-        if (userId is null) return Unauthorized();
+        if (userId is null) return Ok(null);
 
         var result = await _mediator.Send(new GetCurrentUserQuery(Guid.Parse(userId)));
         return Ok(result);
