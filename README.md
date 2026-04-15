@@ -6,16 +6,19 @@ Sistema de prospecção automatizada de empregos via e-mail. Permite gerenciamen
 
 Automatiza o processo de organizar campanhas de e-mail e enviar currículos em massa — reduzindo o tempo de prospecção de horas para minutos.
 
+---
+
 ## Pré-requisitos
 
 - Docker e Docker Compose
 - Conta Gmail (para envio de e-mails via SMTP)
+- [Mais Informações](https://www.docker.com/products/docker-desktop/)
+
+---
 
 ## Configuração
 
 ### 1. Criar o arquivo `.env`
-
-Copie o arquivo de exemplo:
 
 ```bash
 cp .env.example .env
@@ -37,20 +40,18 @@ POSTGRES_USER=postgres
 POSTGRES_PASSWORD=sua_senha_segura
 ```
 
-> `DB_HOST` deve ser `db` (nome do serviço no Docker Compose).
+> `DB_HOST` deve ser `db` (nome do serviço no Docker Compose).  
 > `DB_PASSWORD` e `POSTGRES_PASSWORD` devem ser iguais.
 
 ### 3. Configurar e-mail SMTP (Gmail)
 
-O sistema usa SMTP para enviar e-mails. Para usar o Gmail, você precisa gerar uma **Senha de App** (App Password):
+O sistema usa SMTP para enviar e-mails. Para usar o Gmail, você precisa gerar uma **Senha de App**:
 
-1. Acesse sua conta Google em [myaccount.google.com](https://myaccount.google.com)
-2. Vá em **Segurança**
-3. Na seção **Como fazer login no Google**, ative a **Verificação em duas etapas** (obrigatório)
-4. Depois de ativar, volte em **Segurança** → **Verificação em duas etapas** → **Senhas de app** (no final da página)
-5. Crie uma nova senha de app selecionando **Outro** e dando um nome (ex: "Job Prospector")
-6. O Google vai gerar uma senha de 16 caracteres (ex: `abcd efgh ijkl mnop`)
-7. Copie essa senha e cole no `.env` **sem espaços**
+1. Acesse [myaccount.google.com](https://myaccount.google.com)
+2. Vá em **Segurança** → **Verificação em duas etapas** e ative (obrigatório)
+3. Após ativar, vá em **Segurança** → **Verificação em duas etapas** → **Senhas de app** (no final da página)
+4. Crie uma senha de app com nome "Job Prospector"
+5. O Google vai gerar uma senha de 16 caracteres — copie **sem espaços**
 
 ```env
 SMTP_HOST=smtp.gmail.com
@@ -60,8 +61,26 @@ SMTP_SENDER_PASSWORD=abcdefghijklmnop
 SMTP_SENDER_NAME=Job Prospector
 ```
 
-> **Nunca use sua senha pessoal do Google.** Use sempre a Senha de App gerada.
+> **Nunca use sua senha pessoal do Google.** Use sempre a Senha de App.  
 > **Nunca commite o arquivo `.env`.**
+
+### 4. Configurar o MinIO (armazenamento de currículos)
+
+O MinIO é o servidor de armazenamento de arquivos. Sobe automaticamente junto com o Docker Compose — não é necessário instalar nada separado.
+
+Defina as credenciais no `.env`:
+
+```env
+MINIO_ACCESS_KEY=minioadmin
+MINIO_SECRET_KEY=minioadmin
+MINIO_BUCKET_NAME=smcv-resumes
+```
+
+> Os valores acima são os padrão para desenvolvimento local. Em produção, use valores seguros.  
+> O bucket (`smcv-resumes`) é criado automaticamente na primeira vez que um currículo é enviado.  
+> A interface web do MinIO fica disponível em `http://localhost:9001` (opcional — apenas para visualização dos arquivos).
+
+---
 
 ## Execução
 
@@ -69,13 +88,14 @@ SMTP_SENDER_NAME=Job Prospector
 docker-compose up -d --build
 ```
 
-O Docker Compose sobe os três serviços (banco, backend e frontend). O banco é criado e as migrations são aplicadas automaticamente no startup.
+O Docker Compose sobe quatro serviços: banco de dados, MinIO, backend e frontend. As migrations são aplicadas automaticamente no startup do backend.
 
-| Serviço     | URL                           |
-| ----------- | ----------------------------- |
-| Frontend    | http://localhost:3000         |
-| Backend API | http://localhost:8080         |
-| Swagger     | http://localhost:8080/swagger |
+| Serviço       | URL                           |
+| ------------- | ----------------------------- |
+| Frontend      | http://localhost:3000         |
+| Backend API   | http://localhost:8080         |
+| Swagger       | http://localhost:8080/swagger |
+| MinIO Console | http://localhost:9001         |
 
 Para parar:
 
@@ -83,11 +103,13 @@ Para parar:
 docker-compose down
 ```
 
+---
+
 ## Endpoints
 
 Documentação interativa disponível em `/swagger`.
 
-Autenticação via sessão (email + senha). Endpoints de auth:
+Autenticação via sessão (email + senha).
 
 | Método | Rota                                   | Descrição                         |
 | ------ | -------------------------------------- | --------------------------------- |
@@ -109,7 +131,7 @@ Autenticação via sessão (email + senha). Endpoints de auth:
 | DELETE | `/api/userprofiles/{id}`               | Excluir perfil                    |
 | GET    | `/api/campaigns`                       | Listar campanhas                  |
 | GET    | `/api/campaigns/{id}`                  | Detalhes da campanha com contatos |
-| POST   | `/api/campaigns`                       | Criar campanha (JSON)             |
+| POST   | `/api/campaigns`                       | Criar campanha                    |
 | PUT    | `/api/campaigns/{id}`                  | Atualizar campanha                |
 | DELETE | `/api/campaigns/{id}`                  | Excluir campanha                  |
 | POST   | `/api/campaigns/{id}/send`             | Disparar e-mails da campanha      |
@@ -121,6 +143,8 @@ Autenticação via sessão (email + senha). Endpoints de auth:
 | DELETE | `/api/contacts/{id}`                   | Excluir contato                   |
 | GET    | `/api/emaillogs/contact/{contactId}`   | Log de e-mail por contato         |
 | GET    | `/api/emaillogs/campaign/{campaignId}` | Logs de e-mail por campanha       |
+
+---
 
 ## Diagrama de Entidades
 
@@ -137,7 +161,7 @@ User (1) ──────────────── (1) UserProfile
 User                UserProfile          Campaign
 ├─ Id               ├─ Id                ├─ Id
 ├─ Name             ├─ UserId (FK)       ├─ UserId (FK)
-├─ Email (UNIQUE)   ├─ ResumeFilePath    ├─ Name
+├─ Email (UNIQUE)   ├─ ResumeFilePath*   ├─ Name
 ├─ PasswordHash     └─ CreatedAt         ├─ Niche
 └─ CreatedAt                             ├─ Region
                                          ├─ EmailSubject
@@ -151,13 +175,20 @@ Contact              EmailLog            ├─ EmailBody
 └─ CreatedAt
 ```
 
+> `*` `ResumeFilePath` armazena a object key do arquivo no MinIO (ex: `resumes/abc-123_curriculo.pdf`). O arquivo binário fica no MinIO, não no banco.
+
+---
+
 ## Stack
 
 - **Backend:** ASP.NET Core 9, EF Core, MediatR (CQRS), AutoMapper, FluentValidation, MailKit, BCrypt
 - **Frontend:** React 19, Vite, Tailwind CSS
 - **Banco:** PostgreSQL 15+
+- **Storage:** MinIO (armazenamento de currículos em PDF)
 - **Auth:** Sessão simples (email + senha com BCrypt)
 - **Infra:** Docker Compose
+
+---
 
 ## Limitações Conhecidas
 
@@ -166,69 +197,60 @@ Contact              EmailLog            ├─ EmailBody
 
 ---
 
-## Arquitetura do Backend — Decisões Estruturais
+## Arquitetura do Backend
 
-O objetivo é alinhar o projeto com práticas adotadas em equipes de mercado, mesmo sendo um projeto de menor porte onde parte dessa estrutura seria opcional.
+O backend é dividido em 6 projetos independentes dentro de `backend/src/`:
 
-### Separação em múltiplos projetos (.csproj)
+| Projeto               | Responsabilidade                                                     |
+| --------------------- | -------------------------------------------------------------------- |
+| `SMCV.Api`            | Host HTTP — controllers, middleware, pipeline, Program.cs            |
+| `SMCV.Application`    | Contratos (interfaces), DTOs e mappings — sem implementação concreta |
+| `SMCV.Domain`         | Entidades de banco e enums — zero dependência externa                |
+| `SMCV.Infrastructure` | Implementações concretas — DbContext, repositories, SMTP, MinIO, CSV |
+| `SMCV.Features`       | Handlers CQRS (MediatR), validators (FluentValidation)               |
+| `SMCV.Common`         | Utilitários transversais — exceções, middleware                      |
 
-O backend foi dividido em 6 projetos independentes dentro de `backend/src/`:
+O fluxo de uma requisição segue: `Controller → MediatR Handler → Repository → PostgreSQL`.  
+Armazenamento de arquivos: `Controller → IFileStorageService → MinIO`.
 
-| Projeto               | Responsabilidade                                                           |
-| --------------------- | -------------------------------------------------------------------------- |
-| `SMCV.Api`            | Host HTTP — controllers, middleware, pipeline, Program.cs                  |
-| `SMCV.Application`    | Contratos (interfaces), DTOs e mappings — sem implementação concreta       |
-| `SMCV.Domain`         | Entidades de banco e enums — zero dependência externa                      |
-| `SMCV.Infrastructure` | Implementações concretas — DbContext, repositories, serviços SMTP/CSV      |
-| `SMCV.Features`       | Handlers CQRS (MediatR), validators (FluentValidation) — lógica de negócio |
-| `SMCV.Common`         | Utilitários transversais — Result pattern, exceções, middleware            |
+---
 
-Cada projeto define um **boundary de compilação**, o que significa que o compilador impede violações de arquitetura automaticamente. Por exemplo, `SMCV.Domain` não consegue referenciar `SMCV.Infrastructure` — se alguém tentar usar o `DbContext` dentro de uma entidade, o código simplesmente não compila. Em um projeto monolítico, essa restrição existiria apenas como convenção (facilmente quebrada).
-
-Em projetos .NET de médio/grande porte, essa separação é padrão (Clean Architecture, Onion Architecture, Hexagonal). Permite que equipes diferentes trabalhem em camadas diferentes com menor risco de conflito e facilita a adoção futura de testes unitários por camada.
-
-### Solution file (.slnx)
-
-O `.slnx` (formato XML simplificado do .NET 9+), agrupa os 6 projetos em um único ponto de build:
+## Comandos úteis
 
 ```bash
-dotnet build SMCV.slnx    # compila tudo de uma vez
+# Subir o stack completo
+docker-compose up -d --build
+
+# Parar
+docker-compose down
+
+# Ver logs do backend
+docker-compose logs -f backend
+
+# Rodar build manual (requer .NET 9 SDK)
+dotnet build backend/SMCV.slnx
+
+# Gerar nova migration
+dotnet ef migrations add NomeDaMigration \
+  --project backend/src/SMCV.Infrastructure \
+  --startup-project backend/src/SMCV.Api
 ```
 
-### Central Package Management (Directory.Packages.props)
+---
 
-Todas as versões de pacotes NuGet são definidas em um único arquivo `Directory.Packages.props` na raiz do backend. Cada `.csproj` apenas declara **qual** pacote usa, sem repetir a versão:
+## Colaboradores
 
-```xml
-<!-- No .csproj: sem versão -->
-<PackageReference Include="MediatR" />
+| Nome                        | Responsabilidade                      |
+| --------------------------- | ------------------------------------- |
+| Arthur Sampaio (aluno)      | Backend, arquitetura e banco de dados |
+| Matheus Cataneu (professor) | Backend e arquitetura                 |
+| Davi (aluno)                | Frontend                              |
 
-<!-- No Directory.Packages.props: versão centralizada -->
-<PackageVersion Include="MediatR" Version="12.4.1" />
-```
+---
 
-Sem essa centralização, cada projeto pode acabar em versões diferentes do mesmo pacote (um com MediatR 12.0, outro com 12.4), causando bugs sutis em runtime. Em solutions com dezenas de projetos, é considerada prática padrão.
+## Uso de Agentes de IA
 
-### Directory.Build.props (configuração compartilhada)
+Este projeto contou com o auxílio de agentes de inteligência artificial como suporte ao desenvolvimento. As ferramentas utilizadas foram:
 
-Propriedades comuns como `TargetFramework`, `Nullable` e `ImplicitUsings` são definidas uma única vez em `Directory.Build.props` e herdadas por todos os projetos. Isso evita duplicação e garante consistência.
-
-### Startup Modules (extension methods de DI)
-
-Cada camada registra seus próprios serviços no container de injeção de dependência, em vez de concentrar tudo no `Program.cs`:
-
-| Módulo                               | Arquivo                              | O que registra                                            |
-| ------------------------------------ | ------------------------------------ | --------------------------------------------------------- |
-| `AddApplication()`                   | `ApplicationServiceExtensions.cs`    | AutoMapper                                                |
-| `AddFeatures()`                      | `FeaturesServiceExtensions.cs`       | MediatR + FluentValidation                                |
-| `AddInfrastructure(conn, emailOpts)` | `InfrastructureServiceExtensions.cs` | DbContext, repositories, services externos, EmailSettings |
-
-o `Program.cs` só conhece os módulos:
-
-```csharp
-builder.Services.AddApplication();
-builder.Services.AddFeatures();
-builder.Services.AddInfrastructure(connectionString, opts => { ... });
-```
-
-Isso completa a separação em projetos. Sem os startup modules, o `Program.cs` (que fica no `Api`) precisaria conhecer todas as classes concretas do `Infrastructure`, anulando o benefício do boundary de compilação. Com essa abordagem, cada camada é autônoma: ao criar um repositório novo, basta registrá-lo no extension method da própria camada, sem tocar no `Program.cs`.
+- **Claude (Anthropic)** — utilizado como arquiteto e tech lead assistido por IA, apoiando decisões de arquitetura, modelagem de domínio, definição de padrões de código e geração de prompts estruturados para agentes de codificação
+- **Claude Code** — agente de codificação utilizado para aplicar refatorações em arquivos do projeto a partir de prompts gerados pelo Claude, executando alterações cirúrgicas e rastreáveis por camada
