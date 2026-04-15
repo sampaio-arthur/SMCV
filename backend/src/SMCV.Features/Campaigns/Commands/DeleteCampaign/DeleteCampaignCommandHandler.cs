@@ -5,7 +5,7 @@ using SMCV.Domain.Enums;
 
 namespace SMCV.Features.Campaigns.Commands.DeleteCampaign;
 
-public class DeleteCampaignCommandHandler : IRequestHandler<DeleteCampaignCommand>
+public class DeleteCampaignCommandHandler : IRequestHandler<DeleteCampaignCommand, bool>
 {
     private readonly ICampaignRepository _campaignRepository;
 
@@ -14,7 +14,7 @@ public class DeleteCampaignCommandHandler : IRequestHandler<DeleteCampaignComman
         _campaignRepository = campaignRepository;
     }
 
-    public async Task Handle(DeleteCampaignCommand request, CancellationToken cancellationToken)
+    public async Task<bool> Handle(DeleteCampaignCommand request, CancellationToken cancellationToken)
     {
         var campaign = await _campaignRepository.GetByIdAsync(request.Id)
             ?? throw new NotFoundException("Campaign", request.Id);
@@ -23,5 +23,6 @@ public class DeleteCampaignCommandHandler : IRequestHandler<DeleteCampaignComman
             throw new InvalidOperationException("Campanha em execução não pode ser deletada.");
 
         await _campaignRepository.DeleteAsync(campaign);
+        return true;
     }
 }

@@ -72,12 +72,12 @@ public class CampaignsController : ControllerBase
     }
 
     [HttpDelete("{id:guid}")]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete(Guid id)
     {
-        await _mediator.Send(new DeleteCampaignCommand(id));
-        return NoContent();
+        var result = await _mediator.Send(new DeleteCampaignCommand(id));
+        return Ok(result);
     }
 
     [HttpPost("{id:guid}/send")]
