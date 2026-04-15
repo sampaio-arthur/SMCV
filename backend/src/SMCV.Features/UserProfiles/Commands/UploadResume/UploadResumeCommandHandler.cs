@@ -9,11 +9,16 @@ namespace SMCV.Features.UserProfiles.Commands.UploadResume;
 public class UploadResumeCommandHandler : IRequestHandler<UploadResumeCommand, UserProfileResponse>
 {
     private readonly IUserProfileRepository _userProfileRepository;
+    private readonly IFileStorageService _fileStorageService;
     private readonly IMapper _mapper;
 
-    public UploadResumeCommandHandler(IUserProfileRepository userProfileRepository, IMapper mapper)
+    public UploadResumeCommandHandler(
+        IUserProfileRepository userProfileRepository,
+        IFileStorageService fileStorageService,
+        IMapper mapper)
     {
         _userProfileRepository = userProfileRepository;
+        _fileStorageService = fileStorageService;
         _mapper = mapper;
     }
 
@@ -21,6 +26,9 @@ public class UploadResumeCommandHandler : IRequestHandler<UploadResumeCommand, U
     {
         var profile = await _userProfileRepository.GetByIdAsync(request.Id)
             ?? throw new NotFoundException("UserProfile", request.Id);
+
+        if (!string.IsNullOrEmpty(profile.ResumeFilePath))
+            await _fileStorageService.DeleteAsync(profile.ResumeFilePath, cancellationToken);
 
         profile.ResumeFilePath = request.ResumeFilePath;
 
