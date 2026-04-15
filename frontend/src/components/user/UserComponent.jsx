@@ -47,20 +47,20 @@ function UserComponent({ items = [], onCreate, onUpdate, onDelete }) {
     <div className="space-y-4">
       {/* Toolbar */}
       <div className="flex justify-between items-center">
-        <p className="text-sm text-gray-600">{items.length} usuario(s)</p>
+        <p className="text-sm text-gray-600">{items.length} usuário(s)</p>
         <button
           onClick={() => { setEditing(null); setFormData(emptyForm); setShowForm(true); }}
           className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
         >
           <Plus className="w-4 h-4" />
-          Novo Usuario
+          Novo Usuário
         </button>
       </div>
 
       {/* Form */}
       {showForm && (
         <form onSubmit={handleSubmit} className="bg-white p-4 rounded-lg border border-gray-200 space-y-3">
-          <h3 className="font-semibold text-gray-800">{editing ? 'Editar Usuario' : 'Novo Usuario'}</h3>
+          <h3 className="font-semibold text-gray-800">{editing ? 'Editar Usuário' : 'Novo Usuário'}</h3>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Nome *</label>
@@ -110,9 +110,9 @@ function UserComponent({ items = [], onCreate, onUpdate, onDelete }) {
       {/* List */}
       {items.length === 0 ? (
         <EmptyState
-          title="Nenhum usuario encontrado"
-          description="Crie o primeiro usuario para comecar."
-          actionLabel="Novo Usuario"
+          title="Nenhum usuário encontrado"
+          description="Crie o primeiro usuário para começar."
+          actionLabel="Novo Usuário"
           onAction={() => { setEditing(null); setFormData(emptyForm); setShowForm(true); }}
         />
       ) : (
@@ -123,7 +123,7 @@ function UserComponent({ items = [], onCreate, onUpdate, onDelete }) {
                 <th className="px-4 py-3 text-left font-semibold text-gray-600">Nome</th>
                 <th className="px-4 py-3 text-left font-semibold text-gray-600">E-mail</th>
                 <th className="px-4 py-3 text-left font-semibold text-gray-600">Criado em</th>
-                <th className="px-4 py-3 text-right font-semibold text-gray-600">Acoes</th>
+                <th className="px-4 py-3 text-right font-semibold text-gray-600">Ações</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -157,8 +157,8 @@ function UserComponent({ items = [], onCreate, onUpdate, onDelete }) {
 
       <ConfirmDialog
         {...dialogProps}
-        title="Excluir usuario"
-        message="Tem certeza que deseja excluir este usuario? Esta acao nao pode ser desfeita."
+        title="Excluir usuário"
+        message="Tem certeza que deseja excluir este usuário? Esta ação não pode ser desfeita."
       />
     </div>
   );

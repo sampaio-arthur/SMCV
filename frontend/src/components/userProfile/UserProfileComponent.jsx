@@ -54,7 +54,7 @@ function UserProfileComponent({ items = [], users = [], onCreate, onDelete, onUp
       {items.length === 0 ? (
         <EmptyState
           title="Nenhum perfil encontrado"
-          description="Crie seu perfil para configurar o curriculo."
+          description="Crie seu perfil para configurar o currículo."
           actionLabel="Criar Meu Perfil"
           onAction={handleCreate}
         />
@@ -63,10 +63,10 @@ function UserProfileComponent({ items = [], users = [], onCreate, onDelete, onUp
           <table className="w-full text-sm">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
-                <th className="px-4 py-3 text-left font-semibold text-gray-600">Usuario</th>
-                <th className="px-4 py-3 text-left font-semibold text-gray-600">Curriculo</th>
+                <th className="px-4 py-3 text-left font-semibold text-gray-600">Usuário</th>
+                <th className="px-4 py-3 text-left font-semibold text-gray-600">Currículo</th>
                 <th className="px-4 py-3 text-left font-semibold text-gray-600">Criado em</th>
-                <th className="px-4 py-3 text-right font-semibold text-gray-600">Acoes</th>
+                <th className="px-4 py-3 text-right font-semibold text-gray-600">Ações</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -82,7 +82,7 @@ function UserProfileComponent({ items = [], users = [], onCreate, onDelete, onUp
                     <td className="px-4 py-3 text-right">
                       <label
                         className="inline-flex p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors mr-1 cursor-pointer"
-                        title="Enviar curriculo (PDF)"
+                        title="Enviar currículo (PDF)"
                       >
                         <Upload className="w-4 h-4" />
                         <input
@@ -111,7 +111,7 @@ function UserProfileComponent({ items = [], users = [], onCreate, onDelete, onUp
       <ConfirmDialog
         {...dialogProps}
         title="Excluir perfil"
-        message="Tem certeza que deseja excluir este perfil? Esta acao nao pode ser desfeita."
+        message="Tem certeza que deseja excluir este perfil? Esta ação não pode ser desfeita."
       />
     </div>
   );

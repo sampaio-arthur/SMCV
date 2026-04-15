@@ -24,7 +24,7 @@ function CampaignPage() {
       const data = await getAll();
       setItems(data);
     } catch (err) {
-      toastErrorRef.current(await getErrorMessage(err, 'Nao foi possivel carregar as campanhas. Verifique se a API esta em execucao.'));
+      toastErrorRef.current(await getErrorMessage(err, 'Não foi possível carregar as campanhas. Verifique se a API está em execução.'));
     } finally {
       setLoading(false);
     }
@@ -40,7 +40,7 @@ function CampaignPage() {
       setItems(prev => [...prev, novaCampanha]);
       toastSuccess('Campanha criada com sucesso!');
     } catch (err) {
-      toastError(await getErrorMessage(err, 'Nao foi possivel criar a campanha.'));
+      toastError(await getErrorMessage(err, 'Não foi possível criar a campanha.'));
     }
   };
 
@@ -50,7 +50,7 @@ function CampaignPage() {
       setItems(prev => prev.map(c => c.id === id ? campanhaAtualizada : c));
       toastSuccess('Campanha atualizada com sucesso!');
     } catch (err) {
-      toastError(await getErrorMessage(err, 'Nao foi possivel atualizar a campanha.'));
+      toastError(await getErrorMessage(err, 'Não foi possível atualizar a campanha.'));
     }
   };
 
@@ -58,9 +58,9 @@ function CampaignPage() {
     try {
       await remove(id);
       setItems(prev => prev.filter(c => c.id !== id));
-      toastSuccess('Campanha excluida com sucesso!');
+      toastSuccess('Campanha excluída com sucesso!');
     } catch (err) {
-      toastError(await getErrorMessage(err, 'Nao foi possivel excluir a campanha.'));
+      toastError(await getErrorMessage(err, 'Não foi possível excluir a campanha.'));
     }
   };
 
@@ -118,7 +118,7 @@ function CampaignPage() {
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-800">Campanhas</h1>
         <p className="text-gray-500 text-sm mt-1">
-          Crie e gerencie campanhas de envio de curriculo.
+          Crie e gerencie campanhas de envio de currículo.
         </p>
       </div>
 

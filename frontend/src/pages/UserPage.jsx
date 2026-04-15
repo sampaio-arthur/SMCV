@@ -21,7 +21,7 @@ function UserPage() {
       const data = await getAll();
       setItems(data);
     } catch (err) {
-      toastErrorRef.current(await getErrorMessage(err, 'Nao foi possivel carregar os usuarios. Verifique se a API esta em execucao.'));
+      toastErrorRef.current(await getErrorMessage(err, 'Não foi possível carregar os usuários. Verifique se a API está em execução.'));
     } finally {
       setLoading(false);
     }
@@ -35,9 +35,9 @@ function UserPage() {
     try {
       const novoUsuario = await create(item);
       setItems(prev => [...prev, novoUsuario]);
-      toastSuccess('Usuario criado com sucesso!');
+      toastSuccess('Usuário criado com sucesso!');
     } catch (err) {
-      toastError(await getErrorMessage(err, 'Nao foi possivel criar o usuario.'));
+      toastError(await getErrorMessage(err, 'Não foi possível criar o usuário.'));
     }
   };
 
@@ -45,9 +45,9 @@ function UserPage() {
     try {
       const usuarioAtualizado = await update(id, item);
       setItems(prev => prev.map(u => u.id === id ? usuarioAtualizado : u));
-      toastSuccess('Usuario atualizado com sucesso!');
+      toastSuccess('Usuário atualizado com sucesso!');
     } catch (err) {
-      toastError(await getErrorMessage(err, 'Nao foi possivel atualizar o usuario.'));
+      toastError(await getErrorMessage(err, 'Não foi possível atualizar o usuário.'));
     }
   };
 
@@ -55,18 +55,18 @@ function UserPage() {
     try {
       await remove(id);
       setItems(prev => prev.filter(u => u.id !== id));
-      toastSuccess('Usuario excluido com sucesso!');
+      toastSuccess('Usuário excluído com sucesso!');
     } catch (err) {
-      toastError(await getErrorMessage(err, 'Nao foi possivel excluir o usuario.'));
+      toastError(await getErrorMessage(err, 'Não foi possível excluir o usuário.'));
     }
   };
 
   return (
     <div className="p-6">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">Usuarios</h1>
+        <h1 className="text-2xl font-bold text-gray-800">Usuários</h1>
         <p className="text-gray-500 text-sm mt-1">
-          Gerencie os usuarios da plataforma.
+          Gerencie os usuários da plataforma.
         </p>
       </div>
 

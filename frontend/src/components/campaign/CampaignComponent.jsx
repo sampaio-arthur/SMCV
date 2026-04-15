@@ -9,7 +9,7 @@ import { useConfirm } from '../../hooks/useConfirm';
 const campaignStatusConfig = {
   Draft: { label: 'Rascunho', bg: 'bg-gray-100', text: 'text-gray-600' },
   Running: { label: 'Enviando', bg: 'bg-yellow-100', text: 'text-yellow-700', extra: 'animate-pulse' },
-  Completed: { label: 'Concluido', bg: 'bg-green-100', text: 'text-green-700' },
+  Completed: { label: 'Concluído', bg: 'bg-green-100', text: 'text-green-700' },
   Cancelled: { label: 'Cancelado', bg: 'bg-gray-100', text: 'text-gray-500' },
   Failed: { label: 'Falhou', bg: 'bg-red-100', text: 'text-red-700' },
   PartialSuccess: { label: 'Parcial', bg: 'bg-orange-100', text: 'text-orange-700' },
@@ -18,7 +18,7 @@ const campaignStatusConfig = {
 const statusFilters = [
   { value: '', label: 'Todas' },
   { value: 'Draft', label: 'Rascunho' },
-  { value: 'Completed', label: 'Concluido' },
+  { value: 'Completed', label: 'Concluído' },
   { value: 'Cancelled', label: 'Cancelado' },
   { value: 'Failed', label: 'Falhou' },
   { value: 'PartialSuccess', label: 'Parcial' },
@@ -172,7 +172,7 @@ function CampaignComponent({
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Ex: Devs Floripa - Marco 2026"
+              placeholder="Ex: Devs Floripa - Março 2026"
             />
           </div>
 
@@ -190,14 +190,14 @@ function CampaignComponent({
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Regiao *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Região *</label>
                 <input
                   type="text"
                   required
                   value={formData.region}
                   onChange={(e) => setFormData({ ...formData, region: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Ex: Florianopolis - SC"
+                  placeholder="Ex: Florianópolis - SC"
                 />
               </div>
             </div>
@@ -211,7 +211,7 @@ function CampaignComponent({
               value={formData.emailSubject}
               onChange={(e) => setFormData({ ...formData, emailSubject: e.target.value })}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Ex: Curriculo - Desenvolvedor Full Stack"
+              placeholder="Ex: Currículo - Desenvolvedor Full Stack"
             />
           </div>
 
@@ -250,7 +250,7 @@ function CampaignComponent({
       {filteredItems.length === 0 ? (
         <EmptyState
           title="Nenhuma campanha encontrada"
-          description={statusFilter ? 'Nenhuma campanha com este status.' : 'Crie a primeira campanha para comecar.'}
+          description={statusFilter ? 'Nenhuma campanha com este status.' : 'Crie a primeira campanha para começar.'}
           actionLabel={statusFilter ? undefined : 'Nova Campanha'}
           onAction={statusFilter ? undefined : () => { setEditing(null); setFormData(emptyForm); setShowForm(true); }}
         />
@@ -261,11 +261,11 @@ function CampaignComponent({
               <tr>
                 <th className="px-4 py-3 text-left font-semibold text-gray-600">Nome</th>
                 <th className="px-4 py-3 text-left font-semibold text-gray-600">Nicho</th>
-                <th className="px-4 py-3 text-left font-semibold text-gray-600">Regiao</th>
+                <th className="px-4 py-3 text-left font-semibold text-gray-600">Região</th>
                 <th className="px-4 py-3 text-left font-semibold text-gray-600">Status</th>
                 <th className="px-4 py-3 text-left font-semibold text-gray-600">Contatos</th>
                 <th className="px-4 py-3 text-left font-semibold text-gray-600">Criado em</th>
-                <th className="px-4 py-3 text-right font-semibold text-gray-600">Acoes</th>
+                <th className="px-4 py-3 text-right font-semibold text-gray-600">Ações</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -301,7 +301,7 @@ function CampaignComponent({
                       onClick={() => handleEdit(item)}
                       disabled={isLocked(item.status) || isCampaignSending(item)}
                       className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors mr-1 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:text-gray-400 disabled:hover:bg-transparent"
-                      title={isLocked(item.status) || isCampaignSending(item) ? 'Edicao bloqueada' : 'Editar'}
+                      title={isLocked(item.status) || isCampaignSending(item) ? 'Edição bloqueada' : 'Editar'}
                     >
                       <Pencil className="w-4 h-4" />
                     </button>
@@ -309,7 +309,7 @@ function CampaignComponent({
                       onClick={() => confirm(() => onDelete(item.id))}
                       disabled={isCampaignSending(item)}
                       className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:text-gray-400 disabled:hover:bg-transparent"
-                      title={isCampaignSending(item) ? 'Exclusao bloqueada durante envio' : 'Excluir'}
+                      title={isCampaignSending(item) ? 'Exclusão bloqueada durante envio' : 'Excluir'}
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -324,7 +324,7 @@ function CampaignComponent({
       <ConfirmDialog
         {...dialogProps}
         title="Excluir campanha"
-        message="Tem certeza que deseja excluir esta campanha? Esta acao nao pode ser desfeita."
+        message="Tem certeza que deseja excluir esta campanha? Esta ação não pode ser desfeita."
       />
     </div>
   );

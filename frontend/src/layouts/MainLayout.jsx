@@ -5,7 +5,7 @@ import { useAuth } from '../hooks/useAuth';
 const navItems = [
   { to: '/campaign', label: 'Campanhas', icon: Megaphone },
   { to: '/contact', label: 'Contatos', icon: Users },
-  { to: '/user', label: 'Usuarios', icon: UserCircle },
+  { to: '/user', label: 'Usuários', icon: UserCircle },
   { to: '/user-profile', label: 'Perfis', icon: Settings },
 ];
 
@@ -24,7 +24,7 @@ function MainLayout() {
 
         <nav className="flex-1 p-4">
           <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
-            Navegacao
+            Navegação
           </p>
           <ul className="space-y-1">
             {navItems.map((item) => {

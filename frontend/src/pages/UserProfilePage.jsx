@@ -24,7 +24,7 @@ function UserProfilePage() {
       setItems(profiles);
       setUsers(userList);
     } catch (err) {
-      toastErrorRef.current(await getErrorMessage(err, 'Nao foi possivel carregar os perfis. Verifique se a API esta em execucao.'));
+      toastErrorRef.current(await getErrorMessage(err, 'Não foi possível carregar os perfis. Verifique se a API está em execução.'));
     } finally {
       setLoading(false);
     }
@@ -40,7 +40,7 @@ function UserProfilePage() {
       setItems(prev => [...prev, novoPerfil]);
       toastSuccess('Perfil criado com sucesso!');
     } catch (err) {
-      toastError(await getErrorMessage(err, 'Nao foi possivel criar o perfil.'));
+      toastError(await getErrorMessage(err, 'Não foi possível criar o perfil.'));
     }
   };
 
@@ -48,33 +48,33 @@ function UserProfilePage() {
     try {
       await remove(id);
       setItems(prev => prev.filter(p => p.id !== id));
-      toastSuccess('Perfil excluido com sucesso!');
+      toastSuccess('Perfil excluído com sucesso!');
     } catch (err) {
-      toastError(await getErrorMessage(err, 'Nao foi possivel excluir o perfil.'));
+      toastError(await getErrorMessage(err, 'Não foi possível excluir o perfil.'));
     }
   };
 
   const handleUploadResume = async (id, file) => {
     if (file.size > MAX_RESUME_FILE_SIZE_BYTES) {
-      toastError(`Arquivo muito grande. O tamanho maximo permitido é ${formatFileSize(MAX_RESUME_FILE_SIZE_BYTES)}.`);
+      toastError(`Arquivo muito grande. O tamanho máximo permitido é ${formatFileSize(MAX_RESUME_FILE_SIZE_BYTES)}.`);
       return;
     }
 
     try {
       const perfilAtualizado = await uploadResume(id, file);
       setItems(prev => prev.map(p => p.id === id ? perfilAtualizado : p));
-      toastSuccess('Curriculo enviado com sucesso!');
+      toastSuccess('Currículo enviado com sucesso!');
     } catch (err) {
-      toastError(await getErrorMessage(err, 'Erro ao enviar o curriculo.'));
+      toastError(await getErrorMessage(err, 'Erro ao enviar o currículo.'));
     }
   };
 
   return (
     <div className="p-6">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">Perfil de Usuario</h1>
+        <h1 className="text-2xl font-bold text-gray-800">Perfil de Usuário</h1>
         <p className="text-gray-500 text-sm mt-1">
-          Gerencie seu perfil e envie seu curriculo em PDF.
+          Gerencie seu perfil e envie seu currículo em PDF.
         </p>
       </div>
 

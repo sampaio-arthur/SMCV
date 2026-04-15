@@ -234,7 +234,7 @@ function ContactComponent({ items = [], campaigns = [], onCreate, onUpdate, onDe
                 <th className="px-4 py-3 text-left font-semibold text-gray-600">E-mail</th>
                 <th className="px-4 py-3 text-left font-semibold text-gray-600">Status do envio</th>
                 <th className="px-4 py-3 text-left font-semibold text-gray-600">Enviado em</th>
-                <th className="px-4 py-3 text-right font-semibold text-gray-600">Acoes</th>
+                <th className="px-4 py-3 text-right font-semibold text-gray-600">Ações</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -246,7 +246,7 @@ function ContactComponent({ items = [], campaigns = [], onCreate, onUpdate, onDe
                     <StatusBadge status={item.emailStatus} config={emailStatusConfig} />
                   </td>
                   <td className="px-4 py-3 text-gray-500">
-                    {item.emailSentAt ? formatDate(item.emailSentAt) : 'Nao enviado'}
+                    {item.emailSentAt ? formatDate(item.emailSentAt) : 'Não enviado'}
                   </td>
                   <td className="px-4 py-3 text-right">
                     <button
@@ -274,7 +274,7 @@ function ContactComponent({ items = [], campaigns = [], onCreate, onUpdate, onDe
       <ConfirmDialog
         {...dialogProps}
         title="Excluir contato"
-        message="Tem certeza que deseja excluir este contato? Esta acao nao pode ser desfeita."
+        message="Tem certeza que deseja excluir este contato? Esta ação não pode ser desfeita."
       />
     </div>
   );

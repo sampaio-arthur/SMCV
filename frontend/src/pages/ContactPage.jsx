@@ -27,7 +27,7 @@ function ContactPage() {
       const contacts = await getAllByCampaignId(campaignId);
       setItems(contacts);
     } catch (err) {
-      toastErrorRef.current(await getErrorMessage(err, 'Nao foi possivel carregar os contatos.'));
+      toastErrorRef.current(await getErrorMessage(err, 'Não foi possível carregar os contatos.'));
     } finally {
       setContactsLoading(false);
     }
@@ -46,7 +46,7 @@ function ContactPage() {
           setSelectedCampaignId(campaignList[0].id);
         }
       } catch (err) {
-        toastErrorRef.current(await getErrorMessage(err, 'Nao foi possivel carregar as campanhas. Verifique se a API esta em execucao.'));
+        toastErrorRef.current(await getErrorMessage(err, 'Não foi possível carregar as campanhas. Verifique se a API está em execução.'));
       } finally {
         setCampaignsLoading(false);
       }
@@ -76,7 +76,7 @@ function ContactPage() {
         setItems(prev => [...prev, novoContato]);
       }
     } catch (err) {
-      toastError(await getErrorMessage(err, 'Nao foi possivel criar o contato.'));
+      toastError(await getErrorMessage(err, 'Não foi possível criar o contato.'));
     }
   };
 
@@ -86,7 +86,7 @@ function ContactPage() {
       setItems(prev => prev.map(c => c.id === id ? contatoAtualizado : c));
       toastSuccess('Contato atualizado com sucesso!');
     } catch (err) {
-      toastError(await getErrorMessage(err, 'Nao foi possivel atualizar o contato.'));
+      toastError(await getErrorMessage(err, 'Não foi possível atualizar o contato.'));
     }
   };
 
@@ -94,9 +94,9 @@ function ContactPage() {
     try {
       await remove(id);
       setItems(prev => prev.filter(c => c.id !== id));
-      toastSuccess('Contato excluido com sucesso!');
+      toastSuccess('Contato excluído com sucesso!');
     } catch (err) {
-      toastError(await getErrorMessage(err, 'Nao foi possivel excluir o contato.'));
+      toastError(await getErrorMessage(err, 'Não foi possível excluir o contato.'));
     }
   };
 

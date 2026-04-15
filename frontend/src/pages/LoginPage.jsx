@@ -25,7 +25,7 @@ function LoginPage() {
         toast.success('Login realizado com sucesso!');
       }
     } catch (err) {
-      toast.error(await getErrorMessage(err, isRegister ? 'Erro ao criar conta.' : 'E-mail ou senha invalidos.'));
+      toast.error(await getErrorMessage(err, isRegister ? 'Erro ao criar conta.' : 'E-mail ou senha inválidos.'));
     } finally {
       setSubmitting(false);
     }
@@ -86,7 +86,7 @@ function LoginPage() {
         </form>
 
         <p className="text-sm text-gray-500 text-center mt-4">
-          {isRegister ? 'Ja tem conta?' : 'Nao tem conta?'}{' '}
+          {isRegister ? 'Já tem conta?' : 'Não tem conta?'}{' '}
           <button
             type="button"
             onClick={() => setIsRegister(!isRegister)}
