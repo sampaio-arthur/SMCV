@@ -4,7 +4,7 @@ using SMCV.Common.Exceptions;
 
 namespace SMCV.Features.Users.Commands.DeleteUser;
 
-public class DeleteUserCommandHandler : IRequestHandler<DeleteUserCommand>
+public class DeleteUserCommandHandler : IRequestHandler<DeleteUserCommand, bool>
 {
     private readonly IUserRepository _userRepository;
 
@@ -13,11 +13,12 @@ public class DeleteUserCommandHandler : IRequestHandler<DeleteUserCommand>
         _userRepository = userRepository;
     }
 
-    public async Task Handle(DeleteUserCommand request, CancellationToken cancellationToken)
+    public async Task<bool> Handle(DeleteUserCommand request, CancellationToken cancellationToken)
     {
         var user = await _userRepository.GetByIdAsync(request.Id)
             ?? throw new NotFoundException("User", request.Id);
 
         await _userRepository.DeleteAsync(user);
+        return true;
     }
 }

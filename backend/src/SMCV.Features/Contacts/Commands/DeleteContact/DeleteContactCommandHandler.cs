@@ -4,7 +4,7 @@ using SMCV.Common.Exceptions;
 
 namespace SMCV.Features.Contacts.Commands.DeleteContact;
 
-public class DeleteContactCommandHandler : IRequestHandler<DeleteContactCommand>
+public class DeleteContactCommandHandler : IRequestHandler<DeleteContactCommand, bool>
 {
     private readonly IContactRepository _contactRepository;
 
@@ -13,11 +13,12 @@ public class DeleteContactCommandHandler : IRequestHandler<DeleteContactCommand>
         _contactRepository = contactRepository;
     }
 
-    public async Task Handle(DeleteContactCommand request, CancellationToken cancellationToken)
+    public async Task<bool> Handle(DeleteContactCommand request, CancellationToken cancellationToken)
     {
         var contact = await _contactRepository.GetByIdAsync(request.Id)
             ?? throw new NotFoundException("Contact", request.Id);
 
         await _contactRepository.DeleteAsync(contact);
+        return true;
     }
 }
