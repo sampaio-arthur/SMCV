@@ -6,7 +6,7 @@ const navItems = [
   { to: '/campaign', label: 'Campanhas', icon: Megaphone },
   { to: '/contact', label: 'Contatos', icon: Users },
   { to: '/user', label: 'Usuários', icon: UserCircle },
-  { to: '/user-profile', label: 'Perfis', icon: Settings },
+  { to: '/user-profile', label: 'Currículo', icon: Settings },
 ];
 
 function MainLayout() {

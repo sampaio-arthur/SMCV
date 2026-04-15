@@ -24,7 +24,7 @@ function UserProfilePage() {
       setItems(profiles);
       setUsers(userList);
     } catch (err) {
-      toastErrorRef.current(await getErrorMessage(err, 'Não foi possível carregar os perfis. Verifique se a API está em execução.'));
+      toastErrorRef.current(await getErrorMessage(err, 'Não foi possível carregar os currículos. Verifique se a API está em execução.'));
     } finally {
       setLoading(false);
     }

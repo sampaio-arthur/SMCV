@@ -53,7 +53,7 @@ function UserProfileComponent({ items = [], users = [], onCreate, onDelete, onUp
       {/* List */}
       {items.length === 0 ? (
         <EmptyState
-          title="Nenhum perfil encontrado"
+          title="Nenhum currículo encontrado"
           description="Crie seu perfil para configurar o currículo."
           actionLabel="Criar Meu Perfil"
           onAction={handleCreate}
