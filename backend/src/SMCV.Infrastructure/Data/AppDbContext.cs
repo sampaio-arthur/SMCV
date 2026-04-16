@@ -8,7 +8,6 @@ public class AppDbContext : DbContext
 {
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
-    // ── DbSets (alfabético) ───────────────────────────────────────────
     public DbSet<Campaign> Campaigns { get; set; }
     public DbSet<Contact> Contacts { get; set; }
     public DbSet<EmailLog> EmailLogs { get; set; }
@@ -27,8 +26,9 @@ public class AppDbContext : DbContext
     }
 
     // ─── User ─────────────────────────────────────────────────────────
-    // Raiz do sistema. Possui um perfil (1:1) e várias campanhas (1:N).
-    // Id fornecido externamente (ValueGeneratedNever) — vem do Keycloak.
+    // Raiz do sistema. Autenticação local (PasswordHash).
+    // Possui um perfil (1:1) e várias campanhas (1:N).
+    // Id gerado no construtor via Guid.NewGuid() (ValueGeneratedNever).
     private static void ConfigureUser(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<User>(entity =>
